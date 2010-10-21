@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2009-2010  Geovise BVBA, QMINO BVBA
+  ~
+  ~ This file is part of GeoLatte Mapserver.
+  ~
+  ~ GeoLatte Mapserver is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ GeoLatte Mapserver is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<TileMap version="1.0.0" tilemapservice="http://tms.osgeo.org/1.0.0">
+    <Title>tms-vlaanderen</Title>
+    <Abstract></Abstract>
+    <SRS>EPSG:31370</SRS>
+    <BoundingBox minx="18000.0" miny="152999.75" maxx="259500.250" maxy="244500.0"/>
+    <Origin x="18000.0" y="152999.75"/>
+    <TileFormat width="256" height="256" mime-type="image/jpeg" extension="jpg"/>
+    <TileSets profile="raster">
+        <TileSet href="/tmp/tiles/orthos/0" units-per-pixel="1024.00000000000000" order="0"/>
+        <TileSet href="/tmp/tiles/orthos/1" units-per-pixel="512.00000000000000" order="1"/>
+        <TileSet href="/tmp/tiles/orthos/2" units-per-pixel="256.00000000000000" order="2"/>
+    </TileSets>
+</TileMap>
+	
