@@ -66,7 +66,7 @@ public class WMSCapabilities {
             return new String[]{OGCMIMETypes.CAPABILITIES};
 
         if (service.equals(WMS) && request.equals(WMS_GETMAP_REQUEST))
-            return new String[]{OGCMIMETypes.PNG};
+            return new String[]{OGCMIMETypes.PNG, OGCMIMETypes.JPEG};
 
         return new String[0];
     }
