@@ -46,8 +46,8 @@ public class TestWMSCapabilities {
     }
 
     @Test
-    public void test_only_png_output_supported_in_wms_getmap() {
-        assertArrayEquals(new String[]{"image/png"}, WMSCapabilities.getSupportedFormat("WMS", "GetMap"));
+    public void test_png_and_jpeg_output_supported_in_wms_getmap() {
+        assertArrayEquals(new String[]{"image/png", "image/jpeg"}, WMSCapabilities.getSupportedFormat("WMS", "GetMap"));
     }
 
     @Test
