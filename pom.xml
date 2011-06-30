@@ -67,6 +67,12 @@
             <version>1.0.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.jvnet.ogc</groupId>
+            <artifactId>wms-v_1_3_0-schema</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+
     </dependencies>
     <build>
         <finalName>jmapserv</finalName>
