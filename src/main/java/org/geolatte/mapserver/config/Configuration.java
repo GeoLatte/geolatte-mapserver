@@ -43,6 +43,8 @@ public class Configuration {
 
     private final static String PATH = "path";
 
+    private final static String SRS = "srs";
+
     private final static String SOURCE_FACTORY = "TileImageSourceFactory";
     private static final String DEFAULT_CONFIG_FILENAME
             = "mapserver-config.xml";
@@ -163,6 +165,14 @@ public class Configuration {
      */
     public String getPath(String tileMap) throws ConfigurationException {
         return getAttribute(tileMap, PATH);
+    }
+
+    public String[] getSupportedSRS(String tileMap) throws ConfigurationException {
+        String srsStr = getAttribute(tileMap, SRS);
+        if (srsStr == null) {
+            return new String[0];
+        }
+        return srsStr.split(" ");
     }
 
     /**

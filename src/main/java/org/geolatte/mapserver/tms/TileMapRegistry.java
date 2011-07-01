@@ -22,6 +22,7 @@ package org.geolatte.mapserver.tms;
 import org.apache.log4j.Logger;
 import org.geolatte.mapserver.config.Configuration;
 import org.geolatte.mapserver.config.ConfigurationException;
+import org.geolatte.mapserver.util.SRS;
 
 import java.util.*;
 
@@ -31,26 +32,57 @@ public class TileMapRegistry {
 
     private final Map<String, TileMap> tileMaps;
 
+    private final Map<String, List<SRS>> supportedSRSMap;
+
     public static TileMapRegistry configure(Configuration config) {
         Map<String, TileMap> map = new HashMap<String, TileMap>();
+        Map<String, List<SRS>> srsMap = new HashMap<String, List<SRS>>();
         for (String tilemap : config.getTileMaps()) {
-            addTilemap(map, tilemap, config);
+            addTilemap(map, srsMap, tilemap, config);
+
         }
-        return new TileMapRegistry(map);
+        return new TileMapRegistry(map, srsMap);
     }
 
-    private TileMapRegistry(Map<String, TileMap> map) {
+    private TileMapRegistry(Map<String, TileMap> map, Map<String,List<SRS>> srsMap) {
         this.tileMaps = Collections.unmodifiableMap(map);
+        this.supportedSRSMap = Collections.unmodifiableMap(srsMap);
     }
 
-    private static void addTilemap(Map<String, TileMap> map, String tileMapName, Configuration config) {
-        try {
-            TileMap tilemap = createTileMap(tileMapName, config);
-            map.put(tilemap.getTitle(), tilemap);
-        } catch (TileMapCreationException e) {
-            LOGGER.warn(String.format("Failed to instantiate TileMap \"%s\": %s", tileMapName, e.getMessage()));
-        }
-    }
+    private static void addTilemap(Map<String, TileMap> map, Map<String, List<SRS>> sRSMap, String tileMapName, Configuration config) {
+         try {
+             TileMap tilemap = createTileMap(tileMapName, config);
+             List<SRS> supportedSRSList = createSRSList(tileMapName, config);
+             map.put(tilemap.getTitle(), tilemap);
+             if (!supportedSRSList.isEmpty()) {
+                 sRSMap.put(tilemap.getTitle(), supportedSRSList);
+             }
+         } catch (TileMapCreationException e) {
+             LOGGER.warn(String.format("Failed to instantiate TileMap \"%s\": %s", tileMapName, e.getMessage()));
+         }
+     }
+
+     private static List<SRS> createSRSList(String tileMapName, Configuration config) {
+         List<SRS> result = new ArrayList<SRS>();
+         try {
+             String[] srsNames = config.getSupportedSRS(tileMapName);
+             addSRS(tileMapName, result, srsNames);
+         } catch (ConfigurationException e) {
+             LOGGER.warn(String.format("Failed to register additional SRS's for TileMap \"%s\": %s", tileMapName, e.getMessage()));
+         }
+         return result;
+     }
+
+     private static void addSRS(String tileMapName, List<SRS> result, String[] srsNames) {
+         for (String srs : srsNames) {
+             try{
+                 result.add(SRS.parse(srs));
+             }catch(IllegalArgumentException e) {
+                 LOGGER.warn(String.format("Failed to parse SRS string %s during configuring tilemap \"%s \": %s", srs, tileMapName, e.getMessage()));
+             }
+         }
+     }
+
 
     private static TileMap createTileMap(String tileMapName, Configuration config) throws TileMapCreationException {
         String sourceFactoryName = null;
@@ -100,5 +132,41 @@ public class TileMapRegistry {
 
     public TileMap getTileMap(String tileMapName) {
         return this.tileMaps.get(tileMapName);
+    }
+
+
+
+    /**
+     * Lists the SRS to which the images of the specified <code>TileMap</code> can be projected.
+     *
+     * @param tileMapName the <code>TileMap</code> name
+     * @return a list of <code>SRS</code>s to which projection is supported.
+     */
+    //TODO Does this need to move to TileMap?
+    public List<SRS> getSupportedSRS(String tileMapName) {
+        List<SRS> result = supportedSRSMap.get(tileMapName);
+        if (result == null) {
+            return new ArrayList();
+        } else {
+            return result;
+        }
+    }
+
+    /**
+     *  Checks whether the <code>TileMap</code> can be
+     *  projected to the target <code>SRS</code> are supported
+     *
+     * @param tileMapName the <code>TileMap</code> name
+     * @param srs the target <code>SRS</code>
+     * @return returns true if the <code>TileMap</code> supports the <code>SRS</code>.
+     */
+    public boolean supportsSRS(String tileMapName, SRS srs) {
+        if (getTileMap(tileMapName).getSRS().equals(srs)) {
+            return true;
+        }
+        List<SRS> supported = supportedSRSMap.get(tileMapName);
+        return supported == null ?
+                false :
+                supported.contains(srs);
     }
 }

@@ -57,11 +57,6 @@ public class TestWMSGetCapabilitiesResponse {
     public static void beforeClass() throws JAXBException, SAXException {
         context = JAXBContext.newInstance("net.opengis.wms.v_1_1_1");
         unmarshaller = context.createUnmarshaller();
-//        schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        //the com,mented code below doesn't seem to work for DTD's
-//        URL schemaURL = Thread.currentThread().getContextClassLoader().getResource("wms/1.1.1/WMS_MS_Capabilities.dtd");
-//        Schema schema = schemaFactory.newSchema(schemaURL);
-//        unmarshaller.setSchema(schema);
     }
 
     @Before
@@ -132,10 +127,12 @@ public class TestWMSGetCapabilitiesResponse {
         assertEquals("test title", titleNd.getText());
         verifyLayer(rootLayerNd, "basic");
         verifyLayer(rootLayerNd, "osm");
+        verifyLayer(rootLayerNd, "tms-vlaanderen");
         Element layerNode = (Element) rootLayerNd.selectSingleNode("Layer[Name='error']");
         assertNull("Erroneous Tilemaps should not be advertised", layerNode);
     }
 
+    //TOD) -- refactor to separate methods
     private void verifyLayer(Element rootLayerNd, String tileMap) {
         Element layerNode = (Element) rootLayerNd.selectSingleNode("Layer[Name='" + tileMap + "']");
         assertNotNull("No node for the basic layer", layerNode);
@@ -164,6 +161,12 @@ public class TestWMSGetCapabilitiesResponse {
             assertEquals("incorrect LatLonBB0X", "20037508.34", layerNode.selectSingleNode("BoundingBox/@maxx").getText());
             assertEquals("incorrect LatLonBB0X", "-20037508.34", layerNode.selectSingleNode("BoundingBox/@miny").getText());
             assertEquals("incorrect LatLonBB0X", "20037508.34", layerNode.selectSingleNode("BoundingBox/@maxy").getText());
+        } else if ("tms-vlaanderen".equals(name)) {
+            List list = layerNode.selectNodes("SRS");
+            assertEquals("Expected two SRS elements", 3, list.size());
+            assertEquals("incorrect 1e SRS", "EPSG:31370",((Node)list.get(0)).getText());
+            assertEquals("incorrect 2e SRS", "EPSG:25831",((Node)list.get(1)).getText());
+            assertEquals("incorrect 2e SRS", "EPSG:9100913",((Node)list.get(2)).getText());
         }
 
     }

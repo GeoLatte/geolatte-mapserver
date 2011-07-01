@@ -80,6 +80,7 @@
                     type="file"
                     TileImageSourceFactory="org.geolatte.mapserver.tms.FileTileImageSourceFactory"
                     path="/tmp/tiles/orthos/tilemapresource.xml"
+                    srs="25831 9100913"
                     />
 
 

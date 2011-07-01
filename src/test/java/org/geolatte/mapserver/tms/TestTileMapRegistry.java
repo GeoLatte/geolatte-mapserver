@@ -21,14 +21,14 @@ package org.geolatte.mapserver.tms;
 
 import org.geolatte.mapserver.config.Configuration;
 import org.geolatte.mapserver.config.ConfigurationException;
+import org.geolatte.mapserver.util.SRS;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class TestTileMapRegistry {
 
@@ -48,6 +48,25 @@ public class TestTileMapRegistry {
         expected.add("tms-vlaanderen");
         List<String> received = tileMaps.getTileMapNames();
         assertEquals(expected, received);
+    }
+
+    @Test
+    public void check_supported_srs() {
+        assertTrue(tileMaps.getSupportedSRS("basic").isEmpty());
+        List<SRS> expected = new ArrayList<SRS>();
+        expected.add(SRS.parse("EPSG:25831"));
+        expected.add(SRS.parse("EPSG:9100913"));
+        List<SRS> received = tileMaps.getSupportedSRS("tms-vlaanderen");
+        assertEquals(expected, received);
+    }
+
+    @Test
+    public void check_is_srs_supported() {
+        assertTrue(tileMaps.supportsSRS("tms-vlaanderen", SRS.parse("EPSG:31370")));
+        assertTrue(tileMaps.supportsSRS("tms-vlaanderen", SRS.parse("EPSG:9100913")));
+        assertTrue(tileMaps.supportsSRS("tms-vlaanderen", SRS.parse("EPSG:25831")));
+        assertFalse(tileMaps.supportsSRS("tms-vlaanderen", SRS.parse("EPSG:4326")));
+
     }
 
     @Test
