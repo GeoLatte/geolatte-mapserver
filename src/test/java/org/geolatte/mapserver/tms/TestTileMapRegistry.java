@@ -45,6 +45,7 @@ public class TestTileMapRegistry {
         List<String> expected = new ArrayList<String>();
         expected.add("basic");
         expected.add("osm");
+        expected.add("tms-vlaanderen");
         List<String> received = tileMaps.getTileMapNames();
         assertEquals(expected, received);
     }

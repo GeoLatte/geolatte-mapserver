@@ -21,6 +21,7 @@ package org.geolatte.mapserver.img;
 
 import org.geolatte.mapserver.tms.TileImage;
 import org.geolatte.mapserver.util.PixelRange;
+import org.geolatte.mapserver.util.SRS;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -136,4 +137,18 @@ public interface Imaging {
      *         as the first source.
      */
     public TileImage overlay(TileImage source1, TileImage source2);
+
+
+    /**
+     * Approximates a reprojection of the source <code>TileImage</code> from source to target <code>SRS</code>
+     * by warping (rubber-sheeting).
+     *
+     * @param source the source image
+     * @param sourceSRS the source <code>SRS</code>
+     * @param targetSRS the target <code>SRS</code>
+     * @param bbox the target boundingbox
+     * @param tolerance the tolerance for the approximation
+     * @return
+     */
+    public TileImage reprojectByWarping(TileImage source, SRS sourceSRS, SRS targetSRS, Rectangle bbox, double tolerance);
 }

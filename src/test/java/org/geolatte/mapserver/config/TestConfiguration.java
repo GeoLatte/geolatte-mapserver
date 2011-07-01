@@ -54,6 +54,7 @@ public class TestConfiguration {
         List<String> expected = new ArrayList<String>();
         expected.add("basic");
         expected.add("osm");
+        expected.add("orthos");
         expected.add("error");
         assertEquals(expected, tileMapNames);
 

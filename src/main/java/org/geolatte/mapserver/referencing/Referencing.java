@@ -19,14 +19,20 @@
 
 package org.geolatte.mapserver.referencing;
 
-import org.geotools.referencing.CRS;
 import org.geolatte.mapserver.util.BoundingBox;
 import org.geolatte.mapserver.util.SRS;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.operation.transform.WarpBuilder;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.MathTransform2D;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
 import org.opengis.referencing.operation.TransformException;
+
+import javax.media.jai.Warp;
+import java.awt.*;
 
 /**
  * Transforms bounding boxes to Lat/Lon
@@ -62,6 +68,7 @@ public class Referencing {
 
 
     private static CoordinateReferenceSystem GOOGLE_CRS;
+    private static final double TOLERANCE = 0.333d;
 
     static {
         try {
@@ -80,16 +87,19 @@ public class Referencing {
      * @return bounding box in Lat/Lon coordinates (EPSG:4326)
      */
     public static BoundingBox transformToLatLong(SRS srs, BoundingBox bbox) {
+        SRS target = SRS.parse("EPSG:4326");
+        MathTransform mtf = createMathTransform(srs, target);
+        return transform(mtf, bbox);
+    }
 
+    public static MathTransform createMathTransform(SRS srs, SRS target) {
         try {
             CoordinateReferenceSystem sourceCRS = create(srs);
-            CoordinateReferenceSystem targetCRS = create("EPSG:4326");
-            MathTransform mtf = CRS.findMathTransform(sourceCRS, targetCRS);
-            return transform(mtf, bbox);
-        } catch (FactoryException e) {
+            CoordinateReferenceSystem targetCRS = create(target);
+            return CRS.findMathTransform(sourceCRS, targetCRS);
+        }catch (FactoryException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private static BoundingBox transform(MathTransform transform, BoundingBox sourceBbox) {
@@ -118,5 +128,36 @@ public class Referencing {
 
     private static CoordinateReferenceSystem create(String srsString) throws FactoryException {
         return factory.createCoordinateReferenceSystem(srsString);
+    }
+
+    /**
+     * Derives an JAI Warp that approximates the transform from to Target SRS.
+     * @param sourceSRS
+     * @param targetSRS
+     * @param domain
+     * @param tolerance
+     * @return
+     * @throws ReferencingException
+     */
+    public static Warp createWarpApproximation(SRS sourceSRS, SRS targetSRS, Rectangle domain, double tolerance) throws ReferencingException {
+        MathTransform srcToTargetSRS = Referencing.createMathTransform(sourceSRS, targetSRS);
+        MathTransform targetToSrcSRS = null;
+        try {
+            targetToSrcSRS = srcToTargetSRS.inverse();
+        } catch (NoninvertibleTransformException e) {
+            throw new ReferencingException(e);
+        }
+
+        if (!(targetToSrcSRS instanceof MathTransform2D)) {
+            throw new ReferencingException("Require a 2D transformation");
+        }
+        //use the GeoTools WarpBuilder to build a good approximation
+        WarpBuilder warpBuilder = new WarpBuilder(tolerance);
+        try {
+            return warpBuilder.buildWarp((MathTransform2D)targetToSrcSRS, domain);
+        } catch (TransformException e) {
+            throw new ReferencingException(e);
+        }
+
     }
 }

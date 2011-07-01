@@ -76,7 +76,7 @@ public class TestWMSGetMapRequestHandler {
     @Test
     public void test_invalid_format() throws InvalidWMSRequestException {
         WMSRequest request = makeTestRequest();
-        request.set(WMSParam.FORMAT, "image/jpeg");
+        request.set(WMSParam.FORMAT, "image/bla");
         request.verify();
         OutputStream mock = mock(OutputStream.class);
         try {
