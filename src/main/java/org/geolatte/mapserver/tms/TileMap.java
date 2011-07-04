@@ -107,7 +107,7 @@ public class TileMap {
      */
     Tile makeTile(TileSet set, TileCoordinate tileCoordinate) {
         TileImageSource source = tileImageSourceFactory.create(set, tileCoordinate, tileFormat.extension);
-        return new Tile(source, tileCoordinate, set.getCoordinateSpaces());
+        return new Tile(source, tileCoordinate, set.getTileCoordinateSpace());
     }
 
     /**

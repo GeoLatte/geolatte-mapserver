@@ -19,6 +19,7 @@
 
 package org.geolatte.mapserver.img;
 
+import org.geolatte.mapserver.tms.MapUnitToPixelTransform;
 import org.geolatte.mapserver.tms.TileImage;
 import org.geolatte.mapserver.util.PixelRange;
 import org.geolatte.mapserver.util.SRS;
@@ -145,10 +146,11 @@ public interface Imaging {
      *
      * @param source the source image
      * @param sourceSRS the source <code>SRS</code>
+     * @param mupSrcTransform
      * @param targetSRS the target <code>SRS</code>
-     * @param bbox the target boundingbox
+     * @param mupTargetTransform
      * @param tolerance the tolerance for the approximation
      * @return
      */
-    public TileImage reprojectByWarping(TileImage source, SRS sourceSRS, SRS targetSRS, Rectangle bbox, double tolerance);
+    public TileImage reprojectByWarping(TileImage source, MapUnitToPixelTransform mupSrcTransform, SRS sourceSRS, SRS targetSRS,  MapUnitToPixelTransform mupTargetTransform, double tolerance);
 }

@@ -129,5 +129,15 @@ public class TestWMSGetMapRequestHandler {
         }
     }
 
+    @Test
+    public void test_supported_srs() throws WMSServiceException  {
+        WMSRequest request = makeTestRequest();
+        request.set(WMSParam.LAYERS, "tms-vlaanderen");
+        request.set(WMSParam.SRS, "25831");
+        request.verify();
+        OutputStream mock = mock(OutputStream.class);
+        handler.executeAndWriteTo(request, mock);
+    }
+
 
 }

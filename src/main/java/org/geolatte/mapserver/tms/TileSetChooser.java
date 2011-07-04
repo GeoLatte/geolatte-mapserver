@@ -62,6 +62,7 @@ public class TileSetChooser {
     }
 
     protected double determineRequestUnitsPerPixel() {
+
         double boxH = bbox.getHeight();
         double boxW = bbox.getWidth();
         double yRes = boxH / imageDimension.getHeight();

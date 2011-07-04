@@ -48,7 +48,7 @@ public class TestTileMap {
     @Test
     public void test_tile_width_and_height_in_map_units() {
         TileSet tileSet = tileMap.getTileSets().get(3);
-        TileSetCoordinateSpace cs = tileSet.getCoordinateSpaces();
+        TileSetCoordinateSpace cs = tileSet.getTileCoordinateSpace();
         double w = cs.tileWidthInMapUnits();
         assertEquals(22.5, w, 0.000005);
         double h = cs.tileHeightInMapUnits();

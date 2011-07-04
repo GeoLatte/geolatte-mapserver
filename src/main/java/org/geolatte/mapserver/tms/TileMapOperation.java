@@ -20,15 +20,14 @@
 package org.geolatte.mapserver.tms;
 
 /**
- * Represents an operation on a {@link TileMap} that produces
- * a {@link TileImage}.
+ * Represents an operation on a {@link TileMap}
  */
-public interface TileMapOperation {
+public interface TileMapOperation<R> {
 
     /**
      * Executes this operation
-     * @return  the <code>TileImage</code> that is the result of this operation
+     * @return   the result of this operation
      */
-    TileImage execute();
+    R execute();
 
 }

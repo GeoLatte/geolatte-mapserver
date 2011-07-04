@@ -90,7 +90,7 @@ public class WMSGetCapabilitiesResponse {
     }
 
     private static void addLatLonBoundingBox(org.geolatte.mapserver.util.SRS srs, Layer layer, org.geolatte.mapserver.util.BoundingBox bbox) {
-        org.geolatte.mapserver.util.BoundingBox llbox = Referencing.transformToLatLong(srs, bbox);
+        org.geolatte.mapserver.util.BoundingBox llbox = Referencing.transformToLatLong(bbox, srs);
         LatLonBoundingBox latLongBoundingBox = JAXB.instance().createLatLonBoundingBox();
         latLongBoundingBox.setMinx(toString(llbox.getMinX()));
         latLongBoundingBox.setMaxx(toString(llbox.getMaxX()));

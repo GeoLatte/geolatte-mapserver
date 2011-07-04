@@ -22,6 +22,7 @@ package org.geolatte.mapserver.img;
 import org.apache.log4j.Logger;
 import org.geolatte.mapserver.referencing.Referencing;
 import org.geolatte.mapserver.referencing.ReferencingException;
+import org.geolatte.mapserver.tms.MapUnitToPixelTransform;
 import org.geolatte.mapserver.tms.TileImage;
 import org.geolatte.mapserver.util.PixelRange;
 import org.geolatte.mapserver.util.SRS;
@@ -73,10 +74,10 @@ public class JAIImaging implements Imaging {
      * {@inheritDoc}
      */
     @Override
-    public TileImage reprojectByWarping(TileImage source, SRS sourceSRS, SRS targetSRS, Rectangle domain, double tolerance) {
+    public TileImage reprojectByWarping(TileImage source, MapUnitToPixelTransform mupSrcTransform, SRS sourceSRS, SRS targetSRS, MapUnitToPixelTransform mupTargetTransform, double tolerance) {
         try {
             //Derive the target-to-source transform
-            Warp warp = Referencing.createWarpApproximation(sourceSRS, targetSRS, domain, tolerance);
+            Warp warp = Referencing.createWarpApproximation(mupSrcTransform, sourceSRS, targetSRS, mupTargetTransform, tolerance);
 
             //do the warp
             PlanarImage img = (PlanarImage)source.getInternalRepresentation();
