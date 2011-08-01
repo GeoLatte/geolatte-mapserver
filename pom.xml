@@ -15,9 +15,16 @@
     <groupId>org.geolatte</groupId>
     <artifactId>mapserver</artifactId>
     <packaging>war</packaging>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
     <name>Geolatte Mapserver</name>
-    <url>http://www.jmapserv.org</url>
+    <url>http://www.geolatte.org</url>
+
+
+    <properties>
+        <gt-version>2.7.2</gt-version>
+    </properties>
+
+
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -54,17 +61,23 @@
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-referencing</artifactId>
-            <version>2.6.4</version>
+            <version>${gt-version}</version>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-hsql</artifactId>
-            <version>2.6.4</version>
+            <version>${gt-version}</version>
         </dependency>
         <dependency>
             <groupId>org.jvnet.ogc</groupId>
             <artifactId>wms-v_1_1_1-schema</artifactId>
             <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jvnet.ogc</groupId>
+            <artifactId>wms-v_1_3_0-schema</artifactId>
+            <version>1.0.3</version>
         </dependency>
 
     </dependencies>

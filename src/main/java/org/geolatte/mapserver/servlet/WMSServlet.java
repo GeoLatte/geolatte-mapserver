@@ -52,7 +52,7 @@ public class WMSServlet extends HttpServlet {
 
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        LOGGER.info("Request: " + request.toString());
+    LOGGER.info("Request: " + request.getQueryString());
         try {
             WMSRequest wmsRequest = WMSRequest.adapt(request);
             wmsService.handle(wmsRequest, response.getOutputStream());

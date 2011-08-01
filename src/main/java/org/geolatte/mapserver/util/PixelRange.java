@@ -130,4 +130,8 @@ public class PixelRange {
         result = 31 * result + minY;
         return result;
     }
+
+    public Rectangle toRect() {
+        return new Rectangle(this.minX, this.minY, getWidth(), getHeight());
+    }
 }

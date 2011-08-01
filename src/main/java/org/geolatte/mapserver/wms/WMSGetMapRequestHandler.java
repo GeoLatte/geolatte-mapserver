@@ -21,11 +21,9 @@ package org.geolatte.mapserver.wms;
 
 import org.apache.log4j.Logger;
 import org.geolatte.mapserver.img.JAIImaging;
-import org.geolatte.mapserver.tms.BoundingBoxOp;
-import org.geolatte.mapserver.tms.TileImage;
-import org.geolatte.mapserver.tms.TileMap;
-import org.geolatte.mapserver.tms.TileMapRegistry;
+import org.geolatte.mapserver.tms.*;
 import org.geolatte.mapserver.util.Chrono;
+import org.geolatte.mapserver.util.SRS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -51,14 +49,32 @@ public class WMSGetMapRequestHandler implements WMSRequestHandler {
         TileMap tileMap = getTileMapAndCheck(request);
         LOGGER.info("GetMap Request received: " + request.toString());
         try {
-            TileImage image = executeBoundingBoxOp(request, tileMap);
+            TileImage image = getMapImage(request, tileMap);
             chrono.reset();
             write(wmsRequest, out, image);
             LOGGER.debug("Wrote image to outputstream in " + chrono.stop() + " ms.");
-        } catch (Exception e) {
-            throw new WMSServiceException(e.getMessage());
+        } catch (Exception e) { //TODO: don't catch on class 'Exception'
+            throw new WMSServiceException(e.getMessage(),e);
         }
         LOGGER.info("Response in " + chrono.total() + " ms.");
+    }
+
+    private TileImage getMapImage(WMSGetMapRequest request, TileMap tileMap) throws WMSServiceException {
+
+        TileImage image = null;
+        if (tileMap.getSRS().equals(request.getSrs())) {
+            image = executeBoundingBoxOp(request, tileMap);
+        } else {
+            image =  executeBoundingBoxWithReprojectionOp(request, tileMap);
+        }
+
+        if (image == null) {
+            throw new WMSServiceException("Null-image received.");
+        } else {
+            return image;
+        }
+
+
     }
 
     private TileMap getTileMapAndCheck(WMSGetMapRequest request) throws WMSServiceException {
@@ -82,9 +98,9 @@ public class WMSGetMapRequestHandler implements WMSRequestHandler {
 
     private void checkSRS(WMSGetMapRequest request, WMSServiceExceptionList exceptionList, TileMap tileMap) {
         if (tileMap == null) return;
-        if (!tileMap.getSRS().equals(request.getSrs())) {
-            exceptionList.add(String.format("GetMap request specified SRS:%s, but %s supported",
-                    tileMap.getSRS(), request.getSrs()),
+        if (!isSupported(tileMap, request.getSrs())) {
+            exceptionList.add(String.format("GetMap request specified unsupported SRS: %s",
+                    request.getSrs()),
                     WMSServiceException.CODE.InvalidSRS);
         }
     }
@@ -98,6 +114,18 @@ public class WMSGetMapRequestHandler implements WMSRequestHandler {
         TileImage image = op.execute();
         LOGGER.debug("Created image.");
         return image;
+    }
+
+    private TileImage executeBoundingBoxWithReprojectionOp(WMSGetMapRequest request, TileMap tileMap) {
+        BoundingBoxProjectOp op = new BoundingBoxProjectOp(tileMap, request.getBbox(), request.getSrs(), request.getDimension(), new JAIImaging());
+        TileImage image = op.execute();
+        LOGGER.debug("Created image.");
+        return image;
+    }
+
+
+    private boolean isSupported(TileMap tileMap, SRS srs) {
+        return this.tileMapRegistry.supportsSRS(tileMap.getTitle(), srs);
     }
 
 

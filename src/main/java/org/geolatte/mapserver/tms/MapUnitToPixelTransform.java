@@ -24,6 +24,8 @@ import org.geolatte.mapserver.util.Pixel;
 import org.geolatte.mapserver.util.PixelRange;
 import org.geolatte.mapserver.util.Point;
 
+import java.awt.geom.AffineTransform;
+
 /**
  * Transforms between coordinates in map units and pixel-coordinates.
  * <p/>
@@ -77,6 +79,24 @@ public class MapUnitToPixelTransform {
      */
     public MapUnitToPixelTransform(BoundingBox extent, double mapUnitsPerPixel) {
         this(extent, 0, 0, mapUnitsPerPixel);
+    }
+
+    /**
+     * Returns the range of the transform.
+     *
+     * @return
+     */
+    public PixelRange getRange(){
+        return this.pixelRange;
+    }
+
+    /**
+     * Returns the domain of the transform.
+     *
+     * @return
+     */
+    public BoundingBox getDomain(){
+        return this.extent;
     }
 
     /**
@@ -150,5 +170,17 @@ public class MapUnitToPixelTransform {
         int width = lrPx.x - ulPx.x + 1;
         int height = lrPx.y - ulPx.y + 1;
         return new PixelRange(minX, minY, width, height);
+    }
+
+    //TODO add unit tests
+    //TODO -- refactor to remove code duplication with toPixel
+    public AffineTransform toAffineTransform() {
+        double m00 = 1.0/mapUnitsPerPixelX;
+        double m01 = 0;
+        double m02 = pixelRange.getMinX() - extent.getMinX()/mapUnitsPerPixelX;
+        double m10 = 0;
+        double m11 = -1.0/mapUnitsPerPixelY;
+        double m12 = pixelRange.getMinY() + extent.getMaxY()/mapUnitsPerPixelY;
+        return new AffineTransform(m00, m10, m01, m11, m02, m12);
     }
 }

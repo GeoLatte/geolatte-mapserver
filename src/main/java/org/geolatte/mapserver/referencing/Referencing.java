@@ -19,14 +19,22 @@
 
 package org.geolatte.mapserver.referencing;
 
-import org.geotools.referencing.CRS;
+import org.geolatte.mapserver.tms.MapUnitToPixelTransform;
 import org.geolatte.mapserver.util.BoundingBox;
 import org.geolatte.mapserver.util.SRS;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.ReferencingFactoryFinder;
+import org.geotools.referencing.operation.transform.AffineTransform2D;
+import org.geotools.referencing.operation.transform.WarpBuilder;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.*;
+import org.opengis.referencing.operation.NoninvertibleTransformException;
+
+import javax.media.jai.Warp;
+import java.awt.*;
+import java.awt.geom.*;
 
 /**
  * Transforms bounding boxes to Lat/Lon
@@ -62,6 +70,7 @@ public class Referencing {
 
 
     private static CoordinateReferenceSystem GOOGLE_CRS;
+    private static final double TOLERANCE = 0.333d;
 
     static {
         try {
@@ -79,32 +88,66 @@ public class Referencing {
      * @param bbox bounding box to transform
      * @return bounding box in Lat/Lon coordinates (EPSG:4326)
      */
-    public static BoundingBox transformToLatLong(SRS srs, BoundingBox bbox) {
+    public static BoundingBox transformToLatLong(BoundingBox bbox, SRS srs) {
+        SRS target = SRS.parse("EPSG:4326");
+        return transform(bbox, srs, target);
+    }
 
+
+    public static BoundingBox transform(BoundingBox bbox, SRS srcSRS, SRS targetSRS) {
+        MathTransform mtf = createMathTransform(srcSRS, targetSRS);
+        return transform(mtf, bbox);
+    }
+
+    public static MathTransform createMathTransform(SRS srs, SRS target) {
         try {
             CoordinateReferenceSystem sourceCRS = create(srs);
-            CoordinateReferenceSystem targetCRS = create("EPSG:4326");
-            MathTransform mtf = CRS.findMathTransform(sourceCRS, targetCRS);
-            return transform(mtf, bbox);
-        } catch (FactoryException e) {
+            CoordinateReferenceSystem targetCRS = create(target);
+            return CRS.findMathTransform(sourceCRS, targetCRS);
+        }catch (FactoryException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private static BoundingBox transform(MathTransform transform, BoundingBox sourceBbox) {
-        double[] source = new double[4];
-        double[] target = new double[4];
+        double[] source = new double[8];
+        double[] target = new double[8];
         try {
-            source[0] = sourceBbox.getMinX();
-            source[1] = sourceBbox.getMinY();
-            source[2] = sourceBbox.getMaxX();
-            source[3] = sourceBbox.getMaxY();
-            transform.transform(source, 0, target, 0, 2);
-            return new BoundingBox(target[0], target[1], target[2], target[3]);
+            source[0] = sourceBbox.upperLeft().x;
+            source[1] = sourceBbox.upperLeft().y;
+            source[2] = sourceBbox.lowerLeft().x;
+            source[3] = sourceBbox.lowerLeft().y;
+            source[4] = sourceBbox.upperRight().x;
+            source[5] = sourceBbox.upperRight().y;
+            source[6] = sourceBbox.lowerRight().x;
+            source[7] = sourceBbox.lowerRight().y;
+
+            transform.transform(source, 0, target, 0, 4);
+            return new BoundingBox(
+                    getMin(target[0], target[2], target[4], target[6]),
+                    getMin(target[1], target[3], target[5], target[7]),
+                    getMax(target[0], target[2], target[4], target[6]),
+                    getMax(target[1], target[3], target[5], target[7])
+                    );
         } catch (TransformException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static double getMin(double... v) {
+        double min = Double.POSITIVE_INFINITY;
+        for (double c : v){
+              min = Math.min(min, c);
+        }
+        return min;
+    }
+
+    private static double getMax(double... v) {
+        double max = Double.NEGATIVE_INFINITY;
+        for (double c : v){
+              max = Math.max(max, c);
+        }
+        return max;
     }
 
 
@@ -119,4 +162,49 @@ public class Referencing {
     private static CoordinateReferenceSystem create(String srsString) throws FactoryException {
         return factory.createCoordinateReferenceSystem(srsString);
     }
+
+    /**
+     * Derives an JAI Warp that approximates the transform from to Target SRS.
+     *
+     * @param mupSrcTransform
+     * @param sourceSRS
+     * @param targetSRS
+     * @param mupTargetTransform
+     * @param tolerance
+     * @return
+     * @throws ReferencingException
+     */
+    public static Warp createWarpApproximation(MapUnitToPixelTransform mupSrcTransform, SRS sourceSRS, SRS targetSRS, MapUnitToPixelTransform mupTargetTransform, double tolerance) throws ReferencingException {
+
+        MathTransformFactory mtFactory = ReferencingFactoryFinder.getMathTransformFactory(null);
+
+        MathTransform srcToTargetSRS = Referencing.createMathTransform(sourceSRS, targetSRS);
+        MathTransform targetToSrc = null;
+        try {
+            AffineTransform pixelToMapUnitTransform = mupSrcTransform.toAffineTransform().createInverse();
+            AffineTransform targetM2P = mupTargetTransform.toAffineTransform();
+            MathTransform srcToTarget = mtFactory.createConcatenatedTransform(new AffineTransform2D(pixelToMapUnitTransform), srcToTargetSRS);
+            srcToTarget = mtFactory.createConcatenatedTransform(srcToTarget, new AffineTransform2D(targetM2P));
+            targetToSrc = srcToTarget.inverse();
+        } catch (java.awt.geom.NoninvertibleTransformException e) {
+            throw new ReferencingException("Can't inverse MapUnitToPixel transform.", e);
+        } catch (FactoryException e) {
+             throw new ReferencingException(e);
+        } catch (NoninvertibleTransformException e) {
+            throw new ReferencingException(e);
+        }
+
+        if (!(targetToSrc instanceof MathTransform2D)) {
+            throw new ReferencingException("Require a 2D transformation");
+        }
+        //use the GeoTools WarpBuilder to build a good approximation
+        WarpBuilder warpBuilder = new WarpBuilder(tolerance);
+        try {
+            return warpBuilder.buildWarp((MathTransform2D)targetToSrc, mupTargetTransform.getRange().toRect());
+        } catch (TransformException e) {
+            throw new ReferencingException(e);
+        }
+
+    }
+
 }

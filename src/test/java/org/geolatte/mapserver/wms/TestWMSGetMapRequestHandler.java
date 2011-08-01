@@ -76,7 +76,7 @@ public class TestWMSGetMapRequestHandler {
     @Test
     public void test_invalid_format() throws InvalidWMSRequestException {
         WMSRequest request = makeTestRequest();
-        request.set(WMSParam.FORMAT, "image/jpeg");
+        request.set(WMSParam.FORMAT, "image/bla");
         request.verify();
         OutputStream mock = mock(OutputStream.class);
         try {
@@ -127,6 +127,17 @@ public class TestWMSGetMapRequestHandler {
         } catch (WMSServiceException se) {
             assertTrue(se.getCodes().contains("LayerNotDefined"));
         }
+    }
+
+    @Test
+    public void test_supported_srs() throws WMSServiceException  {
+        WMSRequest request = makeTestRequest();
+        request.set(WMSParam.LAYERS, "tms-vlaanderen");
+        request.set(WMSParam.SRS, "25831");
+        request.set(WMSParam.BBOX, "635500, 5683000, 635600, 5683100");
+        request.verify();
+        OutputStream mock = mock(OutputStream.class);
+        handler.executeAndWriteTo(request, mock);
     }
 
 

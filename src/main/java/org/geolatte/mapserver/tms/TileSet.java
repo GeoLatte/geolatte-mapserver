@@ -62,7 +62,7 @@ class TileSet {
      *
      * @return this <code>TileSet</code>'s <code>TileSetCoordinateSpace</code>.
      */
-    public TileSetCoordinateSpace getCoordinateSpaces() {
+    public TileSetCoordinateSpace getTileCoordinateSpace() {
         return tileSetCoordinateSpace;
     }
 

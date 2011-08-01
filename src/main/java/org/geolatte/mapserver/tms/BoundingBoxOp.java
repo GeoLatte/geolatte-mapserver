@@ -50,11 +50,9 @@ import java.util.concurrent.Future;
  *
  * @author Karel Maesen, Geovise BVBA
  */
-public class BoundingBoxOp implements TileMapOperation {
+public class BoundingBoxOp implements TileMapOperation<TileImage> {
 
     private final static Logger LOGGER = Logger.getLogger(BoundingBoxOp.class);
-
-    private final static TileReadExecutor READ_EXECUTOR = new TileReadExecutor();
 
     final private BoundingBox requestedBbox;
     final private Dimension dimension;
@@ -118,24 +116,9 @@ public class BoundingBoxOp implements TileMapOperation {
         tiles = tileMap.getTilesFor(tileSet, TileSetClippedBbox);
     }
 
-    private void loadTileImages() {
-        List<Future<TileImage>> results = new ArrayList<Future<TileImage>>();
-        LOGGER.debug("Start loading " + tiles.size() + " tiles.");
-        for (Tile tile : tiles) {
-            TileImageReaderTask readerTask = new TileImageReaderTask(tile, imaging);
-            Future<TileImage> future = READ_EXECUTOR.submit(readerTask);
-            results.add(future);
-        }
-
-        for (Future<TileImage> result : results) {
-            try {
-                images.add(result.get());
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e.getCause());
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e.getCause());
-            }
-        }
+    protected void loadTileImages() {
+        TileImageLoadOp loadOp = new TileImageLoadOp(this.tiles, this.imaging);
+        images = loadOp.execute();
         LOGGER.debug("Image loading took " + chrono.stop() + " ms.");
     }
 

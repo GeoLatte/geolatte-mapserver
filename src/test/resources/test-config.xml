@@ -75,6 +75,14 @@
                     path="/tmp/tiles/tilemapresource.xml"
                     />
 
+            <TileMap
+                    title="orthos"
+                    type="file"
+                    TileImageSourceFactory="org.geolatte.mapserver.tms.FileTileImageSourceFactory"
+                    path="/tmp/tiles/orthos/tilemapresource.xml"
+                    srs="25831 9100913"
+                    />
+
 
             <TileMap
                     title="error"
