@@ -54,7 +54,7 @@ public class WMSGetMapRequestHandler implements WMSRequestHandler {
             write(wmsRequest, out, image);
             LOGGER.debug("Wrote image to outputstream in " + chrono.stop() + " ms.");
         } catch (Exception e) { //TODO: don't catch on class 'Exception'
-            throw new WMSServiceException(e.getMessage());
+            throw new WMSServiceException(e.getMessage(),e);
         }
         LOGGER.info("Response in " + chrono.total() + " ms.");
     }

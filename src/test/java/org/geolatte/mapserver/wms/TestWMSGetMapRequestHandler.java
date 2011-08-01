@@ -134,6 +134,7 @@ public class TestWMSGetMapRequestHandler {
         WMSRequest request = makeTestRequest();
         request.set(WMSParam.LAYERS, "tms-vlaanderen");
         request.set(WMSParam.SRS, "25831");
+        request.set(WMSParam.BBOX, "635500, 5683000, 635600, 5683100");
         request.verify();
         OutputStream mock = mock(OutputStream.class);
         handler.executeAndWriteTo(request, mock);
