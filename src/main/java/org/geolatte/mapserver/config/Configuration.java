@@ -45,10 +45,12 @@ public class Configuration {
 
     private final static String SRS = "srs";
 
+    private final static String FORCE_ARGB = "forceArgb";
+
     private final static String SOURCE_FACTORY = "TileImageSourceFactory";
-    private static final String DEFAULT_CONFIG_FILENAME
-            = "mapserver-config.xml";
-    private static final String CONFIG_PATH_PROPERTY_NAME = "mapserver-configuration";
+    private final static String BOUNDING_BOX_OP_FACTORY = "BoundingBoxOpFactory";
+    private static final String DEFAULT_CONFIG_FILENAME = "mapserver-config.xml";
+    public static final String CONFIG_PATH_PROPERTY_NAME = "mapserver-configuration";
 
 
     private final Document configDoc;
@@ -188,6 +190,46 @@ public class Configuration {
     }
 
     /**
+     * Returns the <code>BoundingBoxOpFactory</code> to be
+     * used for this </code>TileMap</code>.
+     *
+     * @param tileMapName
+     * @return the fully-qualified class name of the </code>BoundingBoxOpFactory</code>
+     *          or null, when no </code>BoundingBoxOpFactory</code> is specified
+     */
+    public String getBoundingBoxOpFactoryClass(String tileMapName) {
+        String result = null;
+        try {
+            result = getAttribute(tileMapName, BOUNDING_BOX_OP_FACTORY);
+        } catch (ConfigurationException e) {
+            //BoundingBoxOpFactory not specified
+        }
+        return result;
+    }
+
+    /**
+     * Returns whether this </code>TileMap</code> is configured to force the conversion of tiles to ARGB.
+     * This may incur a performance hit, but is required when using tiles with different bit depth.
+     * Tiles of different bit depth cannot be mosaiced by JAI.
+     *
+     * @param tileMapName
+     * @return true if forceArgb is enabled in the configuration
+     */
+    public boolean isForceArgb(String tileMapName) {
+        String attribute = null;
+        try {
+            attribute = getAttribute(tileMapName, FORCE_ARGB);
+        } catch (ConfigurationException e) {
+            //ForceArgb not specified
+            return false;
+        }
+        if(attribute.toLowerCase().equals("true"))
+            return true;
+        else
+            return false;
+    }
+
+    /**
      * Returns the title to be used in the Capabilities
      * document for this WMS Service.
      *
@@ -247,7 +289,7 @@ public class Configuration {
     private String getAttribute(String tileMapName, String attribute) throws ConfigurationException {
         Attribute attr = (Attribute) configDoc.selectSingleNode("//TileMap[@title='" + tileMapName + "']/@" + attribute);
         if (attr == null) {
-            throw new ConfigurationException(String.format("Configuration fo TileMap \"%s\" has no %s attribute.", tileMapName, attribute));
+            throw new ConfigurationException(String.format("Configuration for TileMap \"%s\" has no %s attribute.", tileMapName, attribute));
         }
         return attr.getValue();
     }

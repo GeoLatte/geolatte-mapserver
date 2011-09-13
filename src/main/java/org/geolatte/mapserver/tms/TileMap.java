@@ -23,6 +23,8 @@ import org.geolatte.mapserver.img.ImageFormat;
 import org.geolatte.mapserver.util.BoundingBox;
 import org.geolatte.mapserver.util.Point;
 import org.geolatte.mapserver.util.SRS;
+import org.geolatte.mapserver.wms.BoundingBoxOpFactory;
+import org.geolatte.mapserver.wms.DefaultBoundingBoxOpFactory;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -46,6 +48,8 @@ public class TileMap {
     private final List<TileSet> tileSets;
 
     private TileImageSourceFactory tileImageSourceFactory = new URLTileImageSourceFactory();
+    private BoundingBoxOpFactory boundingBoxOpFactory = new DefaultBoundingBoxOpFactory();
+    private boolean forceArgb;
 
     protected TileMap(String serviceURL, String title, SRS srs, BoundingBox bbox,
                       Point origin, TileFormat tileFormat,
@@ -61,6 +65,13 @@ public class TileMap {
 
     void setTileImageSourceFactory(TileImageSourceFactory factory) {
         this.tileImageSourceFactory = factory;
+    }
+
+    public BoundingBoxOpFactory getBoundingBoxOpFactory() {
+        return boundingBoxOpFactory;
+    }
+    public void setBoundingBoxOpFactory(BoundingBoxOpFactory boundingBoxOpFactory) {
+        this.boundingBoxOpFactory = boundingBoxOpFactory;
     }
 
     /**
@@ -181,5 +192,13 @@ public class TileMap {
      */
     public BoundingBox clipToMaxBoundingBox(BoundingBox bbox) {
         return getBoundingBox().intersect(bbox);
+    }
+
+    public boolean isForceArgb() {
+        return forceArgb;
+    }
+
+    public void setForceArgb(boolean forceArgb) {
+        this.forceArgb = forceArgb;
     }
 }
