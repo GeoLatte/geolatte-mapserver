@@ -46,6 +46,7 @@ public class LookUpTranscoders {
 
         ImageInputStream in = null;
         ImageOutputStream on = null;
+        String pngOutputFileName = "/tmp/test1-out.png";
         try {
             Iterator<ImageWriter> pngWriters = getImageWritersByFormatName("PNG");
             ImageWriter pngWriter = (ImageWriter) pngWriters.next();
@@ -68,7 +69,7 @@ public class LookUpTranscoders {
 //            param.setDestinationType(destType);
 //            param.setDestinationBands(new int[]{0,1,2});
             BufferedImage inImage = jpegReader.read(0, null);
-            on = ImageIO.createImageOutputStream(new File("/tmp/test1-out.png"));
+            on = ImageIO.createImageOutputStream(new File(pngOutputFileName));
             pngWriter.setOutput(on);
             pngWriter.write(inImage);
 
@@ -88,8 +89,8 @@ public class LookUpTranscoders {
             ImageReader pngReader = (ImageReader) pngReaders.next();
 
 
-            File is = new File("/tmp/partially-exceeds-execute.png");
-            if (is == null) throw new IllegalStateException("Can't locate png");
+            File is = new File(pngOutputFileName);
+            if (!is.exists()) throw new IllegalStateException("Can't locate png");
             in = ImageIO.createImageInputStream(is);
             pngReader.setInput(in);
 
