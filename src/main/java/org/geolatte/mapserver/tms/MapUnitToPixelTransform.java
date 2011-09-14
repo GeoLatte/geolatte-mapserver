@@ -152,8 +152,8 @@ public class MapUnitToPixelTransform {
         double yOffset = (extent.getMaxY() - point.y);
         double x = this.pixelRange.getMinX() + xOffset / mapUnitsPerPixelX;
         double y = this.pixelRange.getMinY() + yOffset / mapUnitsPerPixelY;
-        int xPix = (x == Math.floor(x) && leftBorderInclusive) ? (int) (x - 1) : (int) Math.floor(x);
-        int yPix = (y == Math.floor(y) && lowerBorderInclusive) ? (int) (y - 1) : (int) Math.floor(y);
+        int xPix = (leftBorderInclusive && x == Math.floor(x)) ? (int) (x - 1) : (int) x;
+        int yPix = (lowerBorderInclusive && y == Math.floor(y)) ? (int) (y - 1) : (int) y;
         return new Pixel(xPix, yPix);
     }
 
