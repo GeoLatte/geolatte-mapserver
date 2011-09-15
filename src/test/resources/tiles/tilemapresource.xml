@@ -26,7 +26,7 @@
     <Abstract></Abstract>
     <SRS>EPSG:900913</SRS>
     <BoundingBox minx="-20037508.340000" miny="-20037508.340000" maxx="20037508.340000" maxy="20037508.340000"/>
-    <Origin x="-20037508.340000" y="-20037508.340000"/>
+    <Origin x="-20037508.340000" y="20037508.340000"/>
     <TileFormat width="256" height="256" mime-type="image/png" extension="png"/>
     <TileSets>
 
