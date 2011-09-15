@@ -45,7 +45,7 @@
                     type="file"
                     TileImageSourceFactory="org.geolatte.mapserver.tms.FileTileImageSourceFactory"
                     path="src/test/resources/tiles/tilemapresource.xml"
-                    srs="25831 9100913 4326"
+                    srs="25831 900913 4326"
                     />
 
         </TileMaps>

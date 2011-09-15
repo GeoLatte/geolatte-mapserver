@@ -85,7 +85,7 @@ public class TestConfiguration {
         assertEquals(expected, config.getPath("basic"));
 
 
-        expected = "/tmp/tiles/tilemapresource.xml";
+        expected = "src/test/resources/tiles/tilemapresource.xml";
         assertEquals(expected, config.getPath("osm"));
 
         try {
