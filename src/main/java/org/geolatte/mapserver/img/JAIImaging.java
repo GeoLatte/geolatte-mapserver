@@ -163,8 +163,13 @@ public class JAIImaging implements Imaging {
     @Override
     public TileImage read(InputStream is, int x, int y) throws IOException {
         BufferedImage bi = ImageIO.read(is);
-        RenderedOp op = TranslateDescriptor.create(bi, (float) x, (float) y, null, null);
+
+        BufferedImage rgbImage = new BufferedImage( bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_RGB);
+        rgbImage.createGraphics().drawImage( bi, 0, 0, Color.BLACK, null);
+
+        RenderedOp op = TranslateDescriptor.create(rgbImage, (float) x, (float) y, null, null);
         PlanarImage image = op.createInstance();
+
         return new JAITileImage(image);
     }
 
