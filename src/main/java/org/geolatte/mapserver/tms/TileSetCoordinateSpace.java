@@ -47,8 +47,8 @@ public class TileSetCoordinateSpace {
         double width = tileDimension.getWidth() * unitsPerPixel;
         double height = tileDimension.getHeight() * unitsPerPixel;
         double x = origin.x + (coordinate.i * width);
-        double y = origin.y - (coordinate.j * height);
-        BoundingBox result = new BoundingBox(x, y - height, x + width, y);
+        double y = origin.y + (coordinate.j * height);
+        BoundingBox result = new BoundingBox(x, y, x + width, y + height);
 //        if (!result.isWithin(extent))
 //            throw new IllegalArgumentException("Specified TileCoordinate falls outside of TileSet extent.");
         return result;
@@ -94,7 +94,7 @@ public class TileSetCoordinateSpace {
         int j = (int) (y / height);
         if (!lowerLeftInclusive && (x % width == 0)) i -= 1;
         if (!lowerLeftInclusive && (y % width == 0)) j -= 1;
-        return new TileCoordinate(i, -j);
+        return new TileCoordinate(i, j);
     }
 
     public double unitsPerPixel() {
