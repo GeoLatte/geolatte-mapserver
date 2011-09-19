@@ -27,6 +27,7 @@ import org.dom4j.io.SAXReader;
 import org.geolatte.mapserver.util.BoundingBox;
 import org.geolatte.mapserver.util.Point;
 import org.geolatte.mapserver.util.SRS;
+import org.geolatte.mapserver.wms.BoundingBoxOpFactory;
 
 import java.awt.*;
 import java.io.File;
@@ -82,6 +83,12 @@ public class TileMapBuilder {
     public TileMap buildTileMap(TileImageSourceFactory factory) {
         TileMap tileMap = buildTileMap();
         tileMap.setTileImageSourceFactory(factory);
+        return tileMap;
+    }
+
+    public TileMap buildTileMap(TileImageSourceFactory tileImageSourceFactory, BoundingBoxOpFactory boundingBoxOpFactory) {
+        TileMap tileMap = buildTileMap(tileImageSourceFactory);
+        tileMap.setBoundingBoxOpFactory(boundingBoxOpFactory);
         return tileMap;
     }
 
@@ -174,4 +181,5 @@ public class TileMapBuilder {
     protected Document getMetadataAsXML() {
         return xmlDoc;
     }
+
 }

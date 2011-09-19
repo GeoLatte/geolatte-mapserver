@@ -15,7 +15,7 @@ import java.util.Set;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 7/1/11
  */
-public class BoundingBoxProjectOp implements TileMapOperation{
+public class BoundingBoxProjectOp implements TileMapOperation<TileImage> {
 
     private final static Logger LOGGER = Logger.getLogger(BoundingBoxProjectOp.class);
 

@@ -60,11 +60,11 @@
     <!-- these are the producer services -->
     <Producers>
         <TileMaps>
-
             <TileMap
                     title="basic"
                     type="url"
                     TileImageSourceFactory="org.geolatte.mapserver.tms.URLTileImageSourceFactory"
+                    BoundingBoxOpFactory="org.geolatte.mapserver.wms.DefaultBoundingBoxOpFactory"
                     path="http://localhost/cgi-bin/tilecache.cgi/1.0.0/basic/"
                     />
 

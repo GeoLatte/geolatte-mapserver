@@ -120,6 +120,15 @@ public class TestConfiguration {
     }
 
     @Test
+    public void test_get_boundingbox_op_factory_for_tilemap() throws Exception {
+        String expected = "org.geolatte.mapserver.wms.DefaultBoundingBoxOpFactory";
+        assertEquals(expected, config.getBoundingBoxOpFactoryClass("basic"));
+
+        expected = null;
+        assertEquals(expected, config.getBoundingBoxOpFactoryClass("osm"));
+    }
+
+    @Test
     public void test_get_wms_service_elements() {
         assertEquals("incorrect title read", "test title", config.getWMSServiceTitle());
         assertEquals("incorrect title read", "test abstract", config.getWMSServiceAbstract());

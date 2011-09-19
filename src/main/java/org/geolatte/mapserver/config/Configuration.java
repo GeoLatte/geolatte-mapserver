@@ -46,6 +46,7 @@ public class Configuration {
     private final static String SRS = "srs";
 
     private final static String SOURCE_FACTORY = "TileImageSourceFactory";
+    private final static String BOUNDING_BOX_OP_FACTORY = "BoundingBoxOpFactory";
     private static final String DEFAULT_CONFIG_FILENAME
             = "mapserver-config.xml";
     private static final String CONFIG_PATH_PROPERTY_NAME = "mapserver-configuration";
@@ -188,6 +189,24 @@ public class Configuration {
     }
 
     /**
+     * Returns the <code>BoundingBoxOpFactory</code> to be
+     * used for this </code>TileMap</code>.
+     *
+     * @param tileMapName
+     * @return the fully-qualified class name of the </code>BoundingBoxOpFactory</code>
+     *          or null, when no </code>BoundingBoxOpFactory</code> is specified
+     */
+    public String getBoundingBoxOpFactoryClass(String tileMapName) {
+        String result = null;
+        try {
+            result = getAttribute(tileMapName, BOUNDING_BOX_OP_FACTORY);
+        } catch (ConfigurationException e) {
+            //BoundingBoxOpFactory not specified
+        }
+        return result;
+    }
+
+    /**
      * Returns the title to be used in the Capabilities
      * document for this WMS Service.
      *
@@ -247,7 +266,7 @@ public class Configuration {
     private String getAttribute(String tileMapName, String attribute) throws ConfigurationException {
         Attribute attr = (Attribute) configDoc.selectSingleNode("//TileMap[@title='" + tileMapName + "']/@" + attribute);
         if (attr == null) {
-            throw new ConfigurationException(String.format("Configuration fo TileMap \"%s\" has no %s attribute.", tileMapName, attribute));
+            throw new ConfigurationException(String.format("Configuration for TileMap \"%s\" has no %s attribute.", tileMapName, attribute));
         }
         return attr.getValue();
     }
