@@ -49,6 +49,7 @@ public class TileMap {
 
     private TileImageSourceFactory tileImageSourceFactory = new URLTileImageSourceFactory();
     private BoundingBoxOpFactory boundingBoxOpFactory = new DefaultBoundingBoxOpFactory();
+    private boolean forceArgb;
 
     protected TileMap(String serviceURL, String title, SRS srs, BoundingBox bbox,
                       Point origin, TileFormat tileFormat,
@@ -193,4 +194,11 @@ public class TileMap {
         return getBoundingBox().intersect(bbox);
     }
 
+    public boolean isForceArgb() {
+        return forceArgb;
+    }
+
+    public void setForceArgb(boolean forceArgb) {
+        this.forceArgb = forceArgb;
+    }
 }

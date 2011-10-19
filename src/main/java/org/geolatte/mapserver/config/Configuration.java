@@ -45,6 +45,8 @@ public class Configuration {
 
     private final static String SRS = "srs";
 
+    private final static String FORCE_ARGB = "forceArgb";
+
     private final static String SOURCE_FACTORY = "TileImageSourceFactory";
     private final static String BOUNDING_BOX_OP_FACTORY = "BoundingBoxOpFactory";
     private static final String DEFAULT_CONFIG_FILENAME
@@ -204,6 +206,28 @@ public class Configuration {
             //BoundingBoxOpFactory not specified
         }
         return result;
+    }
+
+    /**
+     * Returns whether this </code>TileMap</code> is configured to force the conversion of tiles to ARGB.
+     * This may incur a performance hit, but is required when using tiles with different bit depth.
+     * Tiles of different bit depth cannot be mosaiced by JAI.
+     *
+     * @param tileMapName
+     * @return true if forceArgb is enabled in the configuration
+     */
+    public boolean isForceArgb(String tileMapName) {
+        String attribute = null;
+        try {
+            attribute = getAttribute(tileMapName, FORCE_ARGB);
+        } catch (ConfigurationException e) {
+            //ForceArgb not specified
+            return false;
+        }
+        if(attribute.toLowerCase().equals("true"))
+            return true;
+        else
+            return false;
     }
 
     /**

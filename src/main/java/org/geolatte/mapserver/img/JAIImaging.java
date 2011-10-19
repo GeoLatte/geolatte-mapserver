@@ -27,7 +27,6 @@ import org.geolatte.mapserver.tms.TileImage;
 import org.geolatte.mapserver.util.PixelRange;
 import org.geolatte.mapserver.util.SRS;
 
-
 import javax.imageio.ImageIO;
 import javax.media.jai.*;
 import javax.media.jai.operator.*;
@@ -161,13 +160,15 @@ public class JAIImaging implements Imaging {
      * {@inheritDoc}
      */
     @Override
-    public TileImage read(InputStream is, int x, int y) throws IOException {
+    public TileImage read(InputStream is, int x, int y, boolean forceArgb) throws IOException {
         BufferedImage bi = ImageIO.read(is);
 
-        BufferedImage rgbImage = new BufferedImage( bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        rgbImage.createGraphics().drawImage( bi, 0, 0, null, null);
-
-        RenderedOp op = TranslateDescriptor.create(rgbImage, (float) x, (float) y, null, null);
+        if (forceArgb) {
+            BufferedImage rgbImage = new BufferedImage(bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            rgbImage.createGraphics().drawImage(bi, 0, 0, null, null);
+            bi = rgbImage;
+        }
+        RenderedOp op = TranslateDescriptor.create(bi, (float) x, (float) y, null, null);
         PlanarImage image = op.createInstance();
 
         return new JAITileImage(image);

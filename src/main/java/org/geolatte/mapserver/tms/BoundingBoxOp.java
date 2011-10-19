@@ -113,7 +113,7 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
     }
 
     protected void loadTileImages() {
-        TileImageLoadOp loadOp = new TileImageLoadOp(this.tiles, this.imaging);
+        TileImageLoadOp loadOp = new TileImageLoadOp(this.tiles, this.imaging, tileMap.isForceArgb());
         images = loadOp.execute();
         LOGGER.debug("Image loading took " + chrono.stop() + " ms.");
     }

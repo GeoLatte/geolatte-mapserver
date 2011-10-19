@@ -73,6 +73,7 @@
                     type="file"
                     TileImageSourceFactory="org.geolatte.mapserver.tms.FileTileImageSourceFactory"
                     path="src/test/resources/tiles/tilemapresource.xml"
+                    forceArgb="true"
                     srs="900913"
                     />
 

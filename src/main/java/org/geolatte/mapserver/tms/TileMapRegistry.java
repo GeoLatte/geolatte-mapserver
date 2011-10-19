@@ -89,15 +89,18 @@ public class TileMapRegistry {
         try {
             String sourceFactoryName = config.getTileImageSourceFactoryClass(tileMapName);
             String boundingBoxOpFactoryName = config.getBoundingBoxOpFactoryClass(tileMapName);
+            boolean forceArgb = config.isForceArgb(tileMapName);
             String path = config.getPath(tileMapName);
             Configuration.RESOURCE_TYPE type = config.getType(tileMapName);
-            return createTileMap(sourceFactoryName, boundingBoxOpFactoryName, path, type);
+            return createTileMap(sourceFactoryName, boundingBoxOpFactoryName, forceArgb, path, type);
         } catch (ConfigurationException e) {
             throw new TileMapCreationException("Cannot create tilemap: " + tileMapName, e);
         }
     }
 
-    private static TileMap createTileMap(String sourceFactoryName, String boundingBoxOpFactoryName, String path, Configuration.RESOURCE_TYPE type) throws TileMapCreationException {
+    private static TileMap createTileMap(String sourceFactoryName, String boundingBoxOpFactoryName,
+                                         boolean forceArgb, String path, Configuration.RESOURCE_TYPE type)
+            throws TileMapCreationException {
         TileMapBuilder builder;
         switch (type) {
             case FILE:
@@ -111,9 +114,9 @@ public class TileMapRegistry {
         }
 
         if (boundingBoxOpFactoryName != null)
-            return builder.buildTileMap(getTileImageSourceFactory(sourceFactoryName), getBoundingBoxOpFactory(boundingBoxOpFactoryName));
+            return builder.buildTileMap(getTileImageSourceFactory(sourceFactoryName), getBoundingBoxOpFactory(boundingBoxOpFactoryName), forceArgb);
         else
-            return builder.buildTileMap(getTileImageSourceFactory(sourceFactoryName));
+            return builder.buildTileMap(getTileImageSourceFactory(sourceFactoryName),forceArgb);
     }
 
     private static TileImageSourceFactory getTileImageSourceFactory(String sourceFactoryName) throws TileMapCreationException {

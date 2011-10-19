@@ -80,14 +80,15 @@ public class TileMapBuilder {
                 this.getTileSets());
     }
 
-    public TileMap buildTileMap(TileImageSourceFactory factory) {
+    public TileMap buildTileMap(TileImageSourceFactory factory, boolean forceArgb) {
         TileMap tileMap = buildTileMap();
         tileMap.setTileImageSourceFactory(factory);
+        tileMap.setForceArgb(forceArgb);
         return tileMap;
     }
 
-    public TileMap buildTileMap(TileImageSourceFactory tileImageSourceFactory, BoundingBoxOpFactory boundingBoxOpFactory) {
-        TileMap tileMap = buildTileMap(tileImageSourceFactory);
+    public TileMap buildTileMap(TileImageSourceFactory tileImageSourceFactory, BoundingBoxOpFactory boundingBoxOpFactory, boolean forceArgb) {
+        TileMap tileMap = buildTileMap(tileImageSourceFactory, forceArgb);
         tileMap.setBoundingBoxOpFactory(boundingBoxOpFactory);
         return tileMap;
     }

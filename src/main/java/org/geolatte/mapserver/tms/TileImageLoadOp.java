@@ -22,10 +22,12 @@ public class TileImageLoadOp implements TileMapOperation<Set<TileImage>> {
 
     private final Set<Tile> tiles;
     private final Imaging imaging;
+    private boolean forceArgb;
 
-    TileImageLoadOp(Set<Tile> tiles, Imaging imaging){
+    TileImageLoadOp(Set<Tile> tiles, Imaging imaging, boolean forceArgb){
         this.tiles = tiles;
         this.imaging = imaging;
+        this.forceArgb = forceArgb;
     }
 
     @Override
@@ -35,7 +37,7 @@ public class TileImageLoadOp implements TileMapOperation<Set<TileImage>> {
         Set<TileImage> results = new HashSet<TileImage>();
 
         for (Tile tile : tiles) {
-            TileImageReaderTask readerTask = new TileImageReaderTask(tile, imaging);
+            TileImageReaderTask readerTask = new TileImageReaderTask(tile, imaging, forceArgb);
             Future<TileImage> future = READ_EXECUTOR.submit(readerTask);
             futures.add(future);
         }
