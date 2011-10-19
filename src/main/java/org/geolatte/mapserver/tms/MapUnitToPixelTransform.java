@@ -152,9 +152,32 @@ public class MapUnitToPixelTransform {
         double yOffset = (extent.getMaxY() - point.y);
         double x = this.pixelRange.getMinX() + xOffset / mapUnitsPerPixelX;
         double y = this.pixelRange.getMinY() + yOffset / mapUnitsPerPixelY;
+        x = removeRoundingError(x);
+        y = removeRoundingError(y);
         int xPix = (leftBorderInclusive && x == Math.floor(x)) ? (int) (x - 1) : (int) x;
         int yPix = (lowerBorderInclusive && y == Math.floor(y)) ? (int) (y - 1) : (int) y;
         return new Pixel(xPix, yPix);
+    }
+
+    /**
+     * In tilemaps where the origin lies on border of the map extend, a calculation is performed where terms can be
+     * crossed out. Because of rounding errors (e.g. x = 160.999999 instead of 161) a map coordinate could be mapped
+     * onto the wrong pixel. As a consequence the pixelBounds could be too large and a transparent border is added to
+     * the tiles.
+     *
+     * @param x The pixelCoordinate to be rounded
+     * @return Math.round(x) if x is close to an integer number.
+     */
+    private double removeRoundingError(double x) {
+        long rounded = Math.round(x);
+        if(almostEquals(x, rounded, 1e-3))
+            return rounded;
+        else
+            return x;
+    }
+
+    private boolean almostEquals(double x, double y, double delta) {
+        return Math.abs(x-y) < delta;
     }
 
     /**
