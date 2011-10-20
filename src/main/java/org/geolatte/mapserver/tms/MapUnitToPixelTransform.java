@@ -169,15 +169,7 @@ public class MapUnitToPixelTransform {
      * @return Math.round(x) if x is close to an integer number.
      */
     private double removeRoundingError(double x) {
-        long rounded = Math.round(x);
-        if(almostEquals(x, rounded, 1e-3))
-            return rounded;
-        else
-            return x;
-    }
-
-    private boolean almostEquals(double x, double y, double delta) {
-        return Math.abs(x-y) < delta;
+        return Math.round(x*1000)/1000.0;
     }
 
     /**
