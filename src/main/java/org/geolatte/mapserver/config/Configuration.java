@@ -49,9 +49,8 @@ public class Configuration {
 
     private final static String SOURCE_FACTORY = "TileImageSourceFactory";
     private final static String BOUNDING_BOX_OP_FACTORY = "BoundingBoxOpFactory";
-    private static final String DEFAULT_CONFIG_FILENAME
-            = "mapserver-config.xml";
-    private static final String CONFIG_PATH_PROPERTY_NAME = "mapserver-configuration";
+    private static final String DEFAULT_CONFIG_FILENAME = "mapserver-config.xml";
+    public static final String CONFIG_PATH_PROPERTY_NAME = "mapserver-configuration";
 
 
     private final Document configDoc;
