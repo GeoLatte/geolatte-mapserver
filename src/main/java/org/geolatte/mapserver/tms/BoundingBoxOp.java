@@ -27,12 +27,8 @@ import org.geolatte.mapserver.util.PixelRange;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * Creates the image from a <code>TileMap</code>that best fits a <code>BoundingBox</code>.
@@ -57,9 +53,8 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
     final private Envelope requestedBbox;
     final private Dimension dimension;
     private final Imaging imaging;
-
     final private TileMap tileMap;
-    private Envelope TileSetClippedBbox;
+    private Envelope tileSetClippedBbox;
     private TileSet tileSet;
     private Set<Tile> tiles;
     private Set<TileImage> images = new HashSet<TileImage>();
@@ -79,7 +74,7 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
         this.dimension = dimension;
         this.requestedBbox = boundingBox;
         this.imaging = imaging;
-        this.TileSetClippedBbox = this.tileMap.clipToMaxBoundingBox(boundingBox);
+        this.tileSetClippedBbox = this.tileMap.clipToMaxBoundingBox(boundingBox);
     }
 
     /**
@@ -89,7 +84,7 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
      */
     @Override
     public TileImage execute() {
-        if (TileSetClippedBbox.isEmpty()) {
+        if (tileSetClippedBbox.isEmpty()) {
             return imaging.createEmptyImage(this.dimension, this.tileMap.getTileImageFormat());
         }
         chrono = new Chrono();
@@ -113,11 +108,11 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
     }
 
     private void getTiles() {
-        tiles = tileMap.getTilesFor(tileSet, TileSetClippedBbox);
+        tiles = tileMap.getTilesFor(tileSet, tileSetClippedBbox);
     }
 
     protected void loadTileImages() {
-        TileImageLoadOp loadOp = new TileImageLoadOp(this.tiles, this.imaging);
+        TileImageLoadOp loadOp = new TileImageLoadOp(this.tiles, this.imaging, tileMap.isForceArgb());
         images = loadOp.execute();
         LOGGER.debug("Image loading took " + chrono.stop() + " ms.");
     }
@@ -128,13 +123,13 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
     }
 
     private void crop() {
-        PixelRange cropBnds = tileSet.pixelBounds(TileSetClippedBbox);
+        PixelRange cropBnds = tileSet.pixelBounds(tileSetClippedBbox);
         result = imaging.crop(result, cropBnds);
     }
 
 
     private void scale() {
-        if (!TileSetClippedBbox.equals(requestedBbox)) {
+        if (!tileSetClippedBbox.equals(requestedBbox)) {
             //if the request bbox is extends beyond the
             // bbox of the TileSet, then we must embed
             // the result in a larger, empty image
@@ -157,7 +152,7 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
 
     private AffineTransform createEmbeddingTransform() {
         MapUnitToPixelTransform mupTransform = new MapUnitToPixelTransform(requestedBbox, new PixelRange(0, 0, (int) dimension.getWidth(), (int) dimension.getHeight()));
-        PixelRange destRange = mupTransform.toPixelRange(TileSetClippedBbox);
+        PixelRange destRange = mupTransform.toPixelRange(tileSetClippedBbox);
         double m00 = (double) destRange.getWidth() / (double) result.getWidth();
         double m02 = destRange.getMinX() - result.getMinX() * m00;
         double m11 = (double) destRange.getHeight() / (double) result.getHeight();

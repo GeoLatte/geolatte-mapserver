@@ -37,7 +37,7 @@ public class TestTile {
     public void test_loading_images() throws IOException {
         Set<Tile> tiles = TMSTestSupport.getTestTiles();
         for (Tile tile : tiles) {
-            TileImage img = tile.getImage(imaging);
+            TileImage img = tile.getImage(imaging,false);
             assertTrue(img.getInternalRepresentation() instanceof PlanarImage);
         }
     }

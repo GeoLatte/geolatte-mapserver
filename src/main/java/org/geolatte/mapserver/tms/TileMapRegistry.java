@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.config.Configuration;
 import org.geolatte.mapserver.config.ConfigurationException;
+import org.geolatte.mapserver.wms.BoundingBoxOpFactory;
 
 import java.util.*;
 
@@ -85,33 +86,43 @@ public class TileMapRegistry {
 
 
     private static TileMap createTileMap(String tileMapName, Configuration config) throws TileMapCreationException {
-        String sourceFactoryName = null;
         try {
-            sourceFactoryName = config.getTileImageSourceFactoryClass(tileMapName);
+            String sourceFactoryName = config.getTileImageSourceFactoryClass(tileMapName);
+            String boundingBoxOpFactoryName = config.getBoundingBoxOpFactoryClass(tileMapName);
+            boolean forceArgb = config.isForceArgb(tileMapName);
             String path = config.getPath(tileMapName);
             Configuration.RESOURCE_TYPE type = config.getType(tileMapName);
-            return createTileMap(sourceFactoryName, path, type);
+            return createTileMap(sourceFactoryName, boundingBoxOpFactoryName, forceArgb, path, type);
         } catch (ConfigurationException e) {
             throw new TileMapCreationException("Cannot create tilemap: " + tileMapName, e);
         }
     }
 
-    private static TileMap createTileMap(String sourceFactoryName, String path, Configuration.RESOURCE_TYPE type) throws TileMapCreationException {
+    private static TileMap createTileMap(String sourceFactoryName, String boundingBoxOpFactoryName,
+                                         boolean forceArgb, String path, Configuration.RESOURCE_TYPE type)
+            throws TileMapCreationException {
+        TileMapBuilder builder;
+        switch (type) {
+            case FILE:
+                builder = TileMapBuilder.fromPath(path);
+                break;
+            case URL:
+                builder = TileMapBuilder.fromURL(path);
+                break;
+            default:
+                throw new IllegalStateException();
+        }
+
+        if (boundingBoxOpFactoryName != null)
+            return builder.buildTileMap(getTileImageSourceFactory(sourceFactoryName), getBoundingBoxOpFactory(boundingBoxOpFactoryName), forceArgb);
+        else
+            return builder.buildTileMap(getTileImageSourceFactory(sourceFactoryName),forceArgb);
+    }
+
+    private static TileImageSourceFactory getTileImageSourceFactory(String sourceFactoryName) throws TileMapCreationException {
         try {
             Class factClass = Class.forName(sourceFactoryName);
-            TileImageSourceFactory factory = (TileImageSourceFactory) factClass.newInstance();
-            TileMapBuilder builder = null;
-            switch (type) {
-                case FILE:
-                    builder = TileMapBuilder.fromPath(path);
-                    break;
-                case URL:
-                    builder = TileMapBuilder.fromURL(path);
-                    break;
-                default:
-                    throw new IllegalStateException();
-            }
-            return builder.buildTileMap(factory);
+            return (TileImageSourceFactory) factClass.newInstance();
         } catch (ClassNotFoundException e) {
             throw new TileMapCreationException(String.format("Can't locate source factory %s.", sourceFactoryName), e);
         } catch (IllegalAccessException e) {
@@ -120,6 +131,21 @@ public class TileMapRegistry {
             throw new TileMapCreationException(String.format("Can't instantiate source factory %s.", sourceFactoryName), e);
         } catch (ClassCastException e) {
             throw new TileMapCreationException(String.format("Configured source factory %s. is not a TileImageSourceFactory implementation", sourceFactoryName), e);
+        }
+    }
+
+    private static BoundingBoxOpFactory getBoundingBoxOpFactory(String boundingBoxOpFactoryName) throws TileMapCreationException {
+        try {
+            Class factClass = Class.forName(boundingBoxOpFactoryName);
+            return (BoundingBoxOpFactory) factClass.newInstance();
+        } catch (ClassNotFoundException e) {
+            throw new TileMapCreationException(String.format("Can't locate bounding box operation factory %s.", boundingBoxOpFactoryName), e);
+        } catch (IllegalAccessException e) {
+            throw new TileMapCreationException(String.format("Can't instantiate bounding box operation factory %s.", boundingBoxOpFactoryName), e);
+        } catch (InstantiationException e) {
+            throw new TileMapCreationException(String.format("Can't instantiate bounding box operation factory %s.", boundingBoxOpFactoryName), e);
+        } catch (ClassCastException e) {
+            throw new TileMapCreationException(String.format("Configured bounding box operation factory %s. is not a TileImageSourceFactory implementation", boundingBoxOpFactoryName), e);
         }
     }
 
@@ -146,7 +172,7 @@ public class TileMapRegistry {
     public List<CrsId> getSupportedSRS(String tileMapName) {
         List<CrsId> result = supportedSRSMap.get(tileMapName);
         if (result == null) {
-            return new ArrayList();
+            return new ArrayList<CrsId>();
         } else {
             return result;
         }

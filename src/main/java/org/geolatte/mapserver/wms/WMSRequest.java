@@ -59,11 +59,11 @@ public abstract class WMSRequest {
         //Note that this is more relaxed than the specification,
         //which states that request parameter values shall be
         //case sensitive (cfr. p. 13)
-        if ("GETMAP".equalsIgnoreCase(requestParamValue)) {
+        if (WMSCapabilities.WMS_GETMAP_REQUEST.equalsIgnoreCase(requestParamValue)) {
             return new WMSGetMapRequest();
         }
 
-        if ("GETCAPABILITIES".equalsIgnoreCase(requestParamValue) ||
+        if (WMSCapabilities.WMS_GETCAPABILITIES_REQUEST.equalsIgnoreCase(requestParamValue) ||
                 "capabilities".equalsIgnoreCase(requestParamValue)) {
             return new WMSGetCapabilitiesRequest();
         }

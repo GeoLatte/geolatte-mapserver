@@ -34,18 +34,34 @@ import org.geolatte.mapserver.servlet.WMSServlet;
  * @author Karel Maesen, Geovise BVBA
  */
 public class JettyServer {
+    private static Server server = null;
 
     public static void main(String[] args) throws Exception {
-
-        Server server = new Server(8090);
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-        server.setHandler(context);
-
-        context.addServlet(new ServletHolder(new WMSServlet()), "/wms");
-
-        server.start();
+        start();
         server.join();
+    }
 
+    public static void start() throws Exception {
+        if (server != null && !server.isStarting() && !server.isStarted()) {
+            server.start();
+        } else {
+            server = new Server(8090);
+            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+            context.setContextPath("/");
+            server.setHandler(context);
+
+            context.addServlet(new ServletHolder(new WMSServlet()), "/wms");
+
+            server.start();
+        }
+    }
+
+    public static void stop() throws Exception {
+        if (server != null) {
+            if(server.isStopping())
+                return;
+            if(server.isStarted() || server.isStarting())
+                server.stop();
+        }
     }
 }

@@ -27,9 +27,9 @@ import org.dom4j.io.SAXReader;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Point;
 import org.geolatte.geom.crs.CrsId;
+import org.geolatte.mapserver.wms.BoundingBoxOpFactory;
 
-
-import java.awt.Dimension;
+import java.awt.*;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -80,9 +80,16 @@ public class TileMapBuilder {
                 this.getTileSets());
     }
 
-    public TileMap buildTileMap(TileImageSourceFactory factory) {
+    public TileMap buildTileMap(TileImageSourceFactory factory, boolean forceArgb) {
         TileMap tileMap = buildTileMap();
         tileMap.setTileImageSourceFactory(factory);
+        tileMap.setForceArgb(forceArgb);
+        return tileMap;
+    }
+
+    public TileMap buildTileMap(TileImageSourceFactory tileImageSourceFactory, BoundingBoxOpFactory boundingBoxOpFactory, boolean forceArgb) {
+        TileMap tileMap = buildTileMap(tileImageSourceFactory, forceArgb);
+        tileMap.setBoundingBoxOpFactory(boundingBoxOpFactory);
         return tileMap;
     }
 
@@ -173,4 +180,5 @@ public class TileMapBuilder {
     protected Document getMetadataAsXML() {
         return xmlDoc;
     }
+
 }

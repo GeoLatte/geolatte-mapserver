@@ -85,7 +85,7 @@ public class TestConfiguration {
         assertEquals(expected, config.getPath("basic"));
 
 
-        expected = "/tmp/tiles/tilemapresource.xml";
+        expected = "src/test/resources/tiles/tilemapresource.xml";
         assertEquals(expected, config.getPath("osm"));
 
         try {
@@ -117,6 +117,15 @@ public class TestConfiguration {
             fail("Expected ConfigurationException");
         }
 
+    }
+
+    @Test
+    public void test_get_boundingbox_op_factory_for_tilemap() throws Exception {
+        String expected = "org.geolatte.mapserver.wms.DefaultBoundingBoxOpFactory";
+        assertEquals(expected, config.getBoundingBoxOpFactoryClass("basic"));
+
+        expected = null;
+        assertEquals(expected, config.getBoundingBoxOpFactoryClass("osm"));
     }
 
     @Test

@@ -61,16 +61,12 @@ public class WMSGetMapRequestHandler implements WMSRequestHandler {
 
     private TileImage getMapImage(WMSGetMapRequest request, TileMap tileMap) throws WMSServiceException {
 
-        TileImage image = null;
-        if (tileMap.getSRS().equals(request.getSrs())) {
-            image = executeBoundingBoxOp(request, tileMap);
-        } else {
-            image =  executeBoundingBoxWithReprojectionOp(request, tileMap);
-        }
+        TileImage image = tileMap.getBoundingBoxOpFactory().create(request, tileMap).execute();
 
         if (image == null) {
             throw new WMSServiceException("Null-image received.");
         } else {
+            LOGGER.debug("Created image.");
             return image;
         }
 
@@ -108,21 +104,6 @@ public class WMSGetMapRequestHandler implements WMSRequestHandler {
     private void write(WMSRequest wmsRequest, OutputStream out, TileImage image) throws IOException {
         image.write(out, wmsRequest.getResponseContentType());
     }
-
-    private TileImage executeBoundingBoxOp(WMSGetMapRequest request, TileMap tileMap) {
-        BoundingBoxOp op = new BoundingBoxOp(tileMap, request.getBbox(), request.getDimension(), new JAIImaging());
-        TileImage image = op.execute();
-        LOGGER.debug("Created image.");
-        return image;
-    }
-
-    private TileImage executeBoundingBoxWithReprojectionOp(WMSGetMapRequest request, TileMap tileMap) {
-        BoundingBoxProjectOp op = new BoundingBoxProjectOp(tileMap, request.getBbox(), request.getSrs(), request.getDimension(), new JAIImaging());
-        TileImage image = op.execute();
-        LOGGER.debug("Created image.");
-        return image;
-    }
-
 
     private boolean isSupported(TileMap tileMap, CrsId srs) {
         return this.tileMapRegistry.supportsSRS(tileMap.getTitle(), srs);

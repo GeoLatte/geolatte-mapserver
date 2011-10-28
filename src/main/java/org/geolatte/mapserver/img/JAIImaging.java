@@ -79,7 +79,7 @@ public class JAIImaging implements Imaging {
             Warp warp = Referencing.createWarpApproximation(mupSrcTransform, sourceSRS, targetSRS, mupTargetTransform, tolerance);
 
             //do the warp
-            PlanarImage img = (PlanarImage)source.getInternalRepresentation();
+            PlanarImage img = (PlanarImage) source.getInternalRepresentation();
             Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
             RenderedOp warped = WarpDescriptor.create(img, warp, interp, null, null);
             return new JAITileImage(warped);
@@ -160,10 +160,17 @@ public class JAIImaging implements Imaging {
      * {@inheritDoc}
      */
     @Override
-    public TileImage read(InputStream is, int x, int y) throws IOException {
+    public TileImage read(InputStream is, int x, int y, boolean forceArgb) throws IOException {
         BufferedImage bi = ImageIO.read(is);
+
+        if (forceArgb) {
+            BufferedImage rgbImage = new BufferedImage(bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            rgbImage.createGraphics().drawImage(bi, 0, 0, null, null);
+            bi = rgbImage;
+        }
         RenderedOp op = TranslateDescriptor.create(bi, (float) x, (float) y, null, null);
         PlanarImage image = op.createInstance();
+
         return new JAITileImage(image);
     }
 
