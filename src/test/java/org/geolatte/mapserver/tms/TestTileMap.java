@@ -21,13 +21,12 @@ package org.geolatte.mapserver.tms;
 
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Point;
-import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.util.PixelRange;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -113,17 +112,17 @@ public class TestTileMap {
         Set<Tile> expected = new HashSet<Tile>();
         TileSet tileSet = tileMap.getTileSets().get(0);
         expected.add(tileMap.makeTile(tileSet, TileCoordinate.valueOf(0, 0)));
-        Envelope bbox = new Envelope(Point.create2D(-180, -90, CrsId.UNDEFINED.getCode()), Point.create2D(-1, 89, CrsId.UNDEFINED.getCode()), null);
+        Envelope bbox = new Envelope(Point.create2D(-180, -90), Point.create2D(-1, 89), null);
         Dimension dim = new Dimension(256, 256);
         Set<Tile> result = tileMap.getTilesFor(tileSet, bbox);
         Assert.assertEquals(expected, result);
 
         expected.add(tileMap.makeTile(tileSet, TileCoordinate.valueOf(1, 0)));
-        bbox = new Envelope(Point.create2D(-180, -90, CrsId.UNDEFINED.getCode()), Point.create2D(180, 90, CrsId.UNDEFINED.getCode()),null);
+        bbox = new Envelope(Point.create2D(-180, -90), Point.create2D(180, 90),null);
         result = tileMap.getTilesFor(tileSet, bbox);
         Assert.assertEquals(expected, result);
 
-        bbox = new Envelope(Point.create2D(-170, -80, CrsId.UNDEFINED.getCode()), Point.create2D(160, 88, CrsId.UNDEFINED.getCode()),null);
+        bbox = new Envelope(Point.create2D(-170, -80), Point.create2D(160, 88),null);
         result = tileMap.getTilesFor(tileSet, bbox);
         Assert.assertEquals(expected, result);
     }

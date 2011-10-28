@@ -207,7 +207,7 @@ public abstract class WMSRequest {
         return Integer.valueOf(strVal);
     }
 
-    private static CrsId convertToSRS(String strVal) throws InvalidWMSRequestException {
+    private static CrsId convertToCrsId(String strVal) throws InvalidWMSRequestException {
         try {
             CrsId crsId = CrsId.parse(strVal);
             return crsId;
