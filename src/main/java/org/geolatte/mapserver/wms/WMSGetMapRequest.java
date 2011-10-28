@@ -104,7 +104,7 @@ public class WMSGetMapRequest extends WMSRequest {
     }
 
     public Envelope getBbox() {
-        return bbox;
+        return new Envelope(bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY(), this.getSrs());
     }
 
     public String getBgcolor() {

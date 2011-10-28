@@ -124,7 +124,7 @@ public class TileMapBuilder {
         double minY = extractAttributeDouble("//BoundingBox/@miny");
         double maxX = extractAttributeDouble("//BoundingBox/@maxx");
         double maxY = extractAttributeDouble("//BoundingBox/@maxy");
-        return new Envelope(minX, minY, maxX, maxY, null);
+        return new Envelope(minX, minY, maxX, maxY, getSRS());
     }
 
 
