@@ -24,11 +24,12 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import org.geolatte.mapserver.util.BoundingBox;
-import org.geolatte.mapserver.util.Point;
-import org.geolatte.mapserver.util.SRS;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Point;
+import org.geolatte.geom.crs.CrsId;
 
-import java.awt.*;
+
+import java.awt.Dimension;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -113,26 +114,24 @@ public class TileMapBuilder {
         return extractNode("//Title");
     }
 
-    protected SRS getSRS() {
+    protected CrsId getSRS() {
         String valueStr = extractNode("//SRS");
-        return SRS.parse(valueStr);
+        return CrsId.parse(valueStr);
     }
 
-    protected BoundingBox getBoundingBox() {
+    protected Envelope getBoundingBox() {
         double minX = extractAttributeDouble("//BoundingBox/@minx");
         double minY = extractAttributeDouble("//BoundingBox/@miny");
         double maxX = extractAttributeDouble("//BoundingBox/@maxx");
         double maxY = extractAttributeDouble("//BoundingBox/@maxy");
-        Point ll = new Point(minX, minY);
-        Point ur = new Point(maxX, maxY);
-        return new BoundingBox(ll, ur);
+        return new Envelope(minX, minY, maxX, maxY, null);
     }
 
 
     protected Point getOrigin() {
         double originX = extractAttributeDouble("//Origin/@x");
         double originY = extractAttributeDouble("//Origin/@y");
-        return new Point(originX, originY);
+        return Point.create2D(originX, originY, CrsId.UNDEFINED.getCode());
     }
 
     protected Dimension getTileDimension() {
@@ -152,7 +151,7 @@ public class TileMapBuilder {
         List<TileSet> tileSetList = new ArrayList<TileSet>();
         Dimension pixelDim = getTileDimension();
         Point origin = getOrigin();
-        BoundingBox bbox = getBoundingBox();
+        Envelope bbox = getBoundingBox();
         Element tilesetsNode = (Element) xmlDoc.selectSingleNode("//TileSets");
         for (Iterator it = tilesetsNode.elementIterator("TileSet"); it.hasNext();) {
             Element tileSetEl = (Element) it.next();
@@ -161,7 +160,7 @@ public class TileMapBuilder {
         return tileSetList;
     }
 
-    private TileSet getTileSet(Element xmlEl, Point origin, Dimension pixelDim, BoundingBox bbox) {
+    private TileSet getTileSet(Element xmlEl, Point origin, Dimension pixelDim, Envelope bbox) {
         String url = xmlEl.valueOf("@href");
         String orderStr = xmlEl.valueOf("@order");
         int order = Integer.valueOf(orderStr);

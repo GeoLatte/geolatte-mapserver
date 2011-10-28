@@ -20,8 +20,8 @@
 package org.geolatte.mapserver.tms;
 
 
+import org.geolatte.geom.Envelope;
 import org.geolatte.mapserver.img.Imaging;
-import org.geolatte.mapserver.util.BoundingBox;
 import org.geolatte.mapserver.util.PixelRange;
 
 import java.awt.*;
@@ -53,12 +53,12 @@ public class Tile {
         return boundsTile;
     }
 
-    static BoundingBox boundingBox(Set<Tile> tiles) {
-        if (tiles.isEmpty()) return new BoundingBox(0, 0, 0, 0);
-        BoundingBox bboxUnion = null;
+    static Envelope boundingBox(Set<Tile> tiles) {
+        if (tiles.isEmpty()) return new Envelope(0, 0, 0, 0, null);
+        Envelope bboxUnion = null;
         for (Tile tile : tiles) {
-            BoundingBox bbox = tile.getBoundingBox();
-            bboxUnion = BoundingBox.union(bboxUnion, bbox);
+            Envelope bbox = tile.getBoundingBox();
+            bboxUnion = Envelope.union(bboxUnion, bbox);
         }
         return bboxUnion;
     }
@@ -99,7 +99,7 @@ public class Tile {
     }
 
 
-    BoundingBox getBoundingBox() {
+    Envelope getBoundingBox() {
         return tileSetCoordinateSpace.boundingBox(this.coordinate);
     }
 

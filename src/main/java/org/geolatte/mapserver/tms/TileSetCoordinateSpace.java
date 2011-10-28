@@ -19,23 +19,25 @@
 
 package org.geolatte.mapserver.tms;
 
-import org.geolatte.mapserver.util.BoundingBox;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Point;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.util.Pixel;
 import org.geolatte.mapserver.util.PixelRange;
-import org.geolatte.mapserver.util.Point;
 
-import java.awt.*;
+
+import java.awt.Dimension;
 
 public class TileSetCoordinateSpace {
 
     private final Point origin;
     private final Dimension tileDimension;
-    private final BoundingBox extent;
+    private final Envelope extent;
     private final double unitsPerPixel;
     private final MapUnitToPixelTransform mupTransform;
 
 
-    TileSetCoordinateSpace(Point origin, Dimension tileDimension, BoundingBox extent, double unitsPerPixel) {
+    TileSetCoordinateSpace(Point origin, Dimension tileDimension, Envelope extent, double unitsPerPixel) {
         this.origin = origin;
         this.tileDimension = tileDimension;
         this.unitsPerPixel = unitsPerPixel;
@@ -43,19 +45,19 @@ public class TileSetCoordinateSpace {
         this.mupTransform = new MapUnitToPixelTransform(this.extent, this.unitsPerPixel);
     }
 
-    public BoundingBox boundingBox(TileCoordinate coordinate) {
+    public Envelope boundingBox(TileCoordinate coordinate) {
         double width = tileDimension.getWidth() * unitsPerPixel;
         double height = tileDimension.getHeight() * unitsPerPixel;
-        double x = origin.x + (coordinate.i * width);
-        double y = origin.y + (coordinate.j * height);
-        BoundingBox result = new BoundingBox(x, y, x + width, y + height);
+        double x = origin.getX() + (coordinate.i * width);
+        double y = origin.getY() + (coordinate.j * height);
+        Envelope result = new Envelope(x, y, x + width, y + height, null);
 //        if (!result.isWithin(extent))
 //            throw new IllegalArgumentException("Specified TileCoordinate falls outside of TileSet extent.");
         return result;
     }
 
     public PixelRange tilePixelRange(TileCoordinate coordinate) {
-        BoundingBox bbox = boundingBox(coordinate);
+        Envelope bbox = boundingBox(coordinate);
         return this.mupTransform.toPixelRange(bbox);
     }
 
@@ -86,8 +88,8 @@ public class TileSetCoordinateSpace {
         if (!this.extent.contains(point))
             throw new IllegalArgumentException(String.format("Point %s outside the extent of this TileSet", point.toString()));
         Point relativeToOrigin = relativeToOrigin(point);
-        double x = relativeToOrigin.x;
-        double y = relativeToOrigin.y;
+        double x = relativeToOrigin.getX();
+        double y = relativeToOrigin.getY();
         double width = tileWidthInMapUnits();
         double height = tileHeightInMapUnits();
         int i = (int) (x / width);
@@ -101,7 +103,7 @@ public class TileSetCoordinateSpace {
         return this.unitsPerPixel;
     }
 
-    public PixelRange pixelRange(BoundingBox bbox) {
+    public PixelRange pixelRange(Envelope bbox) {
         return this.mupTransform.toPixelRange(bbox);
     }
 
@@ -114,6 +116,6 @@ public class TileSetCoordinateSpace {
     }
 
     private Point relativeToOrigin(Point point) {
-        return new Point(point.x - origin.x, point.y - origin.y);
+        return Point.create2D(point.getX() - origin.getY(), point.getX() - origin.getY(), CrsId.UNDEFINED.getCode());
     }
 }

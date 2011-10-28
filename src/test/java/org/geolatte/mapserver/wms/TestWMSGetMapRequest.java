@@ -19,8 +19,8 @@
 
 package org.geolatte.mapserver.wms;
 
-import org.geolatte.mapserver.util.BoundingBox;
-import org.geolatte.mapserver.util.SRS;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.crs.CrsId;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -69,12 +69,12 @@ public class TestWMSGetMapRequest {
         HttpServletRequest request = makeRequest(baseRequestParameters);
         WMSGetMapRequest wmsGetMap = (WMSGetMapRequest) WMSRequest.adapt(request);
 
-        assertEquals(new BoundingBox(-130, 24, -66, 50), wmsGetMap.getBbox());
+        assertEquals(new Envelope(-130, 24, -66, 50), wmsGetMap.getBbox());
         assertEquals("image/png", wmsGetMap.getFormat());
         assertEquals(Integer.valueOf(550), wmsGetMap.getWidth());
         assertArrayEquals(new String[]{"basic"}, wmsGetMap.getLayers());
         assertEquals("1.1.1", wmsGetMap.getVersion());
-        assertEquals(SRS.parse("EPSG:4326"), wmsGetMap.getSrs());
+        assertEquals(CrsId.parse("EPSG:4326"), wmsGetMap.getSrs());
         assertEquals(Integer.valueOf(250), wmsGetMap.getHeight());
 
 
@@ -88,7 +88,7 @@ public class TestWMSGetMapRequest {
         HttpServletRequest request = makeRequest(baseRequestParameters);
 
         WMSGetMapRequest wmsGetMap = (WMSGetMapRequest) WMSRequest.adapt(request);
-        assertEquals(SRS.parse("EPSG:4326"), wmsGetMap.getSrs());
+        assertEquals(CrsId.parse("EPSG:4326"), wmsGetMap.getSrs());
         assertEquals("1.1.1", wmsGetMap.getVersion());
 
     }

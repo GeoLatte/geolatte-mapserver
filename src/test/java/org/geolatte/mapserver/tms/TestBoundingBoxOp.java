@@ -19,8 +19,8 @@
 
 package org.geolatte.mapserver.tms;
 
+import org.geolatte.geom.Envelope;
 import org.geolatte.mapserver.img.JAIImaging;
-import org.geolatte.mapserver.util.BoundingBox;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
@@ -42,17 +42,17 @@ public class TestBoundingBoxOp {
 
     @Test
     public void test_normal_execute() throws IOException {
-        BoundingBox bbox = new BoundingBox(-170, -80, 170, 80);
+        Envelope bbox = new Envelope(-170, -80, 170, 80);
         File f = new File("/tmp/normal-execute-tilecache.png");
         executeAndWriteToFile(bbox, f, tileMap);
 
-        bbox = new BoundingBox(20000, 160000, 180000, 240000);
+        bbox = new Envelope(20000, 160000, 180000, 240000);
         f = new File("/tmp/normal-execute-ortho.png");
         executeAndWriteToFile(bbox, f, orthoMap);
 
     }
 
-    private void executeAndWriteToFile(BoundingBox bbox, File f, TileMap map) throws IOException {
+    private void executeAndWriteToFile(Envelope bbox, File f, TileMap map) throws IOException {
         BoundingBoxOp boundingBoxOp = new BoundingBoxOp(map, bbox, new Dimension(512, 256), new JAIImaging());
         TileImage tileImage = boundingBoxOp.execute();
         PlanarImage received = (PlanarImage) tileImage.getInternalRepresentation();
@@ -64,11 +64,11 @@ public class TestBoundingBoxOp {
     @Test
     public void test_bbox_partially_exceeds_tileset_bounds() throws IOException {
 
-        BoundingBox bbox = new BoundingBox(0, 0, 190, 110);
+        Envelope bbox = new Envelope(0, 0, 190, 110);
         File f = new File("/tmp/partially-exceeds-execute-tilecache.png");
         executeAndWriteToFile(bbox, f, tileMap);
 
-        bbox = new BoundingBox(10000, 140000, 190000, 230000);
+        bbox = new Envelope(10000, 140000, 190000, 230000);
         f = new File("/tmp/partially-exceeds-execute-ortho.png");
         executeAndWriteToFile(bbox, f, orthoMap);
 
@@ -77,11 +77,11 @@ public class TestBoundingBoxOp {
     @Test
     public void test_bbox_fully_exceeds_tileset_bounds() throws IOException {
 
-        BoundingBox bbox = new BoundingBox(-180, -100, 200, 90);
+        Envelope bbox = new Envelope(-180, -100, 200, 90);
         File f = new File("/tmp/fully-exceeds-execute-tilecache.png");
         executeAndWriteToFile(bbox, f, tileMap);
 
-        bbox = new BoundingBox(10000, 140000, 270000, 270000);
+        bbox = new Envelope(10000, 140000, 270000, 270000);
         f = new File("/tmp/fully-exceeds-execute-ortho.png");
         executeAndWriteToFile(bbox, f, orthoMap);
 
@@ -90,7 +90,7 @@ public class TestBoundingBoxOp {
     @Test
     public void test_bbox_outside_of_tilemap_extent_returns_empty_image() throws IOException {
 
-        BoundingBox bbox = new BoundingBox(300, 300, 400, 400);
+        Envelope bbox = new Envelope(300, 300, 400, 400);
         File f = new File("/tmp/empty-image-because-bbox-not-in-extent-tilecache.png");
         executeAndWriteToFile(bbox, f, tileMap);
 
@@ -102,11 +102,11 @@ public class TestBoundingBoxOp {
     @Test
     public void test_empty_bbox_returns_empty_image() throws IOException {
 
-        BoundingBox bbox = new BoundingBox(0, 0, 0, 0);
+        Envelope bbox = new Envelope(0, 0, 0, 0);
         File f = new File("/tmp/empty-image-because-empty-bbox-tilecache.png");
         executeAndWriteToFile(bbox, f, tileMap);
 
-        bbox = new BoundingBox(50000, 200000, 50000, 200000);
+        bbox = new Envelope(50000, 200000, 50000, 200000);
         f = new File("/tmp/empty-image-because-empty-bbox-orthos.png");
         executeAndWriteToFile(bbox, f, orthoMap);
 
