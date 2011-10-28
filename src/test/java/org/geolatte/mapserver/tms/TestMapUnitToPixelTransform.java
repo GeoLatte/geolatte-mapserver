@@ -149,6 +149,26 @@ public class TestMapUnitToPixelTransform {
     }
 
     @Test
+    public void test_point_pixel_on_upp_based_transform_rounding_errors() {
+        double originXinMapUnits = -20037508.34;
+        double originYinMapUnits = -20037508.34;
+        double unitsPerPixel = 4.777314266967774;
+        BoundingBox boundingBoxInMapUnits = new BoundingBox(originXinMapUnits, originYinMapUnits,-originXinMapUnits,-originYinMapUnits);
+        MapUnitToPixelTransform uppBasedTransform = new MapUnitToPixelTransform(boundingBoxInMapUnits, unitsPerPixel);
+        int tileNumberX = 16811;
+        int tileNumberY = 21781;
+        int tileDimensionInPixels = 256;
+        double tileWidthInMapUnits = tileDimensionInPixels * unitsPerPixel;
+        double tileHeightInMapUnits = tileWidthInMapUnits;
+        double tileMinXinMapUnits = tileNumberX * tileWidthInMapUnits + originXinMapUnits;
+        double tileMinYinMapUnits = tileNumberY * tileHeightInMapUnits + originYinMapUnits;
+        BoundingBox tileBoundingBoxInMapUnits = new BoundingBox(tileMinXinMapUnits, tileMinYinMapUnits, tileMinXinMapUnits + tileWidthInMapUnits, tileMinYinMapUnits + tileHeightInMapUnits);
+        PixelRange tilePixelRange = uppBasedTransform.toPixelRange(tileBoundingBoxInMapUnits);
+        assertEquals(tileDimensionInPixels, tilePixelRange.getWidth());
+        assertEquals(tileDimensionInPixels, tilePixelRange.getHeight());
+    }
+
+    @Test
     public void test_bbox_to_pixrange_on_pixrange_based_transform() {
         BoundingBox bbox = new BoundingBox(-180, -90, 180, 90);
         PixelRange pixRange = new PixelRange(0, 0, 512, 256);
@@ -169,6 +189,5 @@ public class TestMapUnitToPixelTransform {
         expected = new PixelRange(0, 0, 512, 256);
         assertEquals(expected, result);
     }
-
 
 }

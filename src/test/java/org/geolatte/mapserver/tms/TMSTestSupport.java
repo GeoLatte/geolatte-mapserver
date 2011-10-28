@@ -90,12 +90,12 @@ public class TMSTestSupport {
 
     public static TileMap makeOSMTileMap() {
         TileMapBuilder builder = new TileMapBuilder(TMSTestSupport.makeOSMResource());
-        return builder.buildTileMap(new FileTileImageSourceFactory());
+        return builder.buildTileMap(new FileTileImageSourceFactory(), false);
     }
 
     public static TileMap makeOrthoTileMap() {
         TileMapBuilder builder = new TileMapBuilder(TMSTestSupport.makeOrthoResource());
-        return builder.buildTileMap(new FileTileImageSourceFactory());
+        return builder.buildTileMap(new FileTileImageSourceFactory(), false);
     }
 
 

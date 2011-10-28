@@ -55,7 +55,7 @@ public class TestTileMapRegistry {
         assertTrue(tileMaps.getSupportedSRS("basic").isEmpty());
         List<SRS> expected = new ArrayList<SRS>();
         expected.add(SRS.parse("EPSG:25831"));
-        expected.add(SRS.parse("EPSG:9100913"));
+        expected.add(SRS.parse("EPSG:900913"));
         List<SRS> received = tileMaps.getSupportedSRS("tms-vlaanderen");
         assertEquals(expected, received);
     }
@@ -63,7 +63,7 @@ public class TestTileMapRegistry {
     @Test
     public void check_is_srs_supported() {
         assertTrue(tileMaps.supportsSRS("tms-vlaanderen", SRS.parse("EPSG:31370")));
-        assertTrue(tileMaps.supportsSRS("tms-vlaanderen", SRS.parse("EPSG:9100913")));
+        assertTrue(tileMaps.supportsSRS("tms-vlaanderen", SRS.parse("EPSG:900913")));
         assertTrue(tileMaps.supportsSRS("tms-vlaanderen", SRS.parse("EPSG:25831")));
         assertFalse(tileMaps.supportsSRS("tms-vlaanderen", SRS.parse("EPSG:4326")));
 
