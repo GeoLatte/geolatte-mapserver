@@ -27,13 +27,15 @@ public class TileImageReaderTask implements Callable<TileImage> {
 
     private final Tile tile;
     private final Imaging imageTool;
+    private boolean forceArgb;
 
-    public TileImageReaderTask(Tile tile, Imaging imageTool) {
+    public TileImageReaderTask(Tile tile, Imaging imageTool, boolean forceArgb) {
         this.tile = tile;
         this.imageTool = imageTool;
+        this.forceArgb = forceArgb;
     }
 
     public TileImage call() throws Exception {
-        return tile.getImage(imageTool);
+        return tile.getImage(imageTool,forceArgb);
     }
 }

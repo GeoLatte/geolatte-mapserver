@@ -166,7 +166,7 @@ public class TestWMSGetCapabilitiesResponse {
             assertEquals("Expected two SRS elements", 3, list.size());
             assertEquals("incorrect 1e SRS", "EPSG:31370",((Node)list.get(0)).getText());
             assertEquals("incorrect 2e SRS", "EPSG:25831",((Node)list.get(1)).getText());
-            assertEquals("incorrect 2e SRS", "EPSG:9100913",((Node)list.get(2)).getText());
+            assertEquals("incorrect 2e SRS", "EPSG:900913",((Node)list.get(2)).getText());
         }
 
     }
