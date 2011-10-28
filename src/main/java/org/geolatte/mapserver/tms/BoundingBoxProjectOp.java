@@ -1,12 +1,12 @@
 package org.geolatte.mapserver.tms;
 
 import org.apache.log4j.Logger;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.img.Imaging;
 import org.geolatte.mapserver.referencing.Referencing;
-import org.geolatte.mapserver.util.BoundingBox;
 import org.geolatte.mapserver.util.Chrono;
 import org.geolatte.mapserver.util.PixelRange;
-import org.geolatte.mapserver.util.SRS;
 
 import java.awt.*;
 import java.util.Set;
@@ -20,9 +20,9 @@ public class BoundingBoxProjectOp implements TileMapOperation{
     private final static Logger LOGGER = Logger.getLogger(BoundingBoxProjectOp.class);
 
     private final TileMap tileMap;
-    private final BoundingBox requestedBBox;
-    private final BoundingBox sourceBBox;
-    private final SRS requestedSRS;
+    private final Envelope requestedBBox;
+    private final Envelope sourceBBox;
+    private final CrsId requestedSRS;
 
     private final Dimension requestDimension;
     private final Imaging imaging;
@@ -36,7 +36,7 @@ public class BoundingBoxProjectOp implements TileMapOperation{
     private double requestYUnitsPerPixel;
 
 
-    public BoundingBoxProjectOp(TileMap tileMap, BoundingBox bbox, SRS srs, Dimension dimension, Imaging imaging) {
+    public BoundingBoxProjectOp(TileMap tileMap, Envelope bbox, CrsId srs, Dimension dimension, Imaging imaging) {
         this.tileMap = tileMap;
         this.requestedBBox = bbox;
         this.requestedSRS = srs;
@@ -66,7 +66,7 @@ public class BoundingBoxProjectOp implements TileMapOperation{
         //reproject using warp
         chrono.reset();
         //before warping, set the output image to encompass the total boundingbox
-        BoundingBox srcBBoxInTargetSRS = Referencing.transform(sourceBBox, this.tileMap.getSRS(), this.requestedSRS);
+        Envelope srcBBoxInTargetSRS = Referencing.transform(sourceBBox, this.tileMap.getSRS(), this.requestedSRS);
         PixelRange srcPixelRange = new PixelRange(srcImg.getMinX(), srcImg.getMinY(), srcImg.getWidth(), srcImg.getHeight());
         MapUnitToPixelTransform mupTransform = new MapUnitToPixelTransform(sourceBBox,srcPixelRange);
         //TODO -- targetMupTransform works only when target and source SRS use the same units.

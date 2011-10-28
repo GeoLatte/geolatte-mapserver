@@ -19,9 +19,9 @@
 
 package org.geolatte.mapserver.tms;
 
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.config.Configuration;
 import org.geolatte.mapserver.config.ConfigurationException;
-import org.geolatte.mapserver.util.SRS;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -51,21 +51,21 @@ public class TestTileMapRegistry {
     }
 
     @Test
-    public void check_supported_srs() {
+    public void check_supported_CrsId() {
         assertTrue(tileMaps.getSupportedSRS("basic").isEmpty());
-        List<SRS> expected = new ArrayList<SRS>();
-        expected.add(SRS.parse("EPSG:25831"));
-        expected.add(SRS.parse("EPSG:9100913"));
-        List<SRS> received = tileMaps.getSupportedSRS("tms-vlaanderen");
+        List<CrsId> expected = new ArrayList<CrsId>();
+        expected.add(CrsId.parse("EPSG:25831"));
+        expected.add(CrsId.parse("EPSG:9100913"));
+        List<CrsId> received = tileMaps.getSupportedSRS("tms-vlaanderen");
         assertEquals(expected, received);
     }
 
     @Test
-    public void check_is_srs_supported() {
-        assertTrue(tileMaps.supportsSRS("tms-vlaanderen", SRS.parse("EPSG:31370")));
-        assertTrue(tileMaps.supportsSRS("tms-vlaanderen", SRS.parse("EPSG:9100913")));
-        assertTrue(tileMaps.supportsSRS("tms-vlaanderen", SRS.parse("EPSG:25831")));
-        assertFalse(tileMaps.supportsSRS("tms-vlaanderen", SRS.parse("EPSG:4326")));
+    public void check_is_CrsId_supported() {
+        assertTrue(tileMaps.supportsSRS("tms-vlaanderen", CrsId.parse("EPSG:31370")));
+        assertTrue(tileMaps.supportsSRS("tms-vlaanderen", CrsId.parse("EPSG:9100913")));
+        assertTrue(tileMaps.supportsSRS("tms-vlaanderen", CrsId.parse("EPSG:25831")));
+        assertFalse(tileMaps.supportsSRS("tms-vlaanderen", CrsId.parse("EPSG:4326")));
 
     }
 

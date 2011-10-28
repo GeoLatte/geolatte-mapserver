@@ -19,9 +19,10 @@
 
 package org.geolatte.mapserver.tms;
 
-import org.geolatte.mapserver.util.BoundingBox;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Point;
 import org.geolatte.mapserver.util.PixelRange;
-import org.geolatte.mapserver.util.Point;
+
 
 /**
  * Represents a tile set in a {@link TileMap}.
@@ -77,7 +78,7 @@ class TileSet {
         return tileSetCoordinateSpace.tileCoordinateContaining(point, lowerLeftInclusive);
     }
 
-    public PixelRange pixelBounds(BoundingBox bbox) {
+    public PixelRange pixelBounds(Envelope bbox) {
         return tileSetCoordinateSpace.pixelRange(bbox);
     }
 

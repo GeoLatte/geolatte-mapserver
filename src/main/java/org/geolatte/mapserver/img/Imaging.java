@@ -19,10 +19,10 @@
 
 package org.geolatte.mapserver.img;
 
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.tms.MapUnitToPixelTransform;
 import org.geolatte.mapserver.tms.TileImage;
 import org.geolatte.mapserver.util.PixelRange;
-import org.geolatte.mapserver.util.SRS;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -152,5 +152,5 @@ public interface Imaging {
      * @param tolerance the tolerance for the approximation
      * @return
      */
-    public TileImage reprojectByWarping(TileImage source, MapUnitToPixelTransform mupSrcTransform, SRS sourceSRS, SRS targetSRS,  MapUnitToPixelTransform mupTargetTransform, double tolerance);
+    public TileImage reprojectByWarping(TileImage source, MapUnitToPixelTransform mupSrcTransform, CrsId sourceSRS, CrsId targetSRS,  MapUnitToPixelTransform mupTargetTransform, double tolerance);
 }

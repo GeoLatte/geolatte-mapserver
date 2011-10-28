@@ -19,14 +19,15 @@
 
 package org.geolatte.mapserver.tms;
 
-import org.geolatte.mapserver.util.BoundingBox;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Point;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.util.PixelRange;
-import org.geolatte.mapserver.util.Point;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -86,22 +87,22 @@ public class TestTileMap {
         TileSet tileSet = tileMap.getTileSets().get(2);
 
         Tile tile = tileMap.makeTile(tileSet, TileCoordinate.valueOf(0, 3));
-        BoundingBox expected = new BoundingBox(-180, 45, -135, 90);
-        BoundingBox received = tile.getBoundingBox();
+        Envelope expected = new Envelope(-180, 45, -135, 90);
+        Envelope received = tile.getBoundingBox();
         assertEquals(expected, received);
 
         tile = tileMap.makeTile(tileSet, TileCoordinate.valueOf(7, 3));
-        expected = new BoundingBox(180 - 45, 45, 180, 90);
+        expected = new Envelope(180 - 45, 45, 180, 90);
         received = tile.getBoundingBox();
         assertEquals(expected, received);
 
         tile = tileMap.makeTile(tileSet, TileCoordinate.valueOf(0, 0));
-        expected = new BoundingBox(-180, -90, -180 + 45, -45);
+        expected = new Envelope(-180, -90, -180 + 45, -45);
         received = tile.getBoundingBox();
         assertEquals(expected, received);
 
         tile = tileMap.makeTile(tileSet, TileCoordinate.valueOf(2, 2));
-        expected = new BoundingBox(-180 + 2 * 45, 0, -180 + 3 * 45, 45);
+        expected = new Envelope(-180 + 2 * 45, 0, -180 + 3 * 45, 45);
         received = tile.getBoundingBox();
         assertEquals(expected, received);
 
@@ -112,17 +113,17 @@ public class TestTileMap {
         Set<Tile> expected = new HashSet<Tile>();
         TileSet tileSet = tileMap.getTileSets().get(0);
         expected.add(tileMap.makeTile(tileSet, TileCoordinate.valueOf(0, 0)));
-        BoundingBox bbox = new BoundingBox(new Point(-180, -90), new Point(-1, 89));
+        Envelope bbox = new Envelope(Point.create2D(-180, -90, CrsId.UNDEFINED.getCode()), Point.create2D(-1, 89, CrsId.UNDEFINED.getCode()), null);
         Dimension dim = new Dimension(256, 256);
         Set<Tile> result = tileMap.getTilesFor(tileSet, bbox);
         Assert.assertEquals(expected, result);
 
         expected.add(tileMap.makeTile(tileSet, TileCoordinate.valueOf(1, 0)));
-        bbox = new BoundingBox(new Point(-180, -90), new Point(180, 90));
+        bbox = new Envelope(Point.create2D(-180, -90, CrsId.UNDEFINED.getCode()), Point.create2D(180, 90, CrsId.UNDEFINED.getCode()),null);
         result = tileMap.getTilesFor(tileSet, bbox);
         Assert.assertEquals(expected, result);
 
-        bbox = new BoundingBox(new Point(-170, -80), new Point(160, 88));
+        bbox = new Envelope(Point.create2D(-170, -80, CrsId.UNDEFINED.getCode()), Point.create2D(160, 88, CrsId.UNDEFINED.getCode()),null);
         result = tileMap.getTilesFor(tileSet, bbox);
         Assert.assertEquals(expected, result);
     }

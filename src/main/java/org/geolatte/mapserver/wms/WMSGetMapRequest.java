@@ -19,8 +19,8 @@
 
 package org.geolatte.mapserver.wms;
 
-import org.geolatte.mapserver.util.BoundingBox;
-import org.geolatte.mapserver.util.SRS;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.crs.CrsId;
 
 import java.awt.*;
 
@@ -43,10 +43,10 @@ public class WMSGetMapRequest extends WMSRequest {
     private String[] styles;
 
     @WMSParameter(required = true, param = WMSParam.SRS)
-    private SRS srs;
+    private CrsId srs;
 
     @WMSParameter(required = true, param = WMSParam.BBOX)
-    private BoundingBox bbox;
+    private Envelope bbox;
 
     @WMSParameter(required = true, param = WMSParam.WIDTH)
     private Integer width;
@@ -99,11 +99,11 @@ public class WMSGetMapRequest extends WMSRequest {
         return width;
     }
 
-    public SRS getSrs() {
+    public CrsId getSrs() {
         return srs;
     }
 
-    public BoundingBox getBbox() {
+    public Envelope getBbox() {
         return bbox;
     }
 

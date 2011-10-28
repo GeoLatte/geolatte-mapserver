@@ -20,10 +20,10 @@
 package org.geolatte.mapserver.wms;
 
 import org.apache.log4j.Logger;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.img.JAIImaging;
 import org.geolatte.mapserver.tms.*;
 import org.geolatte.mapserver.util.Chrono;
-import org.geolatte.mapserver.util.SRS;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -124,7 +124,7 @@ public class WMSGetMapRequestHandler implements WMSRequestHandler {
     }
 
 
-    private boolean isSupported(TileMap tileMap, SRS srs) {
+    private boolean isSupported(TileMap tileMap, CrsId srs) {
         return this.tileMapRegistry.supportsSRS(tileMap.getTitle(), srs);
     }
 

@@ -19,8 +19,8 @@
 
 package org.geolatte.mapserver.wms;
 
-import org.geolatte.mapserver.util.BoundingBox;
-import org.geolatte.mapserver.util.SRS;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.crs.CrsId;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
@@ -186,7 +186,7 @@ public abstract class WMSRequest {
         return m.invoke(this, value);
     }
 
-    private static BoundingBox convertToBoundingBox(String strVal) throws InvalidWMSRequestException {
+    private static Envelope convertToEnvelope(String strVal) throws InvalidWMSRequestException {
         Scanner scanner = new Scanner(strVal);
         scanner.useDelimiter(",");
         double[] xyvals = new double[4];
@@ -200,17 +200,17 @@ public abstract class WMSRequest {
         } catch (IndexOutOfBoundsException e) {
             throw new InvalidWMSRequestException(String.format("Invalid Boundingbox: %s", strVal));
         }
-        return new BoundingBox(xyvals[0], xyvals[1], xyvals[2], xyvals[3]);
+        return new Envelope(xyvals[0], xyvals[1], xyvals[2], xyvals[3], null);
     }
 
     private static Integer convertToInteger(String strVal) {
         return Integer.valueOf(strVal);
     }
 
-    private static SRS convertToSRS(String strVal) throws InvalidWMSRequestException {
+    private static CrsId convertToSRS(String strVal) throws InvalidWMSRequestException {
         try {
-            SRS srs = SRS.parse(strVal);
-            return srs;
+            CrsId crsId = CrsId.parse(strVal);
+            return crsId;
         } catch (IllegalArgumentException e) {
             throw new InvalidWMSRequestException(String.format("Can't interpret specified SRS: %s", strVal), e);
         }
