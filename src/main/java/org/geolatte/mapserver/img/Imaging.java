@@ -65,10 +65,11 @@ public interface Imaging {
      * @param inStream <code>InputStream</code> from which the <code>TileImage</code> is read
      * @param x        the minimum X-coordinate for the <code>TileImage</code>
      * @param y        the minimum Y-coordinate for the <code>TileImage</code>
+     * @param forceArgb force the conversion of tile images to ARGB
      * @return the <code>TileImage</code> provided by the input stream
      * @throws IOException
      */
-    public abstract TileImage read(InputStream inStream, int x, int y) throws IOException;
+    public abstract TileImage read(InputStream inStream, int x, int y, boolean forceArgb) throws IOException;
 
     /**
      * Mosaics a set of <code>TileImage</code>s.

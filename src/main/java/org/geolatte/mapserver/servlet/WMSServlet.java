@@ -55,10 +55,11 @@ public class WMSServlet extends HttpServlet {
     LOGGER.info("Request: " + request.getQueryString());
         try {
             WMSRequest wmsRequest = WMSRequest.adapt(request);
+            response.setContentType(wmsRequest.getResponseContentType());
             wmsService.handle(wmsRequest, response.getOutputStream());
         } catch (WMSServiceException se) {
             //Note that this ignores the EXCEPTIONS Request Parameter!!
-            response.setHeader("Content-Type", OGCMIMETypes.SERVICE_EXCEPTION_XML);
+            response.setContentType(OGCMIMETypes.SERVICE_EXCEPTION_XML);
             se.writeToOutputStream(response.getOutputStream());
         } finally {
             response.getOutputStream().close();

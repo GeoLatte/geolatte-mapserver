@@ -30,7 +30,7 @@
                 <Keyword>kw1</Keyword>
                 <Keyword>kw2</Keyword>
             </KeywordList>
-            <OnlineResource xmlns:xlink="http://www.w3.org/19999/xlink" xlink:type="simple"
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink.xsd" xlink:type="simple"
                             xlink:href="http://www.geolatte.org"/>
 
             <!-- ContactInformation, Fees and AccessConstraints are currently not supported -->
@@ -60,11 +60,11 @@
     <!-- these are the producer services -->
     <Producers>
         <TileMaps>
-
             <TileMap
                     title="basic"
                     type="url"
                     TileImageSourceFactory="org.geolatte.mapserver.tms.URLTileImageSourceFactory"
+                    BoundingBoxOpFactory="org.geolatte.mapserver.wms.DefaultBoundingBoxOpFactory"
                     path="http://localhost/cgi-bin/tilecache.cgi/1.0.0/basic/"
                     />
 
@@ -72,15 +72,17 @@
                     title="osm"
                     type="file"
                     TileImageSourceFactory="org.geolatte.mapserver.tms.FileTileImageSourceFactory"
-                    path="/tmp/tiles/tilemapresource.xml"
+                    path="src/test/resources/tiles/tilemapresource.xml"
+                    forceArgb="true"
+                    srs="900913"
                     />
 
             <TileMap
                     title="orthos"
                     type="file"
                     TileImageSourceFactory="org.geolatte.mapserver.tms.FileTileImageSourceFactory"
-                    path="/tmp/tiles/orthos/tilemapresource.xml"
-                    srs="25831 9100913"
+                    path="src/test/resources/tiles/orthos/tilemapresource.xml"
+                    srs="25831 900913"
                     />
 
 

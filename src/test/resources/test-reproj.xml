@@ -30,7 +30,7 @@
                 <Keyword>kw1</Keyword>
                 <Keyword>kw2</Keyword>
             </KeywordList>
-            <OnlineResource xmlns:xlink="http://www.w3.org/19999/xlink" xlink:type="simple"
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink.xsd" xlink:type="simple"
                             xlink:href="http://www.geolatte.org"/>
         </Service>
     </WMS>
@@ -44,8 +44,8 @@
                     title="orthos"
                     type="file"
                     TileImageSourceFactory="org.geolatte.mapserver.tms.FileTileImageSourceFactory"
-                    path="/home/maesenka/geodata/middenschalige-orthos/tms-antwerpen/tilemapresource.xml"
-                    srs="25831 9100913 4326"
+                    path="src/test/resources/tiles/tilemapresource.xml"
+                    srs="25831 900913 4326"
                     />
 
         </TileMaps>

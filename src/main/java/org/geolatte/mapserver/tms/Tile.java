@@ -69,12 +69,12 @@ public class Tile {
      * @param imaging the <code>Imaging</code> implementation to use for decoding the image
      * @return
      */
-    public TileImage getImage(Imaging imaging) {
+    public TileImage getImage(Imaging imaging, boolean forceArgb) {
         InputStream is = null;
         PixelRange pb = getPixelBounds();
         try {
             is = source.open();
-            return imaging.read(is, pb.getMinX(), pb.getMinY());
+            return imaging.read(is, pb.getMinX(), pb.getMinY(), forceArgb);
         }
         catch (FileNotFoundException e) {
             // no tile found, return an empty tile
