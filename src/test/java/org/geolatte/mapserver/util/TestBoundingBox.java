@@ -61,24 +61,24 @@ public class TestBoundingBox {
     @Test
     public void test_isWithin() {
         Envelope b0 = new Envelope(0, 0, 500, 100);
-        assertTrue(b0.isWithin(b0));
+        assertTrue(b0.within(b0));
 
         Envelope b1 = new Envelope(10, 20, 30, 40);
-        assertTrue(b1.isWithin(b0));
-        assertFalse(b0.isWithin(b1));
+        assertTrue(b1.within(b0));
+        assertFalse(b0.within(b1));
 
         b1 = new Envelope(-10, 20, 30, 40);
-        assertFalse(b1.isWithin(b0));
-        assertFalse(b0.isWithin(b1));
+        assertFalse(b1.within(b0));
+        assertFalse(b0.within(b1));
 
         b1 = new Envelope(-10, -10, -5, -5);
-        assertFalse(b1.isWithin(b0));
+        assertFalse(b1.within(b0));
 
         b1 = new Envelope(-10, -10, 600, 120);
-        assertFalse(b1.isWithin(b0));
+        assertFalse(b1.within(b0));
 
         b1 = new Envelope(600, 50, 700, 80);
-        assertFalse(b1.isWithin(b0));
+        assertFalse(b1.within(b0));
 
 
     }
@@ -136,28 +136,28 @@ public class TestBoundingBox {
     @Test
     public void test_contains() {
         Envelope box = new Envelope(0, 0, 100, 100);
-        Point p = Point.create2D(0, 0);
+        Point p = Point.create(0, 0);
         assertTrue(box.contains(p));
 
-        p = Point.create2D(100, 100);
+        p = Point.create(100, 100);
         assertTrue(box.contains(p));
 
-        p = Point.create2D(10, 20);
+        p = Point.create(10, 20);
         assertTrue(box.contains(p));
 
-        p = Point.create2D(-10, 0);
+        p = Point.create(-10, 0);
         assertFalse(box.contains(p));
 
-        p = Point.create2D(0, -10);
+        p = Point.create(0, -10);
         assertFalse(box.contains(p));
 
-        p = Point.create2D(110, 0);
+        p = Point.create(110, 0);
         assertFalse(box.contains(p));
 
-        p = Point.create2D(0, 110);
+        p = Point.create(0, 110);
         assertFalse(box.contains(p));
 
-        p = Point.create2D(110, 110);
+        p = Point.create(110, 110);
         assertFalse(box.contains(p));
 
 

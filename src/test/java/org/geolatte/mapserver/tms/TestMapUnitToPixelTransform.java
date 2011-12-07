@@ -27,6 +27,7 @@ import org.geolatte.mapserver.util.PixelRange;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -44,7 +45,7 @@ public class TestMapUnitToPixelTransform {
     @Test
     public void test_pixel_outside_range_is_allowed() {
         Point received = pixRangeBasedTransform.toPoint(Pixel.valueOf(0, 0));
-        Point expected = Point.create2D(-90, 120, CrsId.UNDEFINED.getCode());
+        Point expected = Point.create(-90, 120, CrsId.UNDEFINED);
         assertEquals(expected, received);
 
     }
@@ -53,19 +54,19 @@ public class TestMapUnitToPixelTransform {
     public void test_pixel_to_point_on_pixrange_based_transform() {
 
         Point pnt = pixRangeBasedTransform.toPoint(Pixel.valueOf(100, 50));
-        assertEquals(Point.create2D(10, 100, CrsId.UNDEFINED.getCode()), pnt);
+        assertTrue(equalsWithinTolerance(Point.create(10, 100, CrsId.UNDEFINED), pnt, Math.ulp(100d)));
 
         pnt = pixRangeBasedTransform.toPoint(Pixel.valueOf(100, 249));
-        assertEquals(Point.create2D(10, 20.4, CrsId.UNDEFINED.getCode()), pnt);
+        assertTrue(equalsWithinTolerance(Point.create(10, 20.4, CrsId.UNDEFINED), pnt, Math.ulp(250d)));
 
         pnt = pixRangeBasedTransform.toPoint(Pixel.valueOf(199, 249));
-        assertEquals(Point.create2D(109, 20.4, CrsId.UNDEFINED.getCode()), pnt);
+        assertTrue(equalsWithinTolerance(Point.create(109, 20.4, CrsId.UNDEFINED), pnt, Math.ulp(250d)));
 
         pnt = pixRangeBasedTransform.toPoint(Pixel.valueOf(199, 50));
-        assertEquals(Point.create2D(109, 100, CrsId.UNDEFINED.getCode()), pnt);
+        assertTrue(equalsWithinTolerance(Point.create(109, 100, CrsId.UNDEFINED), pnt, Math.ulp(200d)));
 
         pnt = pixRangeBasedTransform.toPoint(Pixel.valueOf(150, 150));
-        assertEquals(Point.create2D(60, 60, CrsId.UNDEFINED.getCode()), pnt);
+        assertTrue(equalsWithinTolerance(Point.create(60, 60, CrsId.UNDEFINED), pnt, Math.ulp(150d)));
 
     }
 
@@ -73,77 +74,77 @@ public class TestMapUnitToPixelTransform {
     public void test_pixel_to_point_on_upp_based_transform() {
 
         Point pnt = uppBasedTransform.toPoint(Pixel.valueOf(100, 200));
-        assertEquals(Point.create2D(10, 100, CrsId.UNDEFINED.getCode()), pnt);
+        assertTrue(equalsWithinTolerance(Point.create(10, 100, CrsId.UNDEFINED), pnt, Math.ulp(100d)));
 
         pnt = uppBasedTransform.toPoint(Pixel.valueOf(100, 999));
-        assertEquals(Point.create2D(10, 20.1, CrsId.UNDEFINED.getCode()), pnt);
+        assertTrue(equalsWithinTolerance(Point.create(10, 20.1, CrsId.UNDEFINED), pnt, Math.ulp(20d)));
 
         pnt = uppBasedTransform.toPoint(Pixel.valueOf(1099, 999));
-        assertEquals(Point.create2D(109.9, 20.1, CrsId.UNDEFINED.getCode()), pnt);
+        assertTrue(equalsWithinTolerance(Point.create(109.9, 20.1, CrsId.UNDEFINED), pnt, Math.ulp(100d)));
 
         pnt = uppBasedTransform.toPoint(Pixel.valueOf(1099, 200));
-        assertEquals(Point.create2D(109.9, 100, CrsId.UNDEFINED.getCode()), pnt);
+        assertTrue(equalsWithinTolerance(Point.create(109.9, 100, CrsId.UNDEFINED), pnt, Math.ulp(100d)));
 
         pnt = uppBasedTransform.toPoint(Pixel.valueOf(600, 600));
-        assertEquals(Point.create2D(60, 60, CrsId.UNDEFINED.getCode()), pnt);
+        assertTrue(equalsWithinTolerance(Point.create(60, 60, CrsId.UNDEFINED), pnt, Math.ulp(60d)));
 
     }
 
     @Test
     public void test_point_outside_extent_is_allowed() {
 
-        Pixel received = pixRangeBasedTransform.toPixel(Point.create2D(0, 2, CrsId.UNDEFINED.getCode()));
+        Pixel received = pixRangeBasedTransform.toPixel(Point.create(0, 2, CrsId.UNDEFINED));
         Pixel expected = Pixel.valueOf(90, 295);
         assertEquals(expected, received);
     }
 
     @Test
     public void test_point_to_pixel_on_pixrange_based_transform() {
-        Pixel pixel = pixRangeBasedTransform.toPixel(Point.create2D(10, 20, CrsId.UNDEFINED.getCode()));
+        Pixel pixel = pixRangeBasedTransform.toPixel(Point.create(10, 20, CrsId.UNDEFINED));
         assertEquals(Pixel.valueOf(100, 249), pixel);
 
-        pixel = pixRangeBasedTransform.toPixel(Point.create2D(10, 100, CrsId.UNDEFINED.getCode()));
+        pixel = pixRangeBasedTransform.toPixel(Point.create(10, 100, CrsId.UNDEFINED));
         assertEquals(Pixel.valueOf(100, 50), pixel);
 
-        pixel = pixRangeBasedTransform.toPixel(Point.create2D(110, 100, CrsId.UNDEFINED.getCode()));
+        pixel = pixRangeBasedTransform.toPixel(Point.create(110, 100, CrsId.UNDEFINED));
         assertEquals(Pixel.valueOf(199, 50), pixel);
 
-        pixel = pixRangeBasedTransform.toPixel(Point.create2D(110, 20, CrsId.UNDEFINED.getCode()));
+        pixel = pixRangeBasedTransform.toPixel(Point.create(110, 20, CrsId.UNDEFINED));
         assertEquals(Pixel.valueOf(199, 249), pixel);
 
-        pixel = pixRangeBasedTransform.toPixel(Point.create2D(60, 60, CrsId.UNDEFINED.getCode()));
+        pixel = pixRangeBasedTransform.toPixel(Point.create(60, 60, CrsId.UNDEFINED));
         assertEquals(Pixel.valueOf(150, 150), pixel);
 
     }
 
     @Test
     public void test_point_pixel_on_upp_based_transform() {
-        Pixel pixel = uppBasedTransform.toPixel(Point.create2D(10, 100, CrsId.UNDEFINED.getCode()));
+        Pixel pixel = uppBasedTransform.toPixel(Point.create(10, 100, CrsId.UNDEFINED));
         assertEquals(Pixel.valueOf(100, 200), pixel);
 
-        pixel = uppBasedTransform.toPixel(Point.create2D(10, 20, CrsId.UNDEFINED.getCode()));
+        pixel = uppBasedTransform.toPixel(Point.create(10, 20, CrsId.UNDEFINED));
         assertEquals(Pixel.valueOf(100, 999), pixel);
 
-        pixel = uppBasedTransform.toPixel(Point.create2D(110, 20, CrsId.UNDEFINED.getCode()));
+        pixel = uppBasedTransform.toPixel(Point.create(110, 20, CrsId.UNDEFINED));
         assertEquals(Pixel.valueOf(1099, 999), pixel);
 
-        pixel = uppBasedTransform.toPixel(Point.create2D(110, 100, CrsId.UNDEFINED.getCode()));
+        pixel = uppBasedTransform.toPixel(Point.create(110, 100, CrsId.UNDEFINED));
         assertEquals(Pixel.valueOf(1099, 200), pixel);
 
-        pixel = uppBasedTransform.toPixel(Point.create2D(60, 60, CrsId.UNDEFINED.getCode()));
+        pixel = uppBasedTransform.toPixel(Point.create(60, 60, CrsId.UNDEFINED));
         assertEquals(Pixel.valueOf(600, 600), pixel);
 
         //the next few cases test whether coordinates map properly to the correct pixel
-        pixel = uppBasedTransform.toPixel(Point.create2D(60.1, 60, CrsId.UNDEFINED.getCode()));
+        pixel = uppBasedTransform.toPixel(Point.create(60.1, 60, CrsId.UNDEFINED));
         assertEquals(Pixel.valueOf(601, 600), pixel);
 
-        pixel = uppBasedTransform.toPixel(Point.create2D(60.05, 60, CrsId.UNDEFINED.getCode()));
+        pixel = uppBasedTransform.toPixel(Point.create(60.05, 60, CrsId.UNDEFINED));
         assertEquals(Pixel.valueOf(600, 600), pixel);
 
-        pixel = uppBasedTransform.toPixel(Point.create2D(60, 60.1, CrsId.UNDEFINED.getCode()));
+        pixel = uppBasedTransform.toPixel(Point.create(60, 60.1, CrsId.UNDEFINED));
         assertEquals(Pixel.valueOf(600, 599), pixel);
 
-        pixel = uppBasedTransform.toPixel(Point.create2D(60, 60.05, CrsId.UNDEFINED.getCode()));
+        pixel = uppBasedTransform.toPixel(Point.create(60, 60.05, CrsId.UNDEFINED));
         assertEquals(Pixel.valueOf(600, 599), pixel);
 
 
@@ -189,6 +190,13 @@ public class TestMapUnitToPixelTransform {
         result = mutpTransform.toPixelRange(testBBox);
         expected = new PixelRange(0, 0, 512, 256);
         assertEquals(expected, result);
+    }
+
+    //TODO -- this should be added to geometry interface
+    public boolean equalsWithinTolerance(Point p1, Point p2, double tolerance){
+        if (tolerance < 0) tolerance = -tolerance;
+        return Math.abs(p1.getX() - p2.getX()) < tolerance &&
+                Math.abs(p2.getY() - p2.getY()) < tolerance;
     }
 
 }

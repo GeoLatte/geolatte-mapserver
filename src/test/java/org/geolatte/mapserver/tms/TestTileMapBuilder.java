@@ -77,8 +77,8 @@ public class TestTileMapBuilder {
 
     @Test
     public void test_get_bbox() {
-        Point ll = Point.create2D(-180.0000, -90.0000, 4326);
-        Point ur = Point.create2D(180.0000, 90.0000, 4326);
+        Point ll = Point.create(-180.0000, -90.0000, CrsId.valueOf(4326));
+        Point ur = Point.create(180.0000, 90.0000, CrsId.valueOf(4326));
         Envelope bbox = builder.getBoundingBox();
 
         assertEquals(ll, bbox.lowerLeft());
@@ -87,7 +87,7 @@ public class TestTileMapBuilder {
 
     @Test
     public void test_get_origin() {
-        Point origin = Point.create2D(-180.0000, -90.000, CrsId.UNDEFINED.getCode());
+        Point origin = Point.create(-180.0000, -90.000, CrsId.UNDEFINED);
         assertEquals(origin, builder.getOrigin());
     }
 
