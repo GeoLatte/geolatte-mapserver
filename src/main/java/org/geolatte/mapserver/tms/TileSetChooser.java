@@ -20,7 +20,7 @@
 package org.geolatte.mapserver.tms;
 
 import org.apache.log4j.Logger;
-import org.geolatte.mapserver.util.BoundingBox;
+import org.geolatte.geom.Envelope;
 
 import java.awt.*;
 import java.util.List;
@@ -31,11 +31,11 @@ public class TileSetChooser {
 
 
     final private TileMap tileMap;
-    final private BoundingBox bbox;
+    final private Envelope bbox;
     final private Dimension imageDimension;
     final private double requestUnitsPerPixel;
 
-    public TileSetChooser(TileMap tileMap, BoundingBox bbox, Dimension imageDimension) {
+    public TileSetChooser(TileMap tileMap, Envelope bbox, Dimension imageDimension) {
         this.tileMap = tileMap;
         this.bbox = bbox;
         this.imageDimension = imageDimension;

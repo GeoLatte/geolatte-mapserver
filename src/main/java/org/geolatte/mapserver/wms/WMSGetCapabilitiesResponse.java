@@ -21,6 +21,8 @@ package org.geolatte.mapserver.wms;
 
 import net.opengis.wms.v_1_1_1.*;
 import net.opengis.wms.v_1_1_1.Exception;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.config.Configuration;
 import org.geolatte.mapserver.referencing.Referencing;
 import org.geolatte.mapserver.tms.TileMap;
@@ -60,24 +62,24 @@ public class WMSGetCapabilitiesResponse {
         layerRoot.setTitle(title);
         for (String tileMapName : registry.getTileMapNames()) {
             TileMap tileMap = registry.getTileMap(tileMapName);
-            List<org.geolatte.mapserver.util.SRS> supportedSRS = registry.getSupportedSRS(tileMapName);
+            List<CrsId> supportedSRS = registry.getSupportedSRS(tileMapName);
             addLayer(layerRoot, tileMap, supportedSRS);
         }
         capability.setLayer(layerRoot);
         capabilities.setCapability(capability);
     }
 
-    private static void addLayer(Layer root, TileMap tileMap, List<org.geolatte.mapserver.util.SRS> supportedSRS) {
+    private static void addLayer(Layer root, TileMap tileMap, List<CrsId> supportedSRS) {
         Layer layer = JAXB.instance().createLayer();
         //Currently title and name are the same because
         //TMS only specifies a title
         layer.setTitle(tileMap.getTitle());
         layer.setName(tileMap.getTitle());
         addLayerSRS(layer,tileMap.getSRS().toString());
-        for (org.geolatte.mapserver.util.SRS srs : supportedSRS) {
+        for (CrsId srs : supportedSRS) {
             addLayerSRS(layer, srs.toString());
         }
-        org.geolatte.mapserver.util.BoundingBox bbox = tileMap.getBoundingBox();
+        Envelope bbox = tileMap.getBoundingBox();
         addLatLonBoundingBox(tileMap.getSRS(), layer, bbox);
         addBoundingBox(tileMap.getSRS(), layer, bbox);
         root.getLayer().add(layer);
@@ -89,8 +91,8 @@ public class WMSGetCapabilitiesResponse {
         layer.getSRS().add(srs);
     }
 
-    private static void addLatLonBoundingBox(org.geolatte.mapserver.util.SRS srs, Layer layer, org.geolatte.mapserver.util.BoundingBox bbox) {
-        org.geolatte.mapserver.util.BoundingBox llbox = Referencing.transformToLatLong(bbox, srs);
+    private static void addLatLonBoundingBox(CrsId srs, Layer layer, Envelope bbox) {
+        Envelope llbox = Referencing.transformToLatLong(bbox, srs);
         LatLonBoundingBox latLongBoundingBox = JAXB.instance().createLatLonBoundingBox();
         latLongBoundingBox.setMinx(toString(llbox.getMinX()));
         latLongBoundingBox.setMaxx(toString(llbox.getMaxX()));
@@ -99,8 +101,8 @@ public class WMSGetCapabilitiesResponse {
         layer.setLatLonBoundingBox(latLongBoundingBox);
     }
 
-    private static void addBoundingBox(org.geolatte.mapserver.util.SRS srs, Layer layer, org.geolatte.mapserver.util.BoundingBox bbox) {
-        net.opengis.wms.v_1_1_1.BoundingBox boundingBox = JAXB.instance().createBoundingBox();
+    private static void addBoundingBox(CrsId srs, Layer layer, Envelope bbox) {
+        BoundingBox boundingBox = JAXB.instance().createBoundingBox();
         boundingBox.setSRS(srs.toString());
         boundingBox.setMaxx(toString(bbox.getMaxX()));
         boundingBox.setMiny(toString(bbox.getMinY()));

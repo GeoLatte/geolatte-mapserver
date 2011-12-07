@@ -22,9 +22,9 @@ package org.geolatte.mapserver.tms;
 import junit.framework.Assert;
 import org.dom4j.Document;
 import org.dom4j.util.NodeComparator;
-import org.geolatte.mapserver.util.BoundingBox;
-import org.geolatte.mapserver.util.Point;
-import org.geolatte.mapserver.util.SRS;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Point;
+import org.geolatte.geom.crs.CrsId;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -71,15 +71,15 @@ public class TestTileMapBuilder {
 
     @Test
     public void test_get_srs() {
-        SRS srs = builder.getSRS();
-        assertEquals(SRS.parse("EPSG: 4326"), srs);
+        CrsId srs = builder.getSRS();
+        assertEquals(CrsId.parse("EPSG: 4326"), srs);
     }
 
     @Test
     public void test_get_bbox() {
-        Point ll = new Point(-180.0000, -90.0000);
-        Point ur = new Point(180.0000, 90.0000);
-        BoundingBox bbox = builder.getBoundingBox();
+        Point ll = Point.create(-180.0000, -90.0000, CrsId.valueOf(4326));
+        Point ur = Point.create(180.0000, 90.0000, CrsId.valueOf(4326));
+        Envelope bbox = builder.getBoundingBox();
 
         assertEquals(ll, bbox.lowerLeft());
         assertEquals(ur, bbox.upperRight());
@@ -87,7 +87,7 @@ public class TestTileMapBuilder {
 
     @Test
     public void test_get_origin() {
-        Point origin = new Point(-180.0000, -90.000);
+        Point origin = Point.create(-180.0000, -90.000, CrsId.UNDEFINED);
         assertEquals(origin, builder.getOrigin());
     }
 

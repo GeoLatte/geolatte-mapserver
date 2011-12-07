@@ -19,39 +19,41 @@
 
 package org.geolatte.mapserver.util;
 
+import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
 
 import static junit.framework.Assert.*;
 
-public class TestSRS {
+//TODO -- move this to geolatte-geom 
+public class TestCrsId {
 
 
     @Test
     public void test_parse() {
-        SRS srs = SRS.parse("EPSG:4326");
-        assertEquals("EPSG", srs.authority);
-        assertEquals(4326, srs.code);
+        CrsId srs = CrsId.parse("EPSG:4326");
+        assertEquals("EPSG", srs.getAuthority());
+        assertEquals(4326, srs.getCode());
 
-        srs = SRS.parse("EPSG: 4326");
-        assertEquals("EPSG", srs.authority);
-        assertEquals(4326, srs.code);
+        srs = CrsId.parse("EPSG: 4326");
+        assertEquals("EPSG", srs.getAuthority());
+        assertEquals(4326, srs.getCode());
 
-        srs = SRS.parse("4326");
-        assertEquals("EPSG", srs.authority);
-        assertEquals(4326, srs.code);
+        srs = CrsId.parse("4326");
+        assertEquals("EPSG", srs.getAuthority());
+        assertEquals(4326, srs.getCode());
 
     }
 
     @Test
     public void test_invalid_input() {
         try {
-            SRS srs = SRS.parse("EPSG: xxx");
+            CrsId srs = CrsId.parse("EPSG: xxx");
             fail();
         } catch (IllegalArgumentException e) {
         }
 
         try {
-            SRS srs = SRS.parse("blabla");
+            CrsId srs = CrsId.parse("blabla");
             fail();
         } catch (IllegalArgumentException e) {
             //OK
@@ -61,7 +63,7 @@ public class TestSRS {
     @Test
     public void test_null_input() {
         try {
-            SRS srs = SRS.parse(null);
+            CrsId srs = CrsId.parse(null);
             fail();
         } catch (IllegalArgumentException e) {
             // OK
@@ -70,10 +72,10 @@ public class TestSRS {
 
     @Test
     public void test_equality() {
-        SRS srs1 = SRS.parse("EPSG: 4326");
-        SRS srs2 = SRS.parse("4326");
+        CrsId srs1 = CrsId.parse("EPSG: 4326");
+        CrsId srs2 = CrsId.parse("4326");
         assertEquals(srs1, srs2);
-        srs2 = SRS.parse("EPSG: 31370");
+        srs2 = CrsId.parse("EPSG: 31370");
         assertFalse(srs1.equals(srs2));
 
     }

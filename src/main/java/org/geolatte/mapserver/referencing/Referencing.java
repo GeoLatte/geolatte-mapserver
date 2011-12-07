@@ -19,9 +19,9 @@
 
 package org.geolatte.mapserver.referencing;
 
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.tms.MapUnitToPixelTransform;
-import org.geolatte.mapserver.util.BoundingBox;
-import org.geolatte.mapserver.util.SRS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.operation.transform.AffineTransform2D;
@@ -44,7 +44,7 @@ import java.awt.geom.*;
 public class Referencing {
 
     private final static CRSAuthorityFactory factory = CRS.getAuthorityFactory(true);
-    private final static SRS GOOGLE_SRS_CODE = new SRS("EPSG", 900913);
+    private final static CrsId GOOGLE_SRS_CODE = new CrsId("EPSG", 900913);
     private final static String GOOGLE_WKT = "PROJCS[\"Google Mercator\", "
             + "GEOGCS[\"WGS 84\", "
             + "DATUM[\"World Geodetic System 1984\", "
@@ -84,22 +84,22 @@ public class Referencing {
      * Transforms the specified <code>BoundingBox</code> to Lat/Lon, assuming that
      * its coordinates are currently expressed in the specified coordinate reference system.
      *
-     * @param srs  specified coordinate reference system
+     * @param crs  specified coordinate reference system
      * @param bbox bounding box to transform
      * @return bounding box in Lat/Lon coordinates (EPSG:4326)
      */
-    public static BoundingBox transformToLatLong(BoundingBox bbox, SRS srs) {
-        SRS target = SRS.parse("EPSG:4326");
-        return transform(bbox, srs, target);
+    public static Envelope transformToLatLong(Envelope bbox, CrsId crs) {
+        CrsId target = CrsId.parse("EPSG:4326");
+        return transform(bbox, crs, target);
     }
 
 
-    public static BoundingBox transform(BoundingBox bbox, SRS srcSRS, SRS targetSRS) {
-        MathTransform mtf = createMathTransform(srcSRS, targetSRS);
-        return transform(mtf, bbox);
+    public static Envelope transform(Envelope bbox, CrsId srcCRS, CrsId targetCRS) {
+        MathTransform mtf = createMathTransform(srcCRS, targetCRS);
+        return transform(mtf, bbox, targetCRS);
     }
 
-    public static MathTransform createMathTransform(SRS srs, SRS target) {
+    public static MathTransform createMathTransform(CrsId srs, CrsId target) {
         try {
             CoordinateReferenceSystem sourceCRS = create(srs);
             CoordinateReferenceSystem targetCRS = create(target);
@@ -109,26 +109,27 @@ public class Referencing {
         }
     }
 
-    private static BoundingBox transform(MathTransform transform, BoundingBox sourceBbox) {
+    private static Envelope transform(MathTransform transform, Envelope sourceBbox, CrsId targetCRS) {
         double[] source = new double[8];
         double[] target = new double[8];
         try {
-            source[0] = sourceBbox.upperLeft().x;
-            source[1] = sourceBbox.upperLeft().y;
-            source[2] = sourceBbox.lowerLeft().x;
-            source[3] = sourceBbox.lowerLeft().y;
-            source[4] = sourceBbox.upperRight().x;
-            source[5] = sourceBbox.upperRight().y;
-            source[6] = sourceBbox.lowerRight().x;
-            source[7] = sourceBbox.lowerRight().y;
+            source[0] = sourceBbox.upperLeft().getX();
+            source[1] = sourceBbox.upperLeft().getY();
+            source[2] = sourceBbox.lowerLeft().getX();
+            source[3] = sourceBbox.lowerLeft().getY();
+            source[4] = sourceBbox.upperRight().getX();
+            source[5] = sourceBbox.upperRight().getY();
+            source[6] = sourceBbox.lowerRight().getX();
+            source[7] = sourceBbox.lowerRight().getY();
 
             transform.transform(source, 0, target, 0, 4);
-            return new BoundingBox(
+            return new Envelope(
                     getMin(target[0], target[2], target[4], target[6]),
                     getMin(target[1], target[3], target[5], target[7]),
                     getMax(target[0], target[2], target[4], target[6]),
-                    getMax(target[1], target[3], target[5], target[7])
-                    );
+                    getMax(target[1], target[3], target[5], target[7]),
+                    targetCRS
+            );
         } catch (TransformException e) {
             throw new RuntimeException(e);
         }
@@ -151,7 +152,7 @@ public class Referencing {
     }
 
 
-    private static CoordinateReferenceSystem create(SRS srs) throws FactoryException {
+    private static CoordinateReferenceSystem create(CrsId srs) throws FactoryException {
         if (GOOGLE_SRS_CODE.equals(srs)) {
             return GOOGLE_CRS;
         }
@@ -174,7 +175,7 @@ public class Referencing {
      * @return
      * @throws ReferencingException
      */
-    public static Warp createWarpApproximation(MapUnitToPixelTransform mupSrcTransform, SRS sourceSRS, SRS targetSRS, MapUnitToPixelTransform mupTargetTransform, double tolerance) throws ReferencingException {
+    public static Warp createWarpApproximation(MapUnitToPixelTransform mupSrcTransform, CrsId sourceSRS, CrsId targetSRS, MapUnitToPixelTransform mupTargetTransform, double tolerance) throws ReferencingException {
 
         MathTransformFactory mtFactory = ReferencingFactoryFinder.getMathTransformFactory(null);
 

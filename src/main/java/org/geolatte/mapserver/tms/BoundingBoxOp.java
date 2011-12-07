@@ -20,8 +20,8 @@
 package org.geolatte.mapserver.tms;
 
 import org.apache.log4j.Logger;
+import org.geolatte.geom.Envelope;
 import org.geolatte.mapserver.img.Imaging;
-import org.geolatte.mapserver.util.BoundingBox;
 import org.geolatte.mapserver.util.Chrono;
 import org.geolatte.mapserver.util.PixelRange;
 
@@ -50,12 +50,11 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
 
     private final static Logger LOGGER = Logger.getLogger(BoundingBoxOp.class);
 
-    final private BoundingBox requestedBbox;
+    final private Envelope requestedBbox;
     final private Dimension dimension;
     private final Imaging imaging;
-
     final private TileMap tileMap;
-    private BoundingBox tileSetClippedBbox;
+    private Envelope tileSetClippedBbox;
     private TileSet tileSet;
     private Set<Tile> tiles;
     private Set<TileImage> images = new HashSet<TileImage>();
@@ -70,7 +69,7 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
      * @param dimension the image dimensions of the result
      * @param imaging the <code>Imaging</code> instance to use for the image-manipulation  
      */
-    public BoundingBoxOp(TileMap tileMap, BoundingBox boundingBox, Dimension dimension, Imaging imaging) {
+    public BoundingBoxOp(TileMap tileMap, Envelope boundingBox, Dimension dimension, Imaging imaging) {
         this.tileMap = tileMap;
         this.dimension = dimension;
         this.requestedBbox = boundingBox;

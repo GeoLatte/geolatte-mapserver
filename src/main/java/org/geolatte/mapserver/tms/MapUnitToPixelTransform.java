@@ -19,10 +19,10 @@
 
 package org.geolatte.mapserver.tms;
 
-import org.geolatte.mapserver.util.BoundingBox;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Point;
 import org.geolatte.mapserver.util.Pixel;
 import org.geolatte.mapserver.util.PixelRange;
-import org.geolatte.mapserver.util.Point;
 
 import java.awt.geom.AffineTransform;
 
@@ -39,7 +39,7 @@ import java.awt.geom.AffineTransform;
  *         creation-date: Jul 8, 2010
  */
 public class MapUnitToPixelTransform {
-    private final BoundingBox extent;
+    private final Envelope extent;
     private final double mapUnitsPerPixelX;
     private final double mapUnitsPerPixelY;
     private final PixelRange pixelRange;
@@ -49,7 +49,7 @@ public class MapUnitToPixelTransform {
      * @param extent the maximum extent in map units
      * @param pixelRange the maximum extent in pixel coordinates
      */
-    public MapUnitToPixelTransform(BoundingBox extent, PixelRange pixelRange) {
+    public MapUnitToPixelTransform(Envelope extent, PixelRange pixelRange) {
         this.extent = extent;
         this.mapUnitsPerPixelX = extent.getWidth() / pixelRange.getWidth();
         this.mapUnitsPerPixelY = extent.getHeight() / pixelRange.getHeight();
@@ -63,7 +63,7 @@ public class MapUnitToPixelTransform {
      * @param minPixelY the minimum pixel coordinate in the Y-axis
      * @param mapUnitsPerPixel the map units per pixel for the <code>PixelRange</code>
      */
-    public MapUnitToPixelTransform(BoundingBox extent, int minPixelX, int minPixelY, double mapUnitsPerPixel) {
+    public MapUnitToPixelTransform(Envelope extent, int minPixelX, int minPixelY, double mapUnitsPerPixel) {
         this.extent = extent;
         this.mapUnitsPerPixelX = mapUnitsPerPixel;
         this.mapUnitsPerPixelY = mapUnitsPerPixel;
@@ -77,7 +77,7 @@ public class MapUnitToPixelTransform {
      * @param extent extent the maximum extent in map units
      * @param mapUnitsPerPixel  the map units per pixel for the <code>PixelRange</code>
      */
-    public MapUnitToPixelTransform(BoundingBox extent, double mapUnitsPerPixel) {
+    public MapUnitToPixelTransform(Envelope extent, double mapUnitsPerPixel) {
         this(extent, 0, 0, mapUnitsPerPixel);
     }
 
@@ -95,7 +95,7 @@ public class MapUnitToPixelTransform {
      *
      * @return
      */
-    public BoundingBox getDomain(){
+    public Envelope getDomain(){
         return this.extent;
     }
 
@@ -110,7 +110,7 @@ public class MapUnitToPixelTransform {
     public Point toPoint(Pixel pixel) {
         double x = extent.getMinX() + mapUnitsPerPixelX * (pixel.x - this.pixelRange.getMinX());
         double y = extent.getMaxY() - mapUnitsPerPixelY * (pixel.y - this.pixelRange.getMinY());
-        return Point.valueOf(x, y);
+        return Point.create(x, y, extent.getCrsId());
     }
 
 
@@ -148,8 +148,8 @@ public class MapUnitToPixelTransform {
      * @return
      */
     public Pixel toPixel(Point point, boolean leftBorderInclusive, boolean lowerBorderInclusive) {
-        double xOffset = (point.x - extent.getMinX());
-        double yOffset = (extent.getMaxY() - point.y);
+        double xOffset = (point.getX() - extent.getMinX());
+        double yOffset = (extent.getMaxY() - point.getY());
         double x = this.pixelRange.getMinX() + xOffset / mapUnitsPerPixelX;
         double y = this.pixelRange.getMinY() + yOffset / mapUnitsPerPixelY;
         x = removeRoundingError(x);
@@ -177,7 +177,7 @@ public class MapUnitToPixelTransform {
      * @param bbox
      * @return
      */
-    public PixelRange toPixelRange(BoundingBox bbox) {
+    public PixelRange toPixelRange(Envelope bbox) {
         Pixel ulPx = toPixel(bbox.upperLeft(), false, false);
         Pixel lrPx = toPixel(bbox.lowerRight(), true, true);
         int minX = ulPx.x;
