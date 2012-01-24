@@ -19,13 +19,13 @@
 
 package org.geolatte.mapserver.tms;
 
-import org.geolatte.mapserver.util.BoundingBox;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Point;
 import org.geolatte.mapserver.util.Pixel;
 import org.geolatte.mapserver.util.PixelRange;
-import org.geolatte.mapserver.util.Point;
 import org.junit.Test;
 
-import java.awt.*;
+import java.awt.Dimension;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -36,27 +36,27 @@ import static org.junit.Assert.fail;
  */
 public class TestTileSetCoordinateSpace {
 
-    TileSetCoordinateSpace space1 = new TileSetCoordinateSpace(new Point(500, 500), new Dimension(10, 10), new BoundingBox(50, 50, 1050, 1050), 5);
-    TileSetCoordinateSpace space2 = new TileSetCoordinateSpace(new Point(-180, -90), new Dimension(256, 256), new BoundingBox(-180, -90, 180, 90), 0.17578125);
+    TileSetCoordinateSpace space1 = new TileSetCoordinateSpace( Point.create(500, 500), new Dimension(10, 10), new Envelope(50, 50, 1050, 1050), 5);
+    TileSetCoordinateSpace space2 = new TileSetCoordinateSpace(Point.create(-180, -90), new Dimension(256, 256), new Envelope(-180, -90, 180, 90), 0.17578125);
 
     @Test
     public void test_get_bounds_for_tile_coordinate() {
 
-        BoundingBox received = space1.boundingBox(TileCoordinate.valueOf(0, 0));
-        BoundingBox expected = new BoundingBox(500, 500, 550, 550);
+        Envelope received = space1.boundingBox(TileCoordinate.valueOf(0, 0));
+        Envelope expected = new Envelope(500, 500, 550, 550);
         assertEquals(expected, received);
 
         received = space1.boundingBox(TileCoordinate.valueOf(-1, -1));
-        expected = new BoundingBox(450, 450, 500, 500);
+        expected = new Envelope(450, 450, 500, 500);
         assertEquals(expected, received);
 
         received = space1.boundingBox(TileCoordinate.valueOf(2, 3));
-        expected = new BoundingBox(600, 650, 650, 700);
+        expected = new Envelope(600, 650, 650, 700);
         assertEquals(expected, received);
 
 
         received = space1.boundingBox(TileCoordinate.valueOf(100, 100));
-        expected = new BoundingBox(5500, 5500, 5550, 5550);
+        expected = new Envelope(5500, 5500, 5550, 5550);
         assertEquals("Also tilecoordinates beyond extent of tilemap are allowed.", expected, received);
 
     }
@@ -89,7 +89,7 @@ public class TestTileSetCoordinateSpace {
         Dimension expected = new Dimension(200, 200);
         assertEquals(expected, received);
 
-        TileSetCoordinateSpace tcs = new TileSetCoordinateSpace(new Point(500, 500), new Dimension(20, 40), new BoundingBox(0, 0, 1000, 5000), 10);
+        TileSetCoordinateSpace tcs = new TileSetCoordinateSpace(Point.create(500, 500), new Dimension(20, 40), new Envelope(0, 0, 1000, 5000), 10);
         expected = new Dimension(100, 500);
         received = tcs.tileSetPixelDimension();
         assertEquals(expected, received);
@@ -98,14 +98,14 @@ public class TestTileSetCoordinateSpace {
 
     @Test
     public void test_tileWidth_In_MapUnits() {
-        TileSetCoordinateSpace tcs = new TileSetCoordinateSpace(new Point(500, 500), new Dimension(20, 40), new BoundingBox(0, 0, 1000, 5000), 10);
+        TileSetCoordinateSpace tcs = new TileSetCoordinateSpace(Point.create(500, 500), new Dimension(20, 40), new Envelope(0, 0, 1000, 5000), 10);
         double received = tcs.tileWidthInMapUnits();
         assertEquals(200.0, received, 0.00001);
     }
 
     @Test
     public void test_tileHeight_In_MapUnits() {
-        TileSetCoordinateSpace tcs = new TileSetCoordinateSpace(new Point(500, 500), new Dimension(20, 40), new BoundingBox(0, 0, 1000, 5000), 10);
+        TileSetCoordinateSpace tcs = new TileSetCoordinateSpace(Point.create(500, 500), new Dimension(20, 40), new Envelope(0, 0, 1000, 5000), 10);
         double received = tcs.tileHeightInMapUnits();
         assertEquals(400.0, received, 0.00001);
     }
@@ -113,23 +113,23 @@ public class TestTileSetCoordinateSpace {
     @Test
     public void test_point_to_tile_coordinate() {
 
-        TileCoordinate received = space1.tileCoordinateContaining(Point.valueOf(500, 500), true);
+        TileCoordinate received = space1.tileCoordinateContaining(Point.create(500, 500), true);
         assertEquals(TileCoordinate.valueOf(0, 0), received);
 
-        received = space1.tileCoordinateContaining(Point.valueOf(50, 50), true);
+        received = space1.tileCoordinateContaining(Point.create(50, 50), true);
         assertEquals(TileCoordinate.valueOf(-9, -9), received);
 
-        received = space1.tileCoordinateContaining(Point.valueOf(610, 575), true);
+        received = space1.tileCoordinateContaining(Point.create(610, 575), true);
         assertEquals(TileCoordinate.valueOf(2, 1), received);
 
-        received = space1.tileCoordinateContaining(Point.valueOf(550, 550), false);
+        received = space1.tileCoordinateContaining(Point.create(550, 550), false);
         assertEquals(TileCoordinate.valueOf(0, 0), received);
 
-        received = space1.tileCoordinateContaining(Point.valueOf(550, 550), true);
+        received = space1.tileCoordinateContaining(Point.create(550, 550), true);
         assertEquals(TileCoordinate.valueOf(1, 1), received);
 
         try {
-            received = space2.tileCoordinateContaining(Point.valueOf(220, 220), true);
+            received = space2.tileCoordinateContaining(Point.create(220, 220), true);
             fail();
         } catch (IllegalArgumentException e) {
             //OK
@@ -140,36 +140,36 @@ public class TestTileSetCoordinateSpace {
 
     @Test
     public void test_to_pixel() {
-        Pixel expected = space1.toPixel(Point.valueOf(50, 50));
+        Pixel expected = space1.toPixel(Point.create(50, 50));
         Pixel received = Pixel.valueOf(0, 199);
         assertEquals(expected, received);
 
-        received = space1.toPixel(Point.valueOf(1050, 1050));
+        received = space1.toPixel(Point.create(1050, 1050));
         expected = Pixel.valueOf(199, 0);
         assertEquals(expected, received);
 
-        received = space1.toPixel(Point.valueOf(1050, 50));
+        received = space1.toPixel(Point.create(1050, 50));
         expected = Pixel.valueOf(199, 199);
         assertEquals(expected, received);
 
-        received = space1.toPixel(Point.valueOf(50, 1050));
+        received = space1.toPixel(Point.create(50, 1050));
         expected = Pixel.valueOf(0, 0);
         assertEquals(expected, received);
 
-        received = space1.toPixel(Point.valueOf(100, 250));
+        received = space1.toPixel(Point.create(100, 250));
         expected = Pixel.valueOf(10, 160);
         assertEquals(expected, received);
 
-        received = space1.toPixel(Point.valueOf(287, 1023));
+        received = space1.toPixel(Point.create(287, 1023));
         expected = Pixel.valueOf(47, 5);
         assertEquals(expected, received);
 
 
-        received = space1.toPixel(Point.valueOf(1200, 2000));
+        received = space1.toPixel(Point.create(1200, 2000));
         expected = Pixel.valueOf(230, -190);
         assertEquals("Points outside TileMap extent are allowed.", expected, received);
 
-        received = space1.toPixel(Point.valueOf(0, 0));
+        received = space1.toPixel(Point.create(0, 0));
         expected = Pixel.valueOf(-10, 210);
         assertEquals("Points outside TileMap extent are allowed.", received, expected);
 
@@ -178,15 +178,15 @@ public class TestTileSetCoordinateSpace {
 
     @Test
     public void test_pixelrange_bbox() {
-        PixelRange received = space1.pixelRange(new BoundingBox(50, 50, 1050, 1050));
+        PixelRange received = space1.pixelRange(new Envelope(50, 50, 1050, 1050));
         PixelRange expected = new PixelRange(0, 0, 200, 200);
         assertEquals(expected, received);
 
-        received = space1.pixelRange(new BoundingBox(50, 950, 150, 1050));
+        received = space1.pixelRange(new Envelope(50, 950, 150, 1050));
         expected = new PixelRange(0, 0, 20, 20);
         assertEquals(expected, received);
 
-        received = space1.pixelRange(new BoundingBox(0, 950, 1100, 1100));
+        received = space1.pixelRange(new Envelope(0, 950, 1100, 1100));
         expected = new PixelRange(-10, -10, 220, 30);
         assertEquals(expected, received);
 
@@ -195,27 +195,27 @@ public class TestTileSetCoordinateSpace {
     @Test
     public void test_to_point() {
         Point received = space1.toPoint(Pixel.valueOf(0, 199));
-        Point expected = Point.valueOf(50, 55);
+        Point expected = Point.create(50, 55);
         assertEquals(expected, received);
 
         received = space1.toPoint(Pixel.valueOf(199, 0));
-        expected = Point.valueOf(1045, 1050);
+        expected = Point.create(1045, 1050);
         assertEquals(expected, received);
 
         received = space1.toPoint(Pixel.valueOf(199, 199));
-        expected = Point.valueOf(1045, 55);
+        expected = Point.create(1045, 55);
         assertEquals(expected, received);
 
         received = space1.toPoint(Pixel.valueOf(0, 0));
-        expected = Point.valueOf(50, 1050);
+        expected = Point.create(50, 1050);
         assertEquals(expected, received);
 
         received = space1.toPoint(Pixel.valueOf(10, 160));
-        expected = Point.valueOf(100, 250);
+        expected = Point.create(100, 250);
         assertEquals(expected, received);
 
         received = space1.toPoint(Pixel.valueOf(201, 201));
-        expected = Point.valueOf(1055, 45);
+        expected = Point.create(1055, 45);
         assertEquals(expected, received);
     }
 }

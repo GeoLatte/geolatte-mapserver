@@ -19,10 +19,10 @@
 
 package org.geolatte.mapserver.tms;
 
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Point;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.img.ImageFormat;
-import org.geolatte.mapserver.util.BoundingBox;
-import org.geolatte.mapserver.util.Point;
-import org.geolatte.mapserver.util.SRS;
 import org.geolatte.mapserver.wms.BoundingBoxOpFactory;
 import org.geolatte.mapserver.wms.DefaultBoundingBoxOpFactory;
 
@@ -40,9 +40,9 @@ import java.util.Set;
 public class TileMap {
 
     private final String serviceUrl;
-    private final SRS srs;
+    private final CrsId srs;
     private final String title;
-    private final BoundingBox maxBoundingBox;
+    private final Envelope maxBoundingBox;
     private final Point origin;
     private final TileFormat tileFormat;
     private final List<TileSet> tileSets;
@@ -51,7 +51,7 @@ public class TileMap {
     private BoundingBoxOpFactory boundingBoxOpFactory = new DefaultBoundingBoxOpFactory();
     private boolean forceArgb;
 
-    protected TileMap(String serviceURL, String title, SRS srs, BoundingBox bbox,
+    protected TileMap(String serviceURL, String title, CrsId srs, Envelope bbox,
                       Point origin, TileFormat tileFormat,
                       List<TileSet> tileSets) throws IllegalArgumentException {
         this.serviceUrl = serviceURL;
@@ -81,7 +81,7 @@ public class TileMap {
      * @param bbox the <code>BoundingBox</code>
      * @return the <code>Tile</code>s in the <code>TileSet</code> specified by the set argument that overlap the <code>BoundingBox</code> specified by the bbox argument
      */
-    Set<Tile> getTilesFor(TileSet set, BoundingBox bbox) {
+    Set<Tile> getTilesFor(TileSet set, Envelope bbox) {
         if (outsideMaxBoundingBox(bbox))
             throw new IllegalArgumentException(String.format("Request BoundingBox: %s exceeds maximum bounding box: %s", bbox.toString(), getBoundingBox().toString()));
         Set<Tile> result = new HashSet<Tile>();
@@ -102,7 +102,7 @@ public class TileMap {
      * @return true if the <code>BoundingBox</code> specified by the bbox argument falls at least partly wihtin
      *         the extent of this <code>TileMap</code>, and false otherwise.
      */
-    public boolean outsideMaxBoundingBox(BoundingBox bbox) {
+    public boolean outsideMaxBoundingBox(Envelope bbox) {
         return (bbox.getMinX() < getBoundingBox().getMinX()
                 || bbox.getMinY() < getBoundingBox().getMinY()
                 || bbox.getMaxX() > getBoundingBox().getMaxX()
@@ -144,7 +144,7 @@ public class TileMap {
      *
      * @return the coordinate reference system
      */
-    public SRS getSRS() {
+    public CrsId getSRS() {
         return this.srs;
     }
 
@@ -153,7 +153,7 @@ public class TileMap {
      *
      * @return a <code>BoundingBox</code> specifying the extent of this <code>TileMap</code>.
      */
-    public BoundingBox getBoundingBox() {
+    public Envelope getBoundingBox() {
         return this.maxBoundingBox;
     }
 
@@ -170,12 +170,12 @@ public class TileMap {
             return ImageFormat.PNG;
     }
 
-    private TileCoordinate lowerLeftTileCoordinate(BoundingBox bbox, TileSet set) {
+    private TileCoordinate lowerLeftTileCoordinate(Envelope bbox, TileSet set) {
         Point ll = bbox.lowerLeft();
         return set.pointIndex(ll, true);
     }
 
-    private TileCoordinate upperRightTileCoordinate(BoundingBox bbox, TileSet set) {
+    private TileCoordinate upperRightTileCoordinate(Envelope bbox, TileSet set) {
         Point ur = bbox.upperRight();
         // if the upperright point falls on the lower or left border of a tile,
         // then that tile should not be returned.
@@ -190,7 +190,7 @@ public class TileMap {
      * @param bbox the BoundingBox to clip
      * @return the clipped BoundingBox.
      */
-    public BoundingBox clipToMaxBoundingBox(BoundingBox bbox) {
+    public Envelope clipToMaxBoundingBox(Envelope bbox) {
         return getBoundingBox().intersect(bbox);
     }
 
