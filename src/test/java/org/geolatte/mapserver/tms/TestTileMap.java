@@ -20,7 +20,7 @@
 package org.geolatte.mapserver.tms;
 
 import org.geolatte.geom.Envelope;
-import org.geolatte.geom.Point;
+import org.geolatte.geom.Points;
 import org.geolatte.mapserver.util.PixelRange;
 import org.junit.Assert;
 import org.junit.Before;
@@ -112,17 +112,17 @@ public class TestTileMap {
         Set<Tile> expected = new HashSet<Tile>();
         TileSet tileSet = tileMap.getTileSets().get(0);
         expected.add(tileMap.makeTile(tileSet, TileCoordinate.valueOf(0, 0)));
-        Envelope bbox = new Envelope(Point.create(-180, -90), Point.create(-1, 89), null);
+        Envelope bbox = new Envelope(Points.create(-180, -90), Points.create(-1, 89), null);
         Dimension dim = new Dimension(256, 256);
         Set<Tile> result = tileMap.getTilesFor(tileSet, bbox);
         Assert.assertEquals(expected, result);
 
         expected.add(tileMap.makeTile(tileSet, TileCoordinate.valueOf(1, 0)));
-        bbox = new Envelope(Point.create(-180, -90), Point.create(180, 90),null);
+        bbox = new Envelope(Points.create(-180, -90), Points.create(180, 90),null);
         result = tileMap.getTilesFor(tileSet, bbox);
         Assert.assertEquals(expected, result);
 
-        bbox = new Envelope(Point.create(-170, -80), Point.create(160, 88),null);
+        bbox = new Envelope(Points.create(-170, -80), Points.create(160, 88),null);
         result = tileMap.getTilesFor(tileSet, bbox);
         Assert.assertEquals(expected, result);
     }

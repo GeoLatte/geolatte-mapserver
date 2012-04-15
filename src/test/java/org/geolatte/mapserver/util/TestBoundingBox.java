@@ -21,6 +21,7 @@ package org.geolatte.mapserver.util;
 
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Point;
+import org.geolatte.geom.Points;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -136,31 +137,29 @@ public class TestBoundingBox {
     @Test
     public void test_contains() {
         Envelope box = new Envelope(0, 0, 100, 100);
-        Point p = Point.create(0, 0);
+        Point p = Points.create(0, 0);
         assertTrue(box.contains(p));
 
-        p = Point.create(100, 100);
+        p = Points.create(100, 100);
         assertTrue(box.contains(p));
 
-        p = Point.create(10, 20);
+        p = Points.create(10, 20);
         assertTrue(box.contains(p));
 
-        p = Point.create(-10, 0);
+        p = Points.create(-10, 0);
         assertFalse(box.contains(p));
 
-        p = Point.create(0, -10);
+        p = Points.create(0, -10);
         assertFalse(box.contains(p));
 
-        p = Point.create(110, 0);
+        p = Points.create(110, 0);
         assertFalse(box.contains(p));
 
-        p = Point.create(0, 110);
+        p = Points.create(0, 110);
         assertFalse(box.contains(p));
 
-        p = Point.create(110, 110);
+        p = Points.create(110, 110);
         assertFalse(box.contains(p));
-
 
     }
-
 }
