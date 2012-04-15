@@ -26,6 +26,7 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Point;
+import org.geolatte.geom.Points;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.wms.BoundingBoxOpFactory;
 
@@ -138,7 +139,7 @@ public class TileMapBuilder {
     protected Point getOrigin() {
         double originX = extractAttributeDouble("//Origin/@x");
         double originY = extractAttributeDouble("//Origin/@y");
-        return Point.create(originX, originY, CrsId.UNDEFINED);
+        return Points.create(originX, originY, CrsId.UNDEFINED);
     }
 
     protected Dimension getTileDimension() {
