@@ -24,6 +24,7 @@ import org.dom4j.Document;
 import org.dom4j.util.NodeComparator;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Point;
+import org.geolatte.geom.Points;
 import org.geolatte.geom.crs.CrsId;
 import org.junit.Before;
 import org.junit.Test;
@@ -77,8 +78,8 @@ public class TestTileMapBuilder {
 
     @Test
     public void test_get_bbox() {
-        Point ll = Point.create(-180.0000, -90.0000, CrsId.valueOf(4326));
-        Point ur = Point.create(180.0000, 90.0000, CrsId.valueOf(4326));
+        Point ll = Points.create(-180.0000, -90.0000, CrsId.valueOf(4326));
+        Point ur = Points.create(180.0000, 90.0000, CrsId.valueOf(4326));
         Envelope bbox = builder.getBoundingBox();
 
         assertEquals(ll, bbox.lowerLeft());
@@ -87,7 +88,7 @@ public class TestTileMapBuilder {
 
     @Test
     public void test_get_origin() {
-        Point origin = Point.create(-180.0000, -90.000, CrsId.UNDEFINED);
+        Point origin = Points.create(-180.0000, -90.000, CrsId.UNDEFINED);
         assertEquals(origin, builder.getOrigin());
     }
 

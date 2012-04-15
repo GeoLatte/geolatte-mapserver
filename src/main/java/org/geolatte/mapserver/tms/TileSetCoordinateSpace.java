@@ -21,6 +21,7 @@ package org.geolatte.mapserver.tms;
 
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Point;
+import org.geolatte.geom.Points;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.util.Pixel;
 import org.geolatte.mapserver.util.PixelRange;
@@ -116,6 +117,6 @@ public class TileSetCoordinateSpace {
     }
 
     private Point relativeToOrigin(Point point) {
-        return Point.create(point.getX() - origin.getX(), point.getY() - origin.getY(), CrsId.UNDEFINED);
+        return Points.create(point.getX() - origin.getX(), point.getY() - origin.getY(), CrsId.UNDEFINED);
     }
 }

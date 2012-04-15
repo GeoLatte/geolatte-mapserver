@@ -21,11 +21,11 @@ package org.geolatte.mapserver.tms;
 
 import org.dom4j.Document;
 import org.geolatte.geom.Envelope;
-import org.geolatte.geom.Point;
+import org.geolatte.geom.Points;
 import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
 
-import java.awt.Dimension;
+import java.awt.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -47,14 +47,14 @@ public class TestTileSetChooser {
         double upp;
         Dimension dim = new Dimension(256, 256);
         //order 0
-        Envelope bbox = new Envelope(Point.create(-180, -90, CrsId.UNDEFINED), Point.create(0, 90, CrsId.UNDEFINED), null);
+        Envelope bbox = new Envelope(Points.create(-180, -90, CrsId.UNDEFINED), Points.create(0, 90, CrsId.UNDEFINED), null);
         tsc = new TileSetChooser(tileMap, bbox, dim);
         tsc.determineRequestUnitsPerPixel();
         upp = (Double) TMSTestSupport.accessField(tsc, "requestUnitsPerPixel");
         assertEquals(0.70312500000000000000, upp, 0.00000005);
 
         //order 1
-        bbox = new Envelope(Point.create(-45, 0, CrsId.UNDEFINED), Point.create(45, 90,  CrsId.UNDEFINED), null);
+        bbox = new Envelope(Points.create(-45, 0, CrsId.UNDEFINED), Points.create(45, 90,  CrsId.UNDEFINED), null);
         tsc = new TileSetChooser(tileMap, bbox, dim);
         tsc.determineRequestUnitsPerPixel();
         upp = (Double) TMSTestSupport.accessField(tsc, "requestUnitsPerPixel");
@@ -67,7 +67,7 @@ public class TestTileSetChooser {
         double upp;
 
         //order 0
-        Envelope bbox = new Envelope(Point.create(-180, -90, CrsId.UNDEFINED), Point.create(0, 0, CrsId.UNDEFINED), null);
+        Envelope bbox = new Envelope(Points.create(-180, -90, CrsId.UNDEFINED), Points.create(0, 0, CrsId.UNDEFINED), null);
         Dimension dim = new Dimension(256, 256);
         tsc = new TileSetChooser(tileMap, bbox, dim);
         tsc.determineRequestUnitsPerPixel();
@@ -81,18 +81,16 @@ public class TestTileSetChooser {
         Dimension dim = new Dimension(256, 256);
 
         //order 0
-        Envelope bbox = new Envelope(Point.create(-180, -90, CrsId.UNDEFINED), Point.create(0, 90,  CrsId.UNDEFINED), null);
+        Envelope bbox = new Envelope(Points.create(-180, -90, CrsId.UNDEFINED), Points.create(0, 90,  CrsId.UNDEFINED), null);
         tsc = new TileSetChooser(tileMap, bbox, dim);
         TileSet ts = tsc.chooseTileSet();
         assertEquals(0, ts.getOrder());
 
         //order 1
-        bbox = new Envelope(Point.create(-45, 0, CrsId.UNDEFINED), Point.create(45, 90, CrsId.UNDEFINED), null);
+        bbox = new Envelope(Points.create(-45, 0, CrsId.UNDEFINED), Points.create(45, 90, CrsId.UNDEFINED), null);
         tsc = new TileSetChooser(tileMap, bbox, dim);
         ts = tsc.chooseTileSet();
         assertEquals(1, ts.getOrder());
 
     }
-
-
 }

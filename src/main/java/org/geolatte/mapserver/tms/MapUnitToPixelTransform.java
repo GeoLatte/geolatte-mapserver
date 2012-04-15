@@ -21,6 +21,7 @@ package org.geolatte.mapserver.tms;
 
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Point;
+import org.geolatte.geom.Points;
 import org.geolatte.mapserver.util.Pixel;
 import org.geolatte.mapserver.util.PixelRange;
 
@@ -110,7 +111,7 @@ public class MapUnitToPixelTransform {
     public Point toPoint(Pixel pixel) {
         double x = extent.getMinX() + mapUnitsPerPixelX * (pixel.x - this.pixelRange.getMinX());
         double y = extent.getMaxY() - mapUnitsPerPixelY * (pixel.y - this.pixelRange.getMinY());
-        return Point.create(x, y, extent.getCrsId());
+        return Points.create(x, y, extent.getCrsId());
     }
 
 
