@@ -20,9 +20,9 @@
 package org.geolatte.mapserver.tms;
 
 import org.apache.log4j.Logger;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.config.Configuration;
 import org.geolatte.mapserver.config.ConfigurationException;
-import org.geolatte.mapserver.util.SRS;
 import org.geolatte.mapserver.wms.BoundingBoxOpFactory;
 
 import java.util.*;
@@ -33,11 +33,11 @@ public class TileMapRegistry {
 
     private final Map<String, TileMap> tileMaps;
 
-    private final Map<String, List<SRS>> supportedSRSMap;
+    private final Map<String, List<CrsId>> supportedSRSMap;
 
     public static TileMapRegistry configure(Configuration config) {
         Map<String, TileMap> map = new HashMap<String, TileMap>();
-        Map<String, List<SRS>> srsMap = new HashMap<String, List<SRS>>();
+        Map<String, List<CrsId>> srsMap = new HashMap<String, List<CrsId>>();
         for (String tilemap : config.getTileMaps()) {
             addTilemap(map, srsMap, tilemap, config);
 
@@ -45,15 +45,15 @@ public class TileMapRegistry {
         return new TileMapRegistry(map, srsMap);
     }
 
-    private TileMapRegistry(Map<String, TileMap> map, Map<String,List<SRS>> srsMap) {
+    private TileMapRegistry(Map<String, TileMap> map, Map<String,List<CrsId>> srsMap) {
         this.tileMaps = Collections.unmodifiableMap(map);
         this.supportedSRSMap = Collections.unmodifiableMap(srsMap);
     }
 
-    private static void addTilemap(Map<String, TileMap> map, Map<String, List<SRS>> sRSMap, String tileMapName, Configuration config) {
+    private static void addTilemap(Map<String, TileMap> map, Map<String, List<CrsId>> sRSMap, String tileMapName, Configuration config) {
          try {
              TileMap tilemap = createTileMap(tileMapName, config);
-             List<SRS> supportedSRSList = createSRSList(tileMapName, config);
+             List<CrsId> supportedSRSList = createSRSList(tileMapName, config);
              map.put(tilemap.getTitle(), tilemap);
              if (!supportedSRSList.isEmpty()) {
                  sRSMap.put(tilemap.getTitle(), supportedSRSList);
@@ -63,8 +63,8 @@ public class TileMapRegistry {
          }
      }
 
-     private static List<SRS> createSRSList(String tileMapName, Configuration config) {
-         List<SRS> result = new ArrayList<SRS>();
+     private static List<CrsId> createSRSList(String tileMapName, Configuration config) {
+         List<CrsId> result = new ArrayList<CrsId>();
          try {
              String[] srsNames = config.getSupportedSRS(tileMapName);
              addSRS(tileMapName, result, srsNames);
@@ -74,10 +74,10 @@ public class TileMapRegistry {
          return result;
      }
 
-     private static void addSRS(String tileMapName, List<SRS> result, String[] srsNames) {
+     private static void addSRS(String tileMapName, List<CrsId> result, String[] srsNames) {
          for (String srs : srsNames) {
              try{
-                 result.add(SRS.parse(srs));
+                 result.add(CrsId.parse(srs));
              }catch(IllegalArgumentException e) {
                  LOGGER.warn(String.format("Failed to parse SRS string %s during configuring tilemap \"%s \": %s", srs, tileMapName, e.getMessage()));
              }
@@ -169,10 +169,10 @@ public class TileMapRegistry {
      * @return a list of <code>SRS</code>s to which projection is supported.
      */
     //TODO Does this need to move to TileMap?
-    public List<SRS> getSupportedSRS(String tileMapName) {
-        List<SRS> result = supportedSRSMap.get(tileMapName);
+    public List<CrsId> getSupportedSRS(String tileMapName) {
+        List<CrsId> result = supportedSRSMap.get(tileMapName);
         if (result == null) {
-            return new ArrayList<SRS>();
+            return new ArrayList<CrsId>();
         } else {
             return result;
         }
@@ -186,11 +186,11 @@ public class TileMapRegistry {
      * @param srs the target <code>SRS</code>
      * @return returns true if the <code>TileMap</code> supports the <code>SRS</code>.
      */
-    public boolean supportsSRS(String tileMapName, SRS srs) {
+    public boolean supportsSRS(String tileMapName, CrsId srs) {
         if (getTileMap(tileMapName).getSRS().equals(srs)) {
             return true;
         }
-        List<SRS> supported = supportedSRSMap.get(tileMapName);
+        List<CrsId> supported = supportedSRSMap.get(tileMapName);
         return supported == null ?
                 false :
                 supported.contains(srs);

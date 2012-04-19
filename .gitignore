@@ -1,5 +1,5 @@
-atlassian-ide-plugin.xml
 *.idea
 *.iml
+*.ipr
+*.iws
 target
-javadoc/*
