@@ -170,7 +170,9 @@ public class MapUnitToPixelTransform {
      * @return Math.round(x) if x is close to an integer number.
      */
     private double removeRoundingError(double x) {
-        return Math.round(x*1000)/1000.0;
+        if(Math.abs(Math.round(x) - x) < 1e-3)
+            return Math.round(x);
+        return x;
     }
 
     /**

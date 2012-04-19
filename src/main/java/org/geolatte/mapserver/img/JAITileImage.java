@@ -26,10 +26,10 @@ import javax.media.jai.PlanarImage;
 import java.io.IOException;
 import java.io.OutputStream;
 
-class JAITileImage implements TileImage {
+public class JAITileImage implements TileImage {
     final private PlanarImage image;
 
-    JAITileImage(PlanarImage image) {
+    public JAITileImage(PlanarImage image) {
         this.image = image;
     }
 
