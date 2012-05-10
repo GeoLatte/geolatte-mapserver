@@ -93,11 +93,29 @@ public class TileSetCoordinateSpace {
         double y = relativeToOrigin.getY();
         double width = tileWidthInMapUnits();
         double height = tileHeightInMapUnits();
-        int i = (int) (x / width);
-        int j = (int) (y / height);
-        if (!lowerLeftInclusive && (x % width == 0)) i -= 1;
-        if (!lowerLeftInclusive && (y % width == 0)) j -= 1;
+        double approxI = removeRoundingError(x / width);
+        double approxJ = removeRoundingError(y / height);
+        int i = (int) approxI;
+        int j = (int) approxJ;
+        if (!lowerLeftInclusive && i == approxI) i -= 1;
+        if (!lowerLeftInclusive && j == approxJ) j -= 1;
         return new TileCoordinate(i, j);
+    }
+
+    /**
+     * In tilemaps where the origin lies on border of the map extend, a calculation is performed where terms can be
+     * crossed out. Because of rounding errors (e.g. x / width = 76.999999999936 instead of 77) a map coordinate could
+     * be mapped onto the wrong tile number. As a consequence the TileCoordinate could be one off and too many tiles
+     * would be loaded.
+     *
+     * @param i The approximated tile number to be rounded
+     * @return Math.round(i) if i is close to an integer number.
+     */
+
+    private double removeRoundingError(double i) {
+        if(Math.abs(Math.round(i) - i) < 1e-6)
+            return Math.round(i);
+        return i;
     }
 
     public double unitsPerPixel() {
