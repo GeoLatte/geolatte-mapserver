@@ -84,7 +84,7 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
      */
     @Override
     public TileImage execute() {
-        if (tileSetClippedBbox.isEmpty()) {
+        if (tileSetClippedBbox.isEmpty() || tileSetClippedBbox.getWidth()  < 1 || tileSetClippedBbox.getHeight() < 1) {
             return imaging.createEmptyImage(this.dimension, this.tileMap.getTileImageFormat());
         }
         chrono = new Chrono();

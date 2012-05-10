@@ -103,11 +103,15 @@ public class TestBoundingBoxOp {
     @Test
     public void test_empty_bbox_returns_empty_image() throws IOException {
 
-        Envelope bbox = new Envelope(0, 0, 0, 0, tileMap.getSRS());
+        Envelope bbox = new Envelope(1, 1, -1, -1, tileMap.getSRS());
         File f = new File("/tmp/empty-image-because-empty-bbox-tilecache.png");
         executeAndWriteToFile(bbox, f, tileMap);
 
         bbox = new Envelope(50000, 200000, 50000, 200000, orthoMap.getSRS());
+        f = new File("/tmp/empty-image-because-empty-bbox-orthos.png");
+        executeAndWriteToFile(bbox, f, orthoMap);
+
+        bbox = new Envelope(50000, 200000, 50002, 200002, orthoMap.getSRS());
         f = new File("/tmp/empty-image-because-empty-bbox-orthos.png");
         executeAndWriteToFile(bbox, f, orthoMap);
 
