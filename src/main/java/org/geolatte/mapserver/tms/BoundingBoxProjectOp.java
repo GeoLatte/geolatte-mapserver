@@ -15,7 +15,7 @@ import java.util.Set;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 7/1/11
  */
-public class BoundingBoxProjectOp implements TileMapOperation<TileImage> {
+public class BoundingBoxProjectOp implements TileMapOperation <TileImage> {
 
     private final static Logger LOGGER = Logger.getLogger(BoundingBoxProjectOp.class);
 
@@ -83,8 +83,7 @@ public class BoundingBoxProjectOp implements TileMapOperation<TileImage> {
             LOGGER.debug("Original BBOx:" + this.requestedBBox);
             LOGGER.debug("Image pixelRange:" + projectedImage.getMinX() + "," + projectedImage.getMinY() + "," + projectedImage.getMinX() + projectedImage.getWidth() + "," + projectedImage.getMinY() + projectedImage.getHeight());
             LOGGER.debug("Image request src PixelRange: " + srcPixelRange);
-            PixelRange cropPixelRange = new PixelRange(projectedImage.getMinX(), projectedImage.getMinY(), srcPixelRange.getWidth(), srcPixelRange.getHeight());
-            TileImage result = imaging.crop(projectedImage, cropPixelRange);
+            TileImage result = imaging.crop(projectedImage, srcPixelRange);
             LOGGER.debug("Warped image clipping took " + chrono.stop() + " ms.");
             return result;
         }catch(Exception e){
