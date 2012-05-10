@@ -69,7 +69,7 @@ public class TestWMSGetMapRequest {
         HttpServletRequest request = makeRequest(baseRequestParameters);
         WMSGetMapRequest wmsGetMap = (WMSGetMapRequest) WMSRequest.adapt(request);
 
-        assertEquals(new Envelope(-130, 24, -66, 50), wmsGetMap.getBbox());
+        assertEquals(new Envelope(-130, 24, -66, 50, CrsId.parse("EPSG:4326")), wmsGetMap.getBbox());
         assertEquals("image/png", wmsGetMap.getFormat());
         assertEquals(Integer.valueOf(550), wmsGetMap.getWidth());
         assertArrayEquals(new String[]{"basic"}, wmsGetMap.getLayers());

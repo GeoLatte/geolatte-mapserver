@@ -200,7 +200,11 @@ public abstract class WMSRequest {
         } catch (IndexOutOfBoundsException e) {
             throw new InvalidWMSRequestException(String.format("Invalid Boundingbox: %s", strVal));
         }
-        return new Envelope(xyvals[0], xyvals[1], xyvals[2], xyvals[3], null);
+        Envelope result =  new Envelope(xyvals[0], xyvals[1], xyvals[2], xyvals[3], null);
+        if (result.isEmpty()) {
+            throw new InvalidWMSRequestException("Empty or invalid bounding box.");
+        }
+        return result;
     }
 
     private static Integer convertToInteger(String strVal) {
