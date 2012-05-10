@@ -26,29 +26,25 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+//TODO -- this should be moved to geolatte-geom
+
 public class TestBoundingBox {
 
 
     @Test
     public void test_invalid_creation() {
-        try {
-            Envelope test = new Envelope(50, 50, 25, 75);
-            fail();
-        } catch (IllegalArgumentException e) {
-        }
 
-        try {
-            Envelope test = new Envelope(50, 50, 75, 25);
-            fail();
-        } catch (IllegalArgumentException e) {
-        }
+        Envelope test = new Envelope(50, 50, 25, 75);
+        assertTrue(test.isEmpty());
 
-        try {
-            Envelope test = new Envelope(50, 50, 25, 25);
-            fail();
-        } catch (IllegalArgumentException e) {
-        }
-    }
+
+        test = new Envelope(50, 50, 75, 25);
+        assertTrue(test.isEmpty());
+
+        test = new Envelope(50, 50, 25, 25);
+        assertTrue(test.isEmpty());
+
+}
 
     @Test
     public void test_union() {
@@ -105,14 +101,12 @@ public class TestBoundingBox {
         assertEquals(expected3, received3);
 
         Envelope b4 = new Envelope(-10, -10, -1, -1);
-        Envelope expected4 = new Envelope(0, 0, 0, 0);
         Envelope received4 = b0.intersect(b4);
-        assertEquals(expected4, received4);
+        assertEquals(Envelope.EMPTY, received4);
 
         Envelope b5 = new Envelope(110, 105, 120, 130);
-        Envelope expected5 = new Envelope(0, 0, 0, 0);
         Envelope received5 = b0.intersect(b5);
-        assertEquals(expected5, received5);
+        assertEquals(Envelope.EMPTY, received5);
 
         Envelope b6 = new Envelope(-10, 10, 50, 110);
         Envelope expected6 = new Envelope(0, 10, 50, 100);
@@ -120,18 +114,16 @@ public class TestBoundingBox {
         assertEquals(expected6, received6);
 
         Envelope b7 = new Envelope(10, 110, 90, 115);
-        Envelope expected7 = new Envelope(0, 0, 0, 0);
         Envelope received7 = b0.intersect(b7);
-        assertEquals(expected7, received7);
+        assertEquals(Envelope.EMPTY, received7);
 
         Envelope b8 = new Envelope(10, 20, 50, 60);
         Envelope received8 = b0.intersect(b8);
         assertEquals(b8, received8);
 
         Envelope b9 = new Envelope(110, 20, 115, 60);
-        Envelope expected9 = new Envelope(0, 0, 0, 0);
         Envelope received9 = b0.intersect(b9);
-        assertEquals(expected9, received9);
+        assertEquals(Envelope.EMPTY, received9);
     }
 
     @Test
