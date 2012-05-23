@@ -78,8 +78,7 @@ public class WMSServiceException extends Exception {
 
     private void addExceptions(ServiceExceptionReport report) {
         if (exceptionItems == null || exceptionItems.isEmpty()) {
-            String message = this.getMessage();
-            addException(report, this.getMessage(), null);
+            addException(report, getMessage(), null);
         } else {
             for (WMSServiceExceptionList.Item item : exceptionItems) {
                 addException(report, item.getMessage(), item.getCode());
