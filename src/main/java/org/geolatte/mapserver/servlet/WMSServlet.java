@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Servlet for WMS requests.
@@ -58,6 +59,12 @@ public class WMSServlet extends HttpServlet {
             response.setContentType(wmsRequest.getResponseContentType());
             wmsService.handle(wmsRequest, response.getOutputStream());
         } catch (WMSServiceException se) {
+            List<String> codes = se.getCodes();
+            if (!codes.isEmpty()) {
+                LOGGER.warn(codes);
+            } else {
+                LOGGER.warn(se.getMessage(), se);
+            }
             //Note that this ignores the EXCEPTIONS Request Parameter!!
             response.setContentType(OGCMIMETypes.SERVICE_EXCEPTION_XML);
             se.writeToOutputStream(response.getOutputStream());
