@@ -21,8 +21,9 @@ package org.geolatte.mapserver.wms;
 
 import org.apache.log4j.Logger;
 import org.geolatte.geom.crs.CrsId;
-import org.geolatte.mapserver.img.JAIImaging;
-import org.geolatte.mapserver.tms.*;
+import org.geolatte.mapserver.tms.TileImage;
+import org.geolatte.mapserver.tms.TileMap;
+import org.geolatte.mapserver.tms.TileMapRegistry;
 import org.geolatte.mapserver.util.Chrono;
 
 import java.io.IOException;
@@ -47,7 +48,7 @@ public class WMSGetMapRequestHandler implements WMSRequestHandler {
         WMSGetMapRequest request = (WMSGetMapRequest) wmsRequest;
         WMSCapabilities.check(request);
         TileMap tileMap = getTileMapAndCheck(request);
-        LOGGER.info("GetMap Request received: " + request.toString());
+        LOGGER.debug("GetMap Request received: " + request.toString());
         try {
             TileImage image = getMapImage(request, tileMap);
             chrono.reset();
@@ -56,7 +57,7 @@ public class WMSGetMapRequestHandler implements WMSRequestHandler {
         } catch (Exception e) { //TODO: don't catch on class 'Exception'
             throw new WMSServiceException(e.getMessage(),e);
         }
-        LOGGER.info("Response in " + chrono.total() + " ms.");
+        LOGGER.debug("Response in " + chrono.total() + " ms.");
     }
 
     private TileImage getMapImage(WMSGetMapRequest request, TileMap tileMap) throws WMSServiceException {
