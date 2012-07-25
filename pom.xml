@@ -15,7 +15,7 @@
     <groupId>org.geolatte</groupId>
     <artifactId>geolatte-mapserver</artifactId>
     <packaging>jar</packaging>
-    <version>1.1</version>
+    <version>1.2-SNAPSHOT</version>
     <name>Geolatte Mapserver</name>
     <url>http://www.geolatte.org/confluence/display/mserv</url>
     <description>An embeddable map server supporting the WMS, WMTS and TMS protocols</description>
