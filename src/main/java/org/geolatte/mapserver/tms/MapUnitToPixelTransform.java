@@ -111,7 +111,7 @@ public class MapUnitToPixelTransform {
     public Point toPoint(Pixel pixel) {
         double x = extent.getMinX() + mapUnitsPerPixelX * (pixel.x - this.pixelRange.getMinX());
         double y = extent.getMaxY() - mapUnitsPerPixelY * (pixel.y - this.pixelRange.getMinY());
-        return Points.create(x, y, extent.getCrsId());
+        return Points.create2D(x, y, extent.getCrsId());
     }
 
 

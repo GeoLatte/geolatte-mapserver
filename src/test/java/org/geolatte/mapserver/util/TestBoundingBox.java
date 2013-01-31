@@ -129,28 +129,28 @@ public class TestBoundingBox {
     @Test
     public void test_contains() {
         Envelope box = new Envelope(0, 0, 100, 100);
-        Point p = Points.create(0, 0);
+        Point p = Points.create2D(0, 0);
         assertTrue(box.contains(p));
 
-        p = Points.create(100, 100);
+        p = Points.create2D(100, 100);
         assertTrue(box.contains(p));
 
-        p = Points.create(10, 20);
+        p = Points.create2D(10, 20);
         assertTrue(box.contains(p));
 
-        p = Points.create(-10, 0);
+        p = Points.create2D(-10, 0);
         assertFalse(box.contains(p));
 
-        p = Points.create(0, -10);
+        p = Points.create2D(0, -10);
         assertFalse(box.contains(p));
 
-        p = Points.create(110, 0);
+        p = Points.create2D(110, 0);
         assertFalse(box.contains(p));
 
-        p = Points.create(0, 110);
+        p = Points.create2D(0, 110);
         assertFalse(box.contains(p));
 
-        p = Points.create(110, 110);
+        p = Points.create2D(110, 110);
         assertFalse(box.contains(p));
 
     }

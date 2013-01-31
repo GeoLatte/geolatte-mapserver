@@ -113,17 +113,17 @@ public class TestTileMap {
         Set<Tile> expected = new HashSet<Tile>();
         TileSet tileSet = tileMap.getTileSets().get(0);
         expected.add(tileMap.makeTile(tileSet, TileCoordinate.valueOf(0, 0)));
-        Envelope bbox = new Envelope(Points.create(-180, -90), Points.create(-1, 89), CrsId.valueOf(4326));
+        Envelope bbox = new Envelope(Points.create2D(-180, -90), Points.create2D(-1, 89), CrsId.valueOf(4326));
         Dimension dim = new Dimension(256, 256);
         Set<Tile> result = tileMap.getTilesFor(tileSet, bbox);
         Assert.assertEquals(expected, result);
 
         expected.add(tileMap.makeTile(tileSet, TileCoordinate.valueOf(1, 0)));
-        bbox = new Envelope(Points.create(-180, -90), Points.create(180, 90),CrsId.valueOf(4326));
+        bbox = new Envelope(Points.create2D(-180, -90), Points.create2D(180, 90),CrsId.valueOf(4326));
         result = tileMap.getTilesFor(tileSet, bbox);
         Assert.assertEquals(expected, result);
 
-        bbox = new Envelope(Points.create(-170, -80), Points.create(160, 88),CrsId.valueOf(4326));
+        bbox = new Envelope(Points.create2D(-170, -80), Points.create2D(160, 88),CrsId.valueOf(4326));
         result = tileMap.getTilesFor(tileSet, bbox);
         Assert.assertEquals(expected, result);
     }

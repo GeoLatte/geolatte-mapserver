@@ -4,7 +4,7 @@
     <groupId>org.geolatte</groupId>
     <artifactId>geolatte-mapserver-standalone</artifactId>
     <packaging>war</packaging>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
     <name>Geolatte Mapserver Standalone</name>
     <url>http://www.geolatte.org</url>
 
@@ -16,7 +16,7 @@
         <dependency>
             <groupId>org.geolatte</groupId>
             <artifactId>mapserver</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

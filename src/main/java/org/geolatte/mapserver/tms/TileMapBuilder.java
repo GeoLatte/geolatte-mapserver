@@ -139,7 +139,7 @@ public class TileMapBuilder {
     protected Point getOrigin() {
         double originX = extractAttributeDouble("//Origin/@x");
         double originY = extractAttributeDouble("//Origin/@y");
-        return Points.create(originX, originY, CrsId.UNDEFINED);
+        return Points.create2D(originX, originY, CrsId.UNDEFINED);
     }
 
     protected Dimension getTileDimension() {

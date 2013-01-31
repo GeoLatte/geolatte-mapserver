@@ -135,6 +135,6 @@ public class TileSetCoordinateSpace {
     }
 
     private Point relativeToOrigin(Point point) {
-        return Points.create(point.getX() - origin.getX(), point.getY() - origin.getY(), CrsId.UNDEFINED);
+        return Points.create2D(point.getX() - origin.getX(), point.getY() - origin.getY(), CrsId.UNDEFINED);
     }
 }
