@@ -31,7 +31,7 @@ import static java.lang.Thread.currentThread;
 /**
  * The configuration information.
  * <p/>
- * <p>By default the <code>Configuration</code> object is created either:
+ * <p>By default the {@code Configuration} object is created either:
  * <ul>
  * <li>from the file "mapserver-config.xml" on the classpath, or</li>
  * <li>from the file mentioned in the Java system-property "mapserver-configuration".</li>
@@ -52,16 +52,14 @@ public class Configuration {
     private static final String DEFAULT_CONFIG_FILENAME = "mapserver-config.xml";
     public static final String CONFIG_PATH_PROPERTY_NAME = "mapserver-configuration";
 
-
     private final Document configDoc;
 
     /**
-     * the type of a resource. Either <code>URL</code> or
-     * <code>FILE</code>.
+     * The type of a resource. Either {@code URL} or {@code FILE}.
      */
     public enum RESOURCE_TYPE {
         URL,
-        FILE;
+        FILE
     }
 
     private static Configuration buildConfiguration(InputStream is) throws ConfigurationException {
@@ -82,10 +80,8 @@ public class Configuration {
     }
 
     /**
-     * Loads configuration from file on the path specified in
-     * the system Property "mapserver-configuration". If no such property
-     * exists, a file with name "mapserver-config.xml" is
-     * searched on the classpath.
+     * Loads configuration from file on the path specified in the system Property "mapserver-configuration". If no such
+     * property exists, a file with name "mapserver-config.xml" is searched on the classpath.
      *
      * @return {@link Configuration} object
      */
@@ -105,7 +101,7 @@ public class Configuration {
 
 
     /**
-     * Loads configuration from the specified file name
+     * Loads configuration from the specified file name.
      *
      * @param filename the configuration file
      * @return {@link Configuration} object
@@ -124,10 +120,9 @@ public class Configuration {
     }
 
     /**
-     * Lists the titles of all <code>TileMap</code>s in the
-     * configuration file.
+     * Lists the titles of all {@code TileMap}s in the configuration file.
      *
-     * @return list of <code>TileMap</code> titles.
+     * @return list of {@code TileMap} titles.
      */
     public List<String> getTileMaps() {
         List titles = configDoc.selectNodes("//TileMap/@title");
@@ -140,11 +135,10 @@ public class Configuration {
     }
 
     /**
-     * Returns the {@linkplain RESOURCE_TYPE} of the <code>TileMap</code> with the
-     * given title
+     * Returns the {@linkplain RESOURCE_TYPE} of the {@code TileMap} with the given title
      *
-     * @param tileMap Title of the <code>TileMap</code>
-     * @return
+     * @param tileMap Title of the {@code TileMap}
+     * @return The resource type of the map.
      * @throws ConfigurationException
      */
     public RESOURCE_TYPE getType(String tileMap) throws ConfigurationException {
@@ -158,10 +152,9 @@ public class Configuration {
     }
 
     /**
-     * Returns the path to the <code>TileMap</code> resource XML representation,
-     * or null if this is not configured.
+     * Returns the path to the {@code TileMap} resource XML representation, or null if this is not configured.
      *
-     * @param tileMap title of the <code>TileMap</code>
+     * @param tileMap title of the {@code TileMap}
      * @return the path to the resource representation
      * @throws ConfigurationException
      */
@@ -178,11 +171,10 @@ public class Configuration {
     }
 
     /**
-     * Returns the <code>TileImageSourceFactory</code> to be
-     * used for this </code>TileMap</code>.
+     * Returns the {@code TileImageSourceFactory} to be used for this {@code TileMap}.
      *
-     * @param tileMapName
-     * @return the fully-qualified class name of the </code>TileImageSourceFactory</code>
+     * @param tileMapName The name of tilemap.
+     * @return the fully-qualified class name of the {@code TileImageSourceFactory}
      * @throws ConfigurationException
      */
     public String getTileImageSourceFactoryClass(String tileMapName) throws ConfigurationException {
@@ -190,12 +182,11 @@ public class Configuration {
     }
 
     /**
-     * Returns the <code>BoundingBoxOpFactory</code> to be
-     * used for this </code>TileMap</code>.
+     * Returns the {@code BoundingBoxOpFactory} to be used for this {@code TileMap}.
      *
-     * @param tileMapName
-     * @return the fully-qualified class name of the </code>BoundingBoxOpFactory</code>
-     *          or null, when no </code>BoundingBoxOpFactory</code> is specified
+     * @param tileMapName The name of the tilamap
+     * @return the fully-qualified class name of the {@code BoundingBoxOpFactory} or null, when no
+     *         {@code BoundingBoxOpFactory} is specified.
      */
     public String getBoundingBoxOpFactoryClass(String tileMapName) {
         String result = null;
@@ -208,11 +199,11 @@ public class Configuration {
     }
 
     /**
-     * Returns whether this </code>TileMap</code> is configured to force the conversion of tiles to ARGB.
-     * This may incur a performance hit, but is required when using tiles with different bit depth.
-     * Tiles of different bit depth cannot be mosaiced by JAI.
+     * Returns whether this {@code TileMap} is configured to force the conversion of tiles to ARGB. This may incur a
+     * performance hit, but is required when using tiles with different bit depth. Tiles of different bit depth cannot
+     * be mosaiced by JAI.
      *
-     * @param tileMapName
+     * @param tileMapName Name of the tilemap.
      * @return true if forceArgb is enabled in the configuration
      */
     public boolean isForceArgb(String tileMapName) {
@@ -223,15 +214,14 @@ public class Configuration {
             //ForceArgb not specified
             return false;
         }
-        if(attribute.toLowerCase().equals("true"))
+        if (attribute.toLowerCase().equals("true"))
             return true;
         else
             return false;
     }
 
     /**
-     * Returns the title to be used in the Capabilities
-     * document for this WMS Service.
+     * Returns the title to be used in the Capabilities document for this WMS Service.
      *
      * @return WMS Title String
      */
@@ -242,8 +232,7 @@ public class Configuration {
     }
 
     /**
-     * Returns the abstract to be used in the Capabilities
-     * document for this WMS Service.
+     * Returns the abstract to be used in the Capabilities document for this WMS Service.
      *
      * @return WMS abstract text
      */
@@ -254,8 +243,7 @@ public class Configuration {
     }
 
     /**
-     * Returns the keywords  to be used in the Capabilities
-     * document for this WMS Service.
+     * Returns the keywords  to be used in the Capabilities document for this WMS Service.
      *
      * @return Array of keywords
      */
@@ -272,10 +260,9 @@ public class Configuration {
     }
 
     /**
-     * Returns the URL to be used in the Capabilities
-     * document for this WMS Service.
+     * Returns the URL to be used in the Capabilities document for this WMS Service.
      *
-     * @return
+     * @return URL of the WMS capabilities document.
      */
     public String getWMSServiceOnlineResource() {
         Element onlineResource = (Element) configDoc.selectSingleNode("//WMS/Service/OnlineResource");
@@ -293,5 +280,4 @@ public class Configuration {
         }
         return attr.getValue();
     }
-
 }
