@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<!--
+  ~ Copyright 2009-2010  Geovise BVBA, QMINO BVBA
+  ~
+  ~ This file is part of GeoLatte Mapserver.
+  ~
+  ~ GeoLatte Mapserver is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ GeoLatte Mapserver is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<config>
+
+
+    <!-- this element configures the WMS interface -->
+    <WMS>
+        <Service>
+            <Title>Orthos Antwerpen</Title>
+            <Abstract>Middenschalig ortho's 2007 - Prov. Antwerpen</Abstract>
+            <KeywordList>
+                <Keyword>kw1</Keyword>
+                <Keyword>kw2</Keyword>
+            </KeywordList>
+            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink.xsd" xlink:type="simple"
+                            xlink:href="http://www.geolatte.org"/>
+        </Service>
+    </WMS>
+
+    <!-- these are the producer services -->
+    <Producers>
+        <TileMaps>
+
+
+            <TileMap
+                    title="orthos"
+                    type="file"
+                    TileImageSourceFactory="org.geolatte.mapserver.tms.FileTileImageSourceFactory"
+                    path="src/test/resources/tiles/tilemapresource.xml"
+                    srs="25831 900913 4326"
+            />
+
+        </TileMaps>
+    </Producers>
+</config>

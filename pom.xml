@@ -9,16 +9,18 @@
   ~ Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>org.geolatte</groupId>
-    <artifactId>geolatte-mapserver</artifactId>
-    <packaging>jar</packaging>
-    <version>1.2-SNAPSHOT</version>
+    <artifactId>mapserver-parent</artifactId>
+    <packaging>pom</packaging>
+    <version>2.0-SNAPSHOT</version>
+
     <name>Geolatte Mapserver</name>
-    <url>http://www.geolatte.org/confluence/display/mserv</url>
-    <description>An embeddable map server supporting the WMS, WMTS and TMS protocols</description>
+
+    <description>An embeddable and modular map server supporting the WMS, WMTS and TMS protocols</description>
 
     <organization>
         <name>geolatte.org</name>
@@ -28,15 +30,144 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <jai.path>${java.home}/lib/ext/</jai.path>
-        <gt-version>2.7.2</gt-version>
     </properties>
 
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
+
+    <modules>
+        <module>mapserver</module>
+        <module>mapserver-imageops</module>
+        <module>mapserver-coordinatetransforms</module>
+        <module>mapserver-protocols</module>
+    </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <phase>generate-test-resources</phase>
+                            <configuration>
+                                <tasks>
+                                    <!-- automatically extract files needed for tests -->
+                                    <untar src="${project.basedir}/src//test/resources/tiles/orthos/ortho-jpeg.tgz"
+                                           dest="/tmp" compression="gzip"/>
+                                </tasks>
+                            </configuration>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- generate compiled (binary) artefacts -->
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+
+                <!--generate source artefacts -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- generate javadoc artefacts -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+
+        </pluginManagement>
+    </build>
+
+
+    <dependencies>
+
+        <!-- geolatte dependencies -->
+        <dependency>
+            <groupId>org.geolatte</groupId>
+            <artifactId>geolatte-geom</artifactId>
+            <version>1.4.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.4</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.25</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <!--<dependency>-->
+        <!--<groupId>dom4j</groupId>-->
+        <!--<artifactId>dom4j</artifactId>-->
+        <!--<version>1.6.1</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>jaxen</groupId>-->
+        <!--<artifactId>jaxen</artifactId>-->
+        <!--<version>1.1.1</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>org.eclipse.jetty</groupId>-->
+        <!--<artifactId>jetty-webapp</artifactId>-->
+        <!--<version>7.0.0.RC6</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>org.mockito</groupId>-->
+        <!--<artifactId>mockito-all</artifactId>-->
+        <!--<version>1.8.5</version>-->
+        <!--<scope>test</scope>-->
+        <!--</dependency>-->
+
+
+        <!--<dependency>-->
+        <!--<groupId>com.jayway.restassured</groupId>-->
+        <!--<artifactId>rest-assured</artifactId>-->
+        <!--<version>1.4</version>-->
+        <!--<scope>test</scope>-->
+        <!--</dependency>-->
+
+    </dependencies>
 
     <licenses>
         <license>
@@ -52,221 +183,4 @@
         <developerConnection>scm:git:git@github.com:GeoLatte/geolatte-mapserver.git</developerConnection>
     </scm>
 
-    <developers>
-        <developer>
-            <id>maesenka</id>
-            <name>Karel Maesen</name>
-            <email>karel@geovise.com</email>
-            <roles>
-                <role>Contributor</role>
-                <role>Committer</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>bertvh</id>
-            <name>Bert Vanhooff</name>
-            <email>bert.vanhooff@qmino.com</email>
-            <roles>
-                <role>Contributor</role>
-                <role>Committer</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>yvesv</id>
-            <name>Yves Vandewoude</name>
-            <email>yves.vandewoude@qmino.com</email>
-            <roles>
-                <role>Contributor</role>
-                <role>Committer</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>rigolepe</id>
-            <name>Peter Rigole</name>
-            <email>peter.rigole@qmino.com</email>
-            <roles>
-                <role>Contributor</role>
-                <role>Committer</role>
-            </roles>
-        </developer>
-    </developers>
-
-    <dependencies>
-
-        <!-- geolatte dependencies -->
-        <dependency>
-            <groupId>org.geolatte</groupId>
-            <artifactId>geolatte-geom</artifactId>
-            <version>0.12-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.4</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
-        </dependency>
-        <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
-            <version>7.0.0.RC6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.8.5</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-referencing</artifactId>
-            <version>${gt-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-epsg-hsql</artifactId>
-            <version>${gt-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jvnet.ogc</groupId>
-            <artifactId>wms-v_1_1_1-schema</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jvnet.ogc</groupId>
-            <artifactId>wms-v_1_3_0-schema</artifactId>
-            <version>1.0.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.media</groupId>
-            <artifactId>jai_codec</artifactId>
-            <version>1.1.3</version>
-            <scope>system</scope>
-            <systemPath>${jai.path}/jai_codec.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>javax.media</groupId>
-            <artifactId>jai_core</artifactId>
-            <version>1.1.3</version>
-            <scope>system</scope>
-            <systemPath>${jai.path}/jai_core.jar</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>com.jayway.restassured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <version>1.4</version>
-            <scope>test</scope>
-        </dependency>
-
-    </dependencies>
-    <build>
-
-        <plugins>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-test-resources</phase>
-                        <configuration>
-                            <tasks>
-                                <!-- automatically extract files needed for tests -->
-                                <untar src="${project.basedir}/src//test/resources/tiles/orthos/ortho-jpeg.tgz" dest="/tmp" compression="gzip"/>
-                            </tasks>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- generate compiled (binary) artefacts -->
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-
-            <!--generate source artefacts -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.1.2</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- generate javadoc artefacts -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.7</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
-    <repositories>
-        <repository>
-            <id>geotools</id>
-            <url>http://download.osgeo.org/webdav/geotools/</url>
-        </repository>
-        <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Maven 2 Repository</name>
-            <url>http://download.java.net/maven/2</url>
-        </repository>
-        <repository>
-            <id>com.springsource.repository.bundles.external</id>
-            <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
-            <url>http://repository.springsource.com/maven/bundles/external</url>
-        </repository>
-    </repositories>
-
-    <profiles>
-        <profile>
-            <id>platform-mac</id>
-            <activation>
-                <os>
-                    <family>mac</family>
-                </os>
-            </activation>
-            <properties>
-                <jai.path>/System/Library/Java/Extensions/</jai.path>
-            </properties>
-        </profile>
-    </profiles>
 </project>
