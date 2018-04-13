@@ -19,17 +19,19 @@
 
 package org.geolatte.mapserver.tilemap;
 
+import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Point;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsId;
-import org.geolatte.mapserver.spi.ImageFormat;
-import org.geolatte.mapserver.wms.BoundingBoxOpFactory;
-import org.geolatte.mapserver.wms.DefaultBoundingBoxOpFactory;
+import org.geolatte.mapserver.core.ImageFormat;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.geolatte.geom.builder.DSL.point;
 
 
 /**
@@ -40,9 +42,9 @@ import java.util.Set;
 public class TileMap {
 
     private final String serviceUrl;
-    private final CrsId srs;
+    private final CoordinateReferenceSystem<C2D> crs;
     private final String title;
-    private final Envelope maxBoundingBox;
+    private final Envelope<C2D> maxBoundingBox;
     private final Point origin;
     private final TileFormat tileFormat;
     private final List<TileSet> tileSets;
@@ -51,29 +53,19 @@ public class TileMap {
     private BoundingBoxOpFactory boundingBoxOpFactory = new DefaultBoundingBoxOpFactory();
     private boolean forceArgb;
 
-    protected TileMap(String serviceURL, String title, CrsId srs, Envelope bbox,
-                      Point origin, TileFormat tileFormat,
-                      List<TileSet> tileSets) throws IllegalArgumentException {
+    TileMap(String serviceURL, String title, CoordinateReferenceSystem<C2D> crs, Envelope<C2D> bbox,
+            Point origin, TileFormat tileFormat, boolean forceArgb,
+            List<TileSet> tileSets) throws IllegalArgumentException {
         this.serviceUrl = serviceURL;
         this.title = title;
         this.maxBoundingBox = bbox;
         this.tileFormat = tileFormat;
-        this.srs = srs;
+        this.crs = crs;
         this.origin = origin;
         this.tileSets = tileSets;
+        this.forceArgb = forceArgb;
     }
 
-    void setTileImageSourceFactory(TileImageSourceFactory factory) {
-        this.tileImageSourceFactory = factory;
-    }
-
-    public BoundingBoxOpFactory getBoundingBoxOpFactory() {
-        return boundingBoxOpFactory;
-    }
-
-    public void setBoundingBoxOpFactory(BoundingBoxOpFactory boundingBoxOpFactory) {
-        this.boundingBoxOpFactory = boundingBoxOpFactory;
-    }
 
     /**
      * Returns the {@link Tile}s in the {@link TileSet} that overlap the <code>BoundingBox</code>.
@@ -82,7 +74,7 @@ public class TileMap {
      * @param bbox the <code>BoundingBox</code>
      * @return the <code>Tile</code>s in the <code>TileSet</code> specified by the set argument that overlap the <code>BoundingBox</code> specified by the bbox argument
      */
-    Set<Tile> getTilesFor(TileSet set, Envelope bbox) {
+    public Set<Tile> getTilesFor(TileSet set, Envelope<C2D> bbox) {
         if (outsideMaxBoundingBox(bbox))
             throw new IllegalArgumentException(String.format("Request BoundingBox: %s exceeds maximum bounding box: %s", bbox.toString(), getBoundingBox().toString()));
         Set<Tile> result = new HashSet<Tile>();
@@ -103,11 +95,11 @@ public class TileMap {
      * @return true if the <code>BoundingBox</code> specified by the bbox argument falls at least partly wihtin
      * the extent of this <code>TileMap</code>, and false otherwise.
      */
-    public boolean outsideMaxBoundingBox(Envelope bbox) {
-        return (bbox.getMinX() < getBoundingBox().getMinX()
-                || bbox.getMinY() < getBoundingBox().getMinY()
-                || bbox.getMaxX() > getBoundingBox().getMaxX()
-                || bbox.getMaxY() > getBoundingBox().getMaxY());
+    public boolean outsideMaxBoundingBox(Envelope<C2D> bbox) {
+        return (bbox.lowerLeft().getX() < getBoundingBox().lowerLeft().getX()
+                || bbox.lowerLeft().getY() < getBoundingBox().lowerLeft().getY()
+                || bbox.upperRight().getX() > getBoundingBox().upperRight().getX()
+                || bbox.upperRight().getY() > getBoundingBox().upperRight().getY());
     }
 
     /**
@@ -117,7 +109,7 @@ public class TileMap {
      * @param tileCoordinate the <code>TileCoordinate</code>
      * @return a <code>Tile</code> in the <code>TileSet</code> specified by the set argument for the coordinate specified by tileCoordinate argument
      */
-    Tile makeTile(TileSet set, TileCoordinate tileCoordinate) {
+    public Tile makeTile(TileSet set, TileCoordinate tileCoordinate) {
         TileImageSource source = tileImageSourceFactory.create(set, tileCoordinate, tileFormat.extension);
         return new Tile(source, tileCoordinate, set.getTileCoordinateSpace());
     }
@@ -127,7 +119,7 @@ public class TileMap {
      *
      * @return an unmodifiable list of the <code>TileSet</code>s in this </code>TileMap</code>.
      */
-    List<TileSet> getTileSets() {
+    public List<TileSet> getTileSets() {
         return Collections.unmodifiableList(tileSets);
     }
 
@@ -140,13 +132,17 @@ public class TileMap {
         return this.title;
     }
 
+    public CoordinateReferenceSystem<C2D> getCoordinateReferenceSystem() {
+        return crs;
+    }
     /**
      * Returns the coordinate reference system of this <code>TileMap</code>
      *
+     * @deprecated
      * @return the coordinate reference system
      */
     public CrsId getSRS() {
-        return this.srs;
+        return this.crs.getCrsId();
     }
 
     /**
@@ -154,7 +150,7 @@ public class TileMap {
      *
      * @return a <code>BoundingBox</code> specifying the extent of this <code>TileMap</code>.
      */
-    public Envelope getBoundingBox() {
+    public Envelope<C2D> getBoundingBox() {
         return this.maxBoundingBox;
     }
 
@@ -171,13 +167,13 @@ public class TileMap {
             return ImageFormat.PNG;
     }
 
-    private TileCoordinate lowerLeftTileCoordinate(Envelope bbox, TileSet set) {
-        Point ll = bbox.lowerLeft();
+    private TileCoordinate lowerLeftTileCoordinate(Envelope<C2D> bbox, TileSet set) {
+        Point<C2D> ll = point(bbox.getCoordinateReferenceSystem(), bbox.lowerLeft());
         return set.pointIndex(ll, true);
     }
 
-    private TileCoordinate upperRightTileCoordinate(Envelope bbox, TileSet set) {
-        Point ur = bbox.upperRight();
+    private TileCoordinate upperRightTileCoordinate(Envelope<C2D> bbox, TileSet set) {
+        Point<C2D> ur = point(bbox.getCoordinateReferenceSystem(), bbox.upperRight());
         // if the upperright point falls on the lower or left border of a tile,
         // then that tile should not be returned.
         return set.pointIndex(ur, false);
@@ -191,7 +187,7 @@ public class TileMap {
      * @param bbox the BoundingBox to clip
      * @return the clipped BoundingBox.
      */
-    public Envelope clipToMaxBoundingBox(Envelope bbox) {
+    public Envelope<C2D> clipToMaxBoundingBox(Envelope<C2D> bbox) {
         return getBoundingBox().intersect(bbox);
     }
 
@@ -199,7 +195,4 @@ public class TileMap {
         return forceArgb;
     }
 
-    public void setForceArgb(boolean forceArgb) {
-        this.forceArgb = forceArgb;
-    }
 }

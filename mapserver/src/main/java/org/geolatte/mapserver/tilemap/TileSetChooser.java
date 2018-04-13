@@ -19,32 +19,38 @@
 
 package org.geolatte.mapserver.tilemap;
 
-import org.apache.log4j.Logger;
+import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.util.List;
 
+import static org.geolatte.mapserver.util.EnvelopUtils.height;
+import static org.geolatte.mapserver.util.EnvelopUtils.width;
+
 public class TileSetChooser {
 
-    private final static Logger LOGGER = Logger.getLogger(TileSetChooser.class);
+    private final static Logger logger = LoggerFactory.getLogger(TileSetChooser.class);
 
 
     final private TileMap tileMap;
-    final private Envelope bbox;
+    final private Envelope<C2D> bbox;
     final private Dimension imageDimension;
     final private double requestUnitsPerPixel;
 
-    public TileSetChooser(TileMap tileMap, Envelope bbox, Dimension imageDimension) {
+    public TileSetChooser(TileMap tileMap, Envelope<C2D> bbox, Dimension imageDimension) {
         this.tileMap = tileMap;
         this.bbox = bbox;
         this.imageDimension = imageDimension;
         requestUnitsPerPixel = determineRequestUnitsPerPixel();
-        LOGGER.debug("Request units per pixel is: " + requestUnitsPerPixel);
+        logger.debug("Request units per pixel is: " + requestUnitsPerPixel);
     }
 
 
-    TileSet chooseTileSet() {
+    //TODO  -- reduce the visibility
+    public TileSet chooseTileSet() {
         List<TileSet> tileSets = tileMap.getTileSets();
         if (tileSets.isEmpty()) throw new RuntimeException("No tilesets.");
         TileSet candidate = tileSets.get(0);
@@ -63,8 +69,8 @@ public class TileSetChooser {
 
     protected double determineRequestUnitsPerPixel() {
 
-        double boxH = bbox.getHeight();
-        double boxW = bbox.getWidth();
+        double boxH = height(bbox);
+        double boxW = width(bbox);
         double yRes = boxH / imageDimension.getHeight();
         double xRes = boxW / imageDimension.getWidth();
         //The WMS spec specifies that the resulting image

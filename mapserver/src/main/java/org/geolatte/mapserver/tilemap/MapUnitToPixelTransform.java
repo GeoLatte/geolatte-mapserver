@@ -71,7 +71,7 @@ public class MapUnitToPixelTransform {
      * @param minPixelY        the minimum pixel coordinate in the Y-axis
      * @param mapUnitsPerPixel the map units per pixel for the <code>PixelRange</code>
      */
-    public MapUnitToPixelTransform(Envelope extent, int minPixelX, int minPixelY, double mapUnitsPerPixel) {
+    public MapUnitToPixelTransform(Envelope<C2D> extent, int minPixelX, int minPixelY, double mapUnitsPerPixel) {
         this.extent = extent;
         this.mapUnitsPerPixelX = mapUnitsPerPixel;
         this.mapUnitsPerPixelY = mapUnitsPerPixel;
@@ -86,7 +86,7 @@ public class MapUnitToPixelTransform {
      * @param extent           extent the maximum extent in map units
      * @param mapUnitsPerPixel the map units per pixel for the <code>PixelRange</code>
      */
-    public MapUnitToPixelTransform(Envelope extent, double mapUnitsPerPixel) {
+    public MapUnitToPixelTransform(Envelope<C2D> extent, double mapUnitsPerPixel) {
         this(extent, 0, 0, mapUnitsPerPixel);
     }
 
@@ -104,7 +104,7 @@ public class MapUnitToPixelTransform {
      *
      * @return
      */
-    public Envelope getDomain() {
+    public Envelope<C2D> getDomain() {
         return this.extent;
     }
 
@@ -116,7 +116,7 @@ public class MapUnitToPixelTransform {
      * @param pixel
      * @return
      */
-    public Point toPoint(Pixel pixel) {
+    public Point<C2D> toPoint(Pixel pixel) {
         double x = extent.lowerLeft().getX() + mapUnitsPerPixelX * (pixel.x - this.pixelRange.getMinX());
         double y = extent.lowerLeft().getY() - mapUnitsPerPixelY * (pixel.y - this.pixelRange.getMinY());
         return point(extent.getCoordinateReferenceSystem(), c(x, y));

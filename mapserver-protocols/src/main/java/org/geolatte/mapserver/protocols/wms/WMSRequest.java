@@ -17,12 +17,8 @@
  * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.geolatte.mapserver.wms;
+package org.geolatte.mapserver.protocols.wms;
 
-import org.geolatte.geom.Envelope;
-import org.geolatte.geom.crs.CrsId;
-
-import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -98,7 +94,7 @@ public abstract class WMSRequest {
         return null;
     }
 
-    private static Envelope convertToEnvelope(String strVal) throws InvalidWMSRequestException {
+    private static Envelope<C2D> convertToEnvelope(String strVal) throws InvalidWMSRequestException {
         Scanner scanner = new Scanner(strVal);
         scanner.useDelimiter(",");
         double[] xyvals = new double[4];
@@ -112,7 +108,7 @@ public abstract class WMSRequest {
         } catch (IndexOutOfBoundsException e) {
             throw new InvalidWMSRequestException(String.format("Invalid Boundingbox: %s", strVal));
         }
-        Envelope result = new Envelope(xyvals[0], xyvals[1], xyvals[2], xyvals[3], null);
+        Envelope<C2D> result = new Envelope<C2D>(xyvals[0], xyvals[1], xyvals[2], xyvals[3], null);
         if (result.isEmpty()) {
             throw new InvalidWMSRequestException("Empty or invalid bounding box.");
         }

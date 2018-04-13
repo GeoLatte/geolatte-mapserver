@@ -19,25 +19,29 @@
 
 package org.geolatte.mapserver.tilemap;
 
+import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Point;
-import org.geolatte.geom.Points;
-import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.util.Pixel;
 import org.geolatte.mapserver.util.PixelRange;
 
 import java.awt.*;
 
+import static org.geolatte.geom.builder.DSL.c;
+import static org.geolatte.geom.builder.DSL.point;
+import static org.geolatte.mapserver.util.EnvelopUtils.height;
+import static org.geolatte.mapserver.util.EnvelopUtils.width;
+
 public class TileSetCoordinateSpace {
 
-    private final Point origin;
+    private final Point<C2D> origin;
     private final Dimension tileDimension;
-    private final Envelope extent;
+    private final Envelope<C2D> extent;
     private final double unitsPerPixel;
     private final MapUnitToPixelTransform mupTransform;
 
 
-    TileSetCoordinateSpace(Point origin, Dimension tileDimension, Envelope extent, double unitsPerPixel) {
+    TileSetCoordinateSpace(Point<C2D> origin, Dimension tileDimension, Envelope<C2D> extent, double unitsPerPixel) {
         this.origin = origin;
         this.tileDimension = tileDimension;
         this.unitsPerPixel = unitsPerPixel;
@@ -45,25 +49,25 @@ public class TileSetCoordinateSpace {
         this.mupTransform = new MapUnitToPixelTransform(this.extent, this.unitsPerPixel);
     }
 
-    public Envelope boundingBox(TileCoordinate coordinate) {
+    public Envelope<C2D> boundingBox(TileCoordinate coordinate) {
         double width = tileDimension.getWidth() * unitsPerPixel;
         double height = tileDimension.getHeight() * unitsPerPixel;
-        double x = origin.getX() + (coordinate.i * width);
-        double y = origin.getY() + (coordinate.j * height);
-        Envelope result = new Envelope(x, y, x + width, y + height, null);
+        double x = origin.getPosition().getX() + (coordinate.i * width);
+        double y = origin.getPosition().getY() + (coordinate.j * height);
+        Envelope<C2D> result = new Envelope<>(x, y, x + width, y + height,origin.getCoordinateReferenceSystem());
 //        if (!result.isWithin(extent))
 //            throw new IllegalArgumentException("Specified TileCoordinate falls outside of TileSet extent.");
         return result;
     }
 
     public PixelRange tilePixelRange(TileCoordinate coordinate) {
-        Envelope bbox = boundingBox(coordinate);
+        Envelope<C2D> bbox = boundingBox(coordinate);
         return this.mupTransform.toPixelRange(bbox);
     }
 
     public Dimension tileSetPixelDimension() {
-        int h = (int) (extent.getHeight() / unitsPerPixel);
-        int w = (int) (extent.getWidth() / unitsPerPixel);
+        int h = (int) (height(extent) / unitsPerPixel);
+        int w = (int) (width(extent) / unitsPerPixel);
         return new Dimension(w, h);
     }
 
@@ -84,12 +88,12 @@ public class TileSetCoordinateSpace {
      * @param lowerLeftInclusive if set, points on the bottom or left border of a tile count as enclosed by that tile
      * @return The <code>TileIndex</code> that encloses this point.
      */
-    public TileCoordinate tileCoordinateContaining(Point point, boolean lowerLeftInclusive) {
-        if (!this.extent.contains(point))
+    public TileCoordinate tileCoordinateContaining(Point<C2D> point, boolean lowerLeftInclusive) {
+        if (!this.extent.contains(point.getPosition()))
             throw new IllegalArgumentException(String.format("Point %s outside the extent of this TileSet", point.toString()));
-        Point relativeToOrigin = relativeToOrigin(point);
-        double x = relativeToOrigin.getX();
-        double y = relativeToOrigin.getY();
+        Point<C2D> relativeToOrigin = relativeToOrigin(point);
+        double x = relativeToOrigin.getPosition().getX();
+        double y = relativeToOrigin.getPosition().getY();
         double width = tileWidthInMapUnits();
         double height = tileHeightInMapUnits();
         double approxI = removeRoundingError(x / width);
@@ -121,19 +125,21 @@ public class TileSetCoordinateSpace {
         return this.unitsPerPixel;
     }
 
-    public PixelRange pixelRange(Envelope bbox) {
+    public PixelRange pixelRange(Envelope<C2D> bbox) {
         return this.mupTransform.toPixelRange(bbox);
     }
 
-    public Pixel toPixel(Point point) {
-        return this.mupTransform.toPixel(point);
+    public Pixel toPixel(Point<C2D> point) {
+        return this.mupTransform.toPixel(point.getPosition());
     }
 
-    public Point toPoint(Pixel pixel) {
+    public Point<C2D> toPoint(Pixel pixel) {
         return this.mupTransform.toPoint(pixel);
     }
 
-    private Point relativeToOrigin(Point point) {
-        return Points.create2D(point.getX() - origin.getX(), point.getY() - origin.getY(), CrsId.UNDEFINED);
+    private Point<C2D> relativeToOrigin(Point<C2D> point) {
+        C2D p = point.getPosition();
+        C2D o = origin.getPosition();
+        return point(point.getCoordinateReferenceSystem(), c(p.getX() - o.getX(), p.getY() - o.getY()));
     }
 }

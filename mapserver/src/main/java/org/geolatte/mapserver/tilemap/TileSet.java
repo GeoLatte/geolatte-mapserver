@@ -19,6 +19,7 @@
 
 package org.geolatte.mapserver.tilemap;
 
+import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Point;
 import org.geolatte.mapserver.util.PixelRange;
@@ -32,7 +33,7 @@ import org.geolatte.mapserver.util.PixelRange;
  * units per pixel).
  * </p>
  */
-class TileSet {
+public class TileSet {
 
     final String href;
     final private int order;
@@ -74,15 +75,15 @@ class TileSet {
      * @param lowerLeftInclusive if set, points on the bottom or left border of a tile counts as enclosed by that tile
      * @return The <code>TileIndex</code> that encloses this point.
      */
-    public TileCoordinate pointIndex(Point point, boolean lowerLeftInclusive) {
+    public TileCoordinate pointIndex(Point<C2D> point, boolean lowerLeftInclusive) {
         return tileSetCoordinateSpace.tileCoordinateContaining(point, lowerLeftInclusive);
     }
 
-    public PixelRange pixelBounds(Envelope bbox) {
+    public PixelRange pixelBounds(Envelope<C2D> bbox) {
         return tileSetCoordinateSpace.pixelRange(bbox);
     }
 
-    int getOrder() {
+    public int getOrder() {
         return this.order;
     }
 

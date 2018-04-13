@@ -30,6 +30,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <johnzon.version>1.1.7</johnzon.version>
+        <jsonspecversion>1.0</jsonspecversion>
+        <jsonbspecversion>1.0</jsonbspecversion>
     </properties>
 
 
@@ -38,6 +41,7 @@
         <module>mapserver-imageops</module>
         <module>mapserver-coordinatetransforms</module>
         <module>mapserver-protocols</module>
+        <module>mapserver-config</module>
     </modules>
 
     <build>
@@ -105,69 +109,120 @@
     </build>
 
 
-    <dependencies>
+    <dependencyManagement>
 
-        <!-- geolatte dependencies -->
-        <dependency>
-            <groupId>org.geolatte</groupId>
-            <artifactId>geolatte-geom</artifactId>
-            <version>1.4.0-SNAPSHOT</version>
-        </dependency>
+        <dependencies>
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.4</version>
-            <scope>test</scope>
-        </dependency>
+            <dependency>
+                <groupId>org.geolatte</groupId>
+                <artifactId>mapserver</artifactId>
+            </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.25</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.25</version>
-            <scope>test</scope>
-        </dependency>
+            <!-- geolatte dependencies -->
+            <dependency>
+                <groupId>org.geolatte</groupId>
+                <artifactId>geolatte-geom</artifactId>
+                <version>1.4.0-SNAPSHOT</version>
+            </dependency>
 
 
-        <!--<dependency>-->
-        <!--<groupId>dom4j</groupId>-->
-        <!--<artifactId>dom4j</artifactId>-->
-        <!--<version>1.6.1</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-        <!--<groupId>jaxen</groupId>-->
-        <!--<artifactId>jaxen</artifactId>-->
-        <!--<version>1.1.1</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-        <!--<groupId>org.eclipse.jetty</groupId>-->
-        <!--<artifactId>jetty-webapp</artifactId>-->
-        <!--<version>7.0.0.RC6</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-        <!--<groupId>org.mockito</groupId>-->
-        <!--<artifactId>mockito-all</artifactId>-->
-        <!--<version>1.8.5</version>-->
-        <!--<scope>test</scope>-->
-        <!--</dependency>-->
+            <dependency>
+                <groupId>org.geolatte</groupId>
+                <artifactId>geolatte-maprenderer</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
 
 
-        <!--<dependency>-->
-        <!--<groupId>com.jayway.restassured</groupId>-->
-        <!--<artifactId>rest-assured</artifactId>-->
-        <!--<version>1.4</version>-->
-        <!--<scope>test</scope>-->
-        <!--</dependency>-->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.4</version>
+                <scope>test</scope>
+            </dependency>
 
-    </dependencies>
+            <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.25</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>1.7.25</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!--  Jonhzon for json-b processing -->
+            <dependency>
+                <groupId>org.apache.johnzon</groupId>
+                <artifactId>johnzon-core</artifactId>
+                <version>${johnzon.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.johnzon</groupId>
+                <artifactId>johnzon-mapper</artifactId>
+                <version>${johnzon.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.johnzon</groupId>
+                <artifactId>johnzon-jsonb</artifactId>
+                <version>${johnzon.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-json_1.1_spec</artifactId>
+                <version>${jsonspecversion}</version>
+                <scope>compile</scope> <!-- or compile if your environment doesn't provide it -->
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jsonb_1.0_spec</artifactId>
+                <version>${jsonbspecversion}</version>
+                <scope>compile</scope> <!-- or compile if your environment doesn't provide it -->
+            </dependency>
+
+            <!-- -->
+
+
+            <!--<dependency>-->
+            <!--<groupId>dom4j</groupId>-->
+            <!--<artifactId>dom4j</artifactId>-->
+            <!--<version>1.6.1</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+            <!--<groupId>jaxen</groupId>-->
+            <!--<artifactId>jaxen</artifactId>-->
+            <!--<version>1.1.1</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+            <!--<groupId>org.eclipse.jetty</groupId>-->
+            <!--<artifactId>jetty-webapp</artifactId>-->
+            <!--<version>7.0.0.RC6</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+            <!--<groupId>org.mockito</groupId>-->
+            <!--<artifactId>mockito-all</artifactId>-->
+            <!--<version>1.8.5</version>-->
+            <!--<scope>test</scope>-->
+            <!--</dependency>-->
+
+
+            <!--<dependency>-->
+            <!--<groupId>com.jayway.restassured</groupId>-->
+            <!--<artifactId>rest-assured</artifactId>-->
+            <!--<version>1.4</version>-->
+            <!--<scope>test</scope>-->
+            <!--</dependency>-->
+
+        </dependencies>
+    </dependencyManagement>
 
     <licenses>
         <license>

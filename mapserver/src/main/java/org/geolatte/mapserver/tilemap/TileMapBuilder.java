@@ -19,167 +19,151 @@
 
 package org.geolatte.mapserver.tilemap;
 
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
+import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Point;
-import org.geolatte.geom.Points;
-import org.geolatte.geom.crs.CrsId;
-import org.geolatte.mapserver.wms.BoundingBoxOpFactory;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.mapserver.core.ImageFormat;
 
 import java.awt.*;
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
+import static org.geolatte.geom.builder.DSL.point;
+
 public class TileMapBuilder {
+    private String name;
+    private CoordinateReferenceSystem<C2D> crs;
+    private double minX;
+    private double minY;
+    private double maxX;
+    private double maxY;
+    private int tileWidth;
+    private int tileHeight;
+    private C2D originPos;
+    private List<TileSetInfo> tileSetInfo = new ArrayList<>();
+    private boolean forceArgb = false;
+    private String tileMimeType = ImageFormat.PNG.getMimeType();
+    private String tileExtension = ImageFormat.PNG.getExt();
+    private String root;
 
-    private final Document xmlDoc;
-
-    public TileMapBuilder(Document xmlDoc) {
-        this.xmlDoc = xmlDoc;
+    public TileMap build() {
+        verify();
+        Envelope<C2D> bbox = new Envelope<>(minX, minY, maxX, maxY, crs);
+        Point<C2D> origin = point(crs, originPos);
+        Dimension tileDim = getTileDimension();
+        TileFormat tileFormat = new TileFormat(tileDim, tileMimeType, tileExtension);
+        List<TileSet> tileSets = buildTileSets(tileDim, origin, bbox);
+        return new TileMap(root,
+                name,
+                crs,
+                bbox,
+                origin,
+                tileFormat,
+                forceArgb,
+                tileSets);
     }
 
-    public static TileMapBuilder fromURL(String urlStr) throws TileMapCreationException {
-        try {
-            URL url = new URL(urlStr);
-            SAXReader reader = new SAXReader();
-            Document xmlDoc = reader.read(url);
-            return new TileMapBuilder(xmlDoc);
-        } catch (MalformedURLException e) {
-            throw new TileMapCreationException(String.format("Tilemap resource configured with malformed url"), e);
-        } catch (DocumentException e) {
-            throw new TileMapCreationException(String.format("Can't read Tilemap resource from URL"), e);
-        }
+    private void verify() {
+        if (this.root == null) throw new IllegalStateException("No root defined for TileMap");
+        if (crs == null) throw new IllegalStateException("No CRS defined for TileMap");
+        if (tileSetInfo.isEmpty()) throw new IllegalStateException("No TileSets defined");
+        if (tileWidth <= 0 || tileHeight <= 0) throw new IllegalStateException("Invalid Tile Dimension");
+        if (originPos == null) throw new IllegalStateException("No origin defined");
     }
 
-    public static TileMapBuilder fromPath(String path) throws TileMapCreationException {
-        File file = new File(path);
-        SAXReader reader = new SAXReader();
-        try {
-            Document xmlDoc = reader.read(file);
-            return new TileMapBuilder(xmlDoc);
-        } catch (DocumentException e) {
-            throw new TileMapCreationException("Can't read tilemap resource from href.", e);
-        }
+    private Dimension getTileDimension() {
+        return new Dimension(tileWidth, tileHeight);
     }
 
-
-    public TileMap buildTileMap() {
-        return new TileMap(this.getMapServiceUrl(),
-                this.getTitle(),
-                this.getSRS(),
-                this.getBoundingBox(),
-                this.getOrigin(),
-                this.getTileFormat(),
-                this.getTileSets());
+    public TileMapBuilder root(String root) {
+        if (root == null) throw new IllegalArgumentException("No null argument allowed");
+        this.root = root;
+        return this;
     }
 
-    public TileMap buildTileMap(TileImageSourceFactory factory, boolean forceArgb) {
-        TileMap tileMap = buildTileMap();
-        tileMap.setTileImageSourceFactory(factory);
-        tileMap.setForceArgb(forceArgb);
-        return tileMap;
+    public TileMapBuilder name(String name) {
+        if (name == null) throw new IllegalArgumentException("No null argument allowed");
+        this.name = name;
+        return this;
     }
 
-    public TileMap buildTileMap(TileImageSourceFactory tileImageSourceFactory, BoundingBoxOpFactory boundingBoxOpFactory, boolean forceArgb) {
-        TileMap tileMap = buildTileMap(tileImageSourceFactory, forceArgb);
-        tileMap.setBoundingBoxOpFactory(boundingBoxOpFactory);
-        return tileMap;
+    public TileMapBuilder crs(CoordinateReferenceSystem<C2D> ci) {
+        if (ci == null) throw new IllegalArgumentException("No null argument allowed");
+        this.crs = ci;
+        return this;
     }
 
-    private String extractNode(String node) {
-        return xmlDoc.selectSingleNode(node).getText();
+    public TileMapBuilder envelope(double minX, double minY, double maxX, double maxY) {
+        this.minX = minX;
+        this.minY = minY;
+        this.maxX = maxX;
+        this.maxY = maxY;
+        return this;
     }
 
-    private Double extractAttributeDouble(String xpath) {
-        String str = extractAttribute(xpath);
-        return Double.valueOf(str);
+    public TileMapBuilder origin(double x, double y) {
+        this.originPos = new C2D(x, y);
+        return this;
     }
 
-    private Integer extractAttributeInteger(String xpath) {
-        String str = extractAttribute(xpath);
-        return Integer.valueOf(str);
+    public TileMapBuilder tileWidth(int w) {
+        this.tileWidth = w;
+        return this;
     }
 
-    private String extractAttribute(String xpath) {
-        Attribute attr = (Attribute) xmlDoc.selectSingleNode(xpath);
-        String str = attr.getValue();
-        return str;
+    public TileMapBuilder tileHeight(int h) {
+        this.tileHeight = h;
+        return this;
     }
 
-    protected String getMapServiceUrl() {
-        return extractAttribute("//TileMap/@tilemapservice");
+    public TileMapBuilder tileMimeType(String mimeType) {
+        if (mimeType == null) throw new IllegalArgumentException("No null argument allowed");
+        this.tileMimeType = mimeType;
+        return this;
     }
 
-    protected String getTitle() {
-        return extractNode("//Title");
+    public TileMapBuilder tileExtension(String extension) {
+        if (extension == null) throw new IllegalArgumentException("No null argument allowed");
+        this.tileExtension = extension;
+        return this;
     }
 
-    protected CrsId getSRS() {
-        String valueStr = extractNode("//SRS");
-        return CrsId.parse(valueStr);
+    public TileMapBuilder forceArgb(boolean v) {
+        this.forceArgb = v;
+        return this;
     }
 
-    protected Envelope getBoundingBox() {
-        double minX = extractAttributeDouble("//BoundingBox/@minx");
-        double minY = extractAttributeDouble("//BoundingBox/@miny");
-        double maxX = extractAttributeDouble("//BoundingBox/@maxx");
-        double maxY = extractAttributeDouble("//BoundingBox/@maxy");
-        return new Envelope(minX, minY, maxX, maxY, getSRS());
+    public TileMapBuilder addSet(String url, int order, double unitsPerPixel) {
+        tileSetInfo.add(new TileSetInfo(url, order, unitsPerPixel));
+        return this;
     }
 
 
-    protected Point getOrigin() {
-        double originX = extractAttributeDouble("//Origin/@x");
-        double originY = extractAttributeDouble("//Origin/@y");
-        return Points.create2D(originX, originY, CrsId.UNDEFINED);
-    }
-
-    protected Dimension getTileDimension() {
-        int h = extractAttributeInteger("//TileFormat/@height");
-        int w = extractAttributeInteger("//TileFormat/@width");
-        return new Dimension(w, h);
-    }
-
-    protected TileFormat getTileFormat() {
-        Dimension dim = getTileDimension();
-        String tileMimeType = extractAttribute("//TileFormat/@mime-type");
-        String tileExtension = extractAttribute("//TileFormat/@extension");
-        return new TileFormat(dim, tileMimeType, tileExtension);
-    }
-
-    protected List<TileSet> getTileSets() {
+    private List<TileSet> buildTileSets(Dimension pixelDim, Point<C2D> origin, Envelope<C2D> bbox) {
         List<TileSet> tileSetList = new ArrayList<TileSet>();
-        Dimension pixelDim = getTileDimension();
-        Point origin = getOrigin();
-        Envelope bbox = getBoundingBox();
-        Element tilesetsNode = (Element) xmlDoc.selectSingleNode("//TileSets");
-        for (Iterator it = tilesetsNode.elementIterator("TileSet"); it.hasNext(); ) {
-            Element tileSetEl = (Element) it.next();
-            tileSetList.add(getTileSet(tileSetEl, origin, pixelDim, bbox));
+        for (TileSetInfo ti : tileSetInfo) {
+            tileSetList.add(buildTileSet(ti, origin, pixelDim, bbox));
         }
         return tileSetList;
     }
 
-    private TileSet getTileSet(Element xmlEl, Point origin, Dimension pixelDim, Envelope bbox) {
-        String url = xmlEl.valueOf("@href");
-        String orderStr = xmlEl.valueOf("@order");
-        int order = Integer.valueOf(orderStr);
-        String uppStr = xmlEl.valueOf("@units-per-pixel");
-        double upp = Double.valueOf(uppStr);
-        TileSetCoordinateSpace cs = new TileSetCoordinateSpace(origin, pixelDim, bbox, upp);
-        return new TileSet(url, order, cs);
+    private TileSet buildTileSet(TileSetInfo ti, Point<C2D> origin, Dimension pixelDim, Envelope<C2D> bbox) {
+        TileSetCoordinateSpace cs = new TileSetCoordinateSpace(origin, pixelDim, bbox, ti.unitsPerPixel);
+        return new TileSet(ti.path, ti.order, cs);
     }
 
-    protected Document getMetadataAsXML() {
-        return xmlDoc;
+    static class TileSetInfo {
+        String path;
+        int order;
+        double unitsPerPixel;
+
+        TileSetInfo(String path, int order, double unitsPerPixel) {
+            this.path = path;
+            this.order = order;
+            this.unitsPerPixel = unitsPerPixel;
+        }
     }
+
 
 }

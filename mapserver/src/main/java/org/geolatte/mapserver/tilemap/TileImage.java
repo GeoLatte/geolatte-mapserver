@@ -19,8 +19,9 @@
 
 package org.geolatte.mapserver.tilemap;
 
-import org.geolatte.mapserver.spi.ImageFormat;
+import org.geolatte.mapserver.core.ImageFormat;
 
+import java.awt.*;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -33,6 +34,10 @@ public interface TileImage {
 
 
     public Object getInternalRepresentation();
+
+    default public <T> T getInternalRepresentation(Class<T> rep) {
+        return (T) getInternalRepresentation();
+    }
 
     public void write(OutputStream os, ImageFormat format) throws IOException;
 
@@ -47,4 +52,7 @@ public interface TileImage {
     public int getMinY();
 
 
+    default Dimension getDimension() {
+        return new Dimension(getWidth(), getHeight());
+    }
 }

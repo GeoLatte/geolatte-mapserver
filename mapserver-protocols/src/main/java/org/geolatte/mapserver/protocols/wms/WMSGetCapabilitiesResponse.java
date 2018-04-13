@@ -17,7 +17,7 @@
  * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.geolatte.mapserver.wms;
+package org.geolatte.mapserver.protocols.wms;
 
 import net.opengis.wms.v_1_1_1.*;
 import net.opengis.wms.v_1_1_1.Exception;

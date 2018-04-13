@@ -26,14 +26,12 @@ public class BoundingBoxProjectOp implements TileMapOperation<TileImage> {
     private final static Logger logger = LoggerFactory.getLogger(BoundingBoxProjectOp.class);
 
     private final TileMap tileMap;
-    private final Envelope requestedBBox;
-    private final Envelope sourceBBox;
-    private final CoordinateReferenceSystem<?> requestedSRS;
+    private final Envelope<C2D> requestedBBox;
+    private final Envelope<C2D> sourceBBox;
+    private final CoordinateReferenceSystem<C2D> requestedSRS;
 
-    private final Dimension requestDimension;
     private final Imaging imaging;
 
-    private Chrono chrono;
     private Dimension sourceDimension;
     private TileSet tileSet;
     private Set<Tile> tiles;
@@ -44,11 +42,11 @@ public class BoundingBoxProjectOp implements TileMapOperation<TileImage> {
     //needs to be injected
     private CoordinateTransforms coordinateTransforms;
 
-    public BoundingBoxProjectOp(TileMap tileMap, Envelope<C2D> bbox, CoordinateReferenceSystem<?> srs, Dimension dimension, Imaging imaging) {
+    public BoundingBoxProjectOp(TileMap tileMap, Envelope<C2D> bbox, CoordinateReferenceSystem<C2D> srs, Dimension dimension, Imaging imaging) {
         this.tileMap = tileMap;
         this.requestedBBox = bbox;
         this.requestedSRS = srs;
-        this.requestDimension = dimension;
+        Dimension requestDimension = dimension;
         this.imaging = imaging;
         this.sourceBBox = coordinateTransforms.transform(this.requestedBBox, this.requestedSRS);
         this.requestXUnitsPerPixel = width(requestedBBox) / requestDimension.getWidth();
@@ -59,13 +57,13 @@ public class BoundingBoxProjectOp implements TileMapOperation<TileImage> {
 //        int srcWidth =  (int)Math.round(sourceBBox.getWidth()/requestXUnitsPerPixel);
 //        int srcHeight = (int)Math.round(sourceBBox.getHeight()/requestYUnitsPerPixel);
 //        this.sourceDimension = new Dimension(srcWidth, srcHeight);
-        this.sourceDimension = this.requestDimension; //temporary fix.
+        this.sourceDimension = requestDimension; //temporary fix.
 
     }
 
     @Override
     public TileImage execute() {
-        chrono = new Chrono();
+        Chrono chrono = new Chrono();
 
         BoundingBoxOp bboxOp = new BoundingBoxOp(tileMap, sourceBBox, sourceDimension, imaging);
         TileImage srcImg = bboxOp.execute();
@@ -74,7 +72,7 @@ public class BoundingBoxProjectOp implements TileMapOperation<TileImage> {
         //reproject using warp
         chrono.reset();
         //before warping, set the output image to encompass the total boundingbox
-        Envelope srcBBoxInTargetSRS = coordinateTransforms.transform(sourceBBox, this.requestedSRS);
+        Envelope<C2D> srcBBoxInTargetSRS = coordinateTransforms.transform(sourceBBox, this.requestedSRS);
         PixelRange srcPixelRange = new PixelRange(srcImg.getMinX(), srcImg.getMinY(), srcImg.getWidth(), srcImg.getHeight());
         MapUnitToPixelTransform mupTransform = new MapUnitToPixelTransform(sourceBBox, srcPixelRange);
         //TODO -- targetMupTransform works only when target and source SRS use the same units.

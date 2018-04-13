@@ -56,9 +56,9 @@ public class Tile {
 
     static Envelope<C2D> boundingBox(Set<Tile> tiles) {
         if (tiles.isEmpty()) return new Envelope<C2D>(0, 0, 0, 0, null);
-        Envelope bboxUnion = null;
+        Envelope<C2D> bboxUnion = null;
         for (Tile tile : tiles) {
-            Envelope bbox = tile.getBoundingBox();
+            Envelope<C2D> bbox = tile.getBoundingBox();
             bboxUnion = bboxUnion.union(bbox);
         }
         return bboxUnion;
@@ -76,11 +76,9 @@ public class Tile {
         try {
             is = source.open();
             return imaging.read(is, pb.getMinX(), pb.getMinY(), forceArgb);
-        } catch (FileNotFoundException e) {
+        } catch (Throwable e) {
             // no tile found, return an empty tile
             // return img.empty(pb.getWidth(), pb.getHeight());
-            throw new RuntimeException(e);
-        } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
             if (is != null) {
@@ -98,7 +96,7 @@ public class Tile {
     }
 
 
-    Envelope getBoundingBox() {
+    Envelope<C2D> getBoundingBox() {
         return tileSetCoordinateSpace.boundingBox(this.coordinate);
     }
 

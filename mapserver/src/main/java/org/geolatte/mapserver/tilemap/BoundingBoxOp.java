@@ -55,7 +55,7 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(BoundingBoxOp.class);
 
-    final private Envelope requestedBbox;
+    final private Envelope<C2D> requestedBbox;
     final private Dimension dimension;
     private final Imaging imaging;
     final private TileMap tileMap;
@@ -75,7 +75,7 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
      * @param dimension   the image dimensions of the result
      * @param imaging     the <code>Imaging</code> instance to use for the image-manipulation
      */
-    public BoundingBoxOp(TileMap tileMap, Envelope boundingBox, Dimension dimension, Imaging imaging) {
+    public BoundingBoxOp(TileMap tileMap, Envelope<C2D> boundingBox, Dimension dimension, Imaging imaging) {
         this.tileMap = tileMap;
         this.dimension = dimension;
         this.requestedBbox = boundingBox;

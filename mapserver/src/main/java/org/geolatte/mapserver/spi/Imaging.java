@@ -2,6 +2,7 @@ package org.geolatte.mapserver.spi;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsId;
+import org.geolatte.mapserver.core.ImageFormat;
 import org.geolatte.mapserver.tilemap.MapUnitToPixelTransform;
 import org.geolatte.mapserver.tilemap.TileImage;
 import org.geolatte.mapserver.util.PixelRange;
