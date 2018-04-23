@@ -24,9 +24,23 @@ public interface Imaging {
 
     TileImage mosaic(Set<TileImage> images, PixelRange imgBounds);
 
-    TileImage crop(TileImage result, PixelRange cropBnds);
+    /**
+     * Crops a <code>TileImage</code> to the specified <code>PixelRange</code>.
+     *
+     * @param image      the <code>TileImge</code> to crop
+     * @param cropBounds the <code>PixelRange</code> to which to crop
+     * @return the cropped <code>TileImage</code>
+     */
+    TileImage crop(TileImage image, PixelRange cropBounds);
 
-    TileImage scale(TileImage result, Dimension dimension);
+    /**
+     * Scales a <code>TileImage</code> to the specified <code>Dimension</code>s
+     *
+     * @param image     the <code>TileImage</code> to scale
+     * @param dimension the dimensions to which to scale
+     * @return the scaled <code>TileImage</code>
+     */
+    TileImage scale(TileImage image, Dimension dimension);
 
 
     TileImage overlay(TileImage empty, TileImage result);

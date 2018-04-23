@@ -21,6 +21,9 @@ package org.geolatte.mapserver.util;
 
 import java.awt.*;
 
+/**
+ * Specifies a Rectangular subregion of the raster image.
+ */
 public class PixelRange {
     final private Dimension dimension;
     final private int minX;
