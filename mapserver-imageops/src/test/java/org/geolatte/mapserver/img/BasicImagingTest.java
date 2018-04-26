@@ -1,5 +1,6 @@
 package org.geolatte.mapserver.img;
 
+import org.geolatte.mapserver.core.ImageFormat;
 import org.geolatte.mapserver.spi.Imaging;
 import org.geolatte.mapserver.tilemap.TileImage;
 import org.geolatte.mapserver.util.PixelRange;
@@ -48,10 +49,20 @@ public class BasicImagingTest {
     public void testCrop() throws IOException {
         PixelRange range = new PixelRange(50, 50, 100, 80);
         TileImage cropped = imaging.crop(img, range);
-        TileImage received = testImageAfterIO(cropped);
+        TileImage received = testImageAfterIO(cropped, ImageFormat.JPEG);
         assertEquals(100, cropped.getWidth());
         assertEquals(80, cropped.getHeight());
         TileImage expected = readTileImage("test1-cropped.jpg", true);
+        assertTileImageEquals(expected, received);
+    }
+
+    @Test
+    public void testOverlay() throws IOException{
+        TileImage img1 = readTileImage("test1.png", false);
+        TileImage img2 = readTileImage("test2.png", false);
+        TileImage result = imaging.overlay(img1, img2);
+        TileImage received = testImageAfterIO(result, ImageFormat.PNG);
+        TileImage expected = readTileImage("test1-test2-overlay.png", true);
         assertTileImageEquals(expected, received);
     }
 
@@ -59,7 +70,7 @@ public class BasicImagingTest {
         Dimension dim = img.getDimension();
         Dimension newDim = new Dimension((int)(dim.width * factor), (int)(dim.height * factor));
         TileImage result = imaging.scale(img, newDim);
-        TileImage received = testImageAfterIO(result);
+        TileImage received = testImageAfterIO(result, ImageFormat.JPEG);
         assertEquals(newDim, result.getDimension());
         TileImage expected = readTileImage(expectedImageFile, true);
         assertTileImageEquals(expected, received);
@@ -68,10 +79,10 @@ public class BasicImagingTest {
 
     //writing an image to file, and reading it back in doesn't result in exactly the same image. Therefore, first write
     //to disk, read result, and then compare to the expected file.
-    private TileImage testImageAfterIO(TileImage result) throws IOException {
-        File out = File.createTempFile("test-", ".jpg");
+    private TileImage testImageAfterIO(TileImage result, ImageFormat fmt) throws IOException {
+        File out = File.createTempFile("test-", "." + fmt.getExt());
         logger.info("Writing outfile: " + out.getAbsolutePath());
-        ImageIO.write(result.getInternalRepresentation(BufferedImage.class), "JPEG", out);
+        ImageIO.write(result.getInternalRepresentation(BufferedImage.class), fmt.name(), out);
         return readTileImage(out);
     }
 

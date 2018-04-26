@@ -42,8 +42,24 @@ public interface Imaging {
      */
     TileImage scale(TileImage image, Dimension dimension);
 
-
-    TileImage overlay(TileImage empty, TileImage result);
+    /**
+     * Overlays to <code>TileImages</code>.
+     *
+     * <p>The overlay operation can be described by the following pseudo-code</p>
+     * <code>
+     *  if (srcs[1] contains the point (x, y)) {
+     *      dst[x][y][b] = srcs[1][x][y][b];
+     *  } else {
+     *      dst[x][y][b] = srcs[0][x][y][b];
+     *  }
+     *</code>
+     *
+     * @param source1 the first <code>TileImage</code>
+     * @param source2 the <code>TileImage</code> which is to be overlayed on top of the first.
+     * @return the overlay of the source <code>TileImage</code>s and having the same <code>PixelRange</code>
+     *         as the first source.
+     */
+    TileImage overlay(TileImage source1, TileImage source2);
 
     TileImage affineTransform(TileImage result, AffineTransform atf);
 
