@@ -12,12 +12,13 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Paths;
 import java.util.Set;
 
 /**
@@ -30,7 +31,6 @@ public class BasicImaging implements Imaging {
     private final static RenderingHints colorConvertOpHints = new RenderingHints(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
 
 
-    //TODO -- do we still need tileImageFormat??
     @Override
     public TileImage createEmptyImage(Dimension dimension, ImageFormat tileImageFormat) {
         BufferedImage img = createEmptyImage(dimension);
@@ -92,7 +92,7 @@ public class BasicImaging implements Imaging {
         BufferedImage target = clone(img1);
         try {
             overlayByGraphicsDrawImage(img2, target);
-        }catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             logger.warn("Failure on overlay Operation", e);
             logger.debug("Attempting Overlay by pixel copy");
             overlayByPixelCopy(img1, img2, target);
@@ -111,8 +111,9 @@ public class BasicImaging implements Imaging {
 
     /**
      * Overlay pixel-by-pixel which is necessary if the ColorModels of the source images are incompatible
-     * @param src1 background image
-     * @param src2 foreground image
+     *
+     * @param src1   background image
+     * @param src2   foreground image
      * @param target overlay result
      */
     private void overlayByPixelCopy(BufferedImage src1, BufferedImage src2, BufferedImage target) {
@@ -121,14 +122,14 @@ public class BasicImaging implements Imaging {
         int startX = src2.getMinX();
         int startY = src2.getMinY();
 
-        Object tdata = target.getRaster().getDataElements(0,0, null);
+        Object tdata = target.getRaster().getDataElements(0, 0, null);
         Raster source = src2.getRaster();
         WritableRaster raster = target.getRaster();
         Object srcBuffer = source.getDataElements(0, 0, null);
         ColorModel srcModel = src1.getColorModel();
         ColorModel trgtModel = target.getColorModel();
         for (int i = startX; i < startX + width; i++) {
-            for(int j = startY; j < startY + height; j++) {
+            for (int j = startY; j < startY + height; j++) {
                 source.getDataElements(i, j, srcBuffer);
                 if (srcModel.getAlpha(srcBuffer) == 0) continue;
                 int rgb = srcModel.getRGB(srcBuffer);
@@ -145,12 +146,19 @@ public class BasicImaging implements Imaging {
 
     @Override
     public TileImage affineTransform(TileImage result, AffineTransform atf) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public TileImage read(InputStream is, int minX, int minY, boolean forceArgb) {
-        return null;
+    public TileImage read(InputStream is, int minX, int minY, boolean forceArgb) throws IOException {
+        BufferedImage bi = ImageIO.read(is);
+
+        if (forceArgb) {
+            BufferedImage rgbImage = new BufferedImage(bi.getWidth(), bi.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            rgbImage.createGraphics().drawImage(bi, 0, 0, null, null);
+            bi = rgbImage;
+        }
+        return new BasicTileImage(bi);
     }
 
     @Override

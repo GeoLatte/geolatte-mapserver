@@ -9,6 +9,7 @@ import org.geolatte.mapserver.util.PixelRange;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 
@@ -63,7 +64,7 @@ public interface Imaging {
 
     TileImage affineTransform(TileImage result, AffineTransform atf);
 
-    TileImage read(InputStream is, int minX, int minY, boolean forceArgb);
+    TileImage read(InputStream is, int minX, int minY, boolean forceArgb) throws IOException;
 
     TileImage reprojectByWarping(TileImage srcImg, MapUnitToPixelTransform mupTransform, CrsId srs, CoordinateReferenceSystem<?> requestedSRS, MapUnitToPixelTransform targetMupTransform, double v);
 
