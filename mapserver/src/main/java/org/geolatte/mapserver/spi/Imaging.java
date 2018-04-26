@@ -62,7 +62,7 @@ public interface Imaging {
      */
     TileImage overlay(TileImage source1, TileImage source2);
 
-    TileImage affineTransform(TileImage result, AffineTransform atf);
+    TileImage affineTransform(TileImage tileImage, AffineTransform atf);
 
     TileImage read(InputStream is, int minX, int minY, boolean forceArgb) throws IOException;
 

@@ -13,13 +13,12 @@ import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
+import java.awt.image.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
+
+import static java.awt.image.AffineTransformOp.TYPE_BICUBIC;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 13/04/2018.
@@ -145,8 +144,10 @@ public class BasicImaging implements Imaging {
     }
 
     @Override
-    public TileImage affineTransform(TileImage result, AffineTransform atf) {
-        throw new UnsupportedOperationException();
+    public TileImage affineTransform(TileImage tileImage, AffineTransform atf) {
+        BufferedImage src = get(tileImage);
+        AffineTransformOp op = new AffineTransformOp(atf, TYPE_BICUBIC);
+        return new BasicTileImage(op.filter(src, null));
     }
 
     @Override

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -63,6 +64,17 @@ public class BasicImagingTest {
         TileImage result = imaging.overlay(img1, img2);
         TileImage received = testImageAfterIO(result, ImageFormat.PNG);
         TileImage expected = readTileImage("test1-test2-overlay.png", true);
+        assertTileImageEquals(expected, received);
+    }
+
+    @Test
+    public void testAffineTransform() throws IOException {
+        TileImage img1 = readTileImage("test3.png", false);
+        AffineTransform atf = new AffineTransform();
+        atf.rotate(Math.PI/2, 128, 128);
+        TileImage result = imaging.affineTransform(img1, atf);
+        TileImage received = testImageAfterIO(result, ImageFormat.PNG);
+        TileImage expected = readTileImage("test3-transform.png", true);
         assertTileImageEquals(expected, received);
     }
 
