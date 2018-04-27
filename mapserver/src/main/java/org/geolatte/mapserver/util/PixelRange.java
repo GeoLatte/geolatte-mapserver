@@ -19,6 +19,8 @@
 
 package org.geolatte.mapserver.util;
 
+import org.python.modules.jffi.CType;
+
 import java.awt.*;
 
 /**
@@ -41,6 +43,15 @@ public class PixelRange {
         this.minX = minX;
         this.minY = minY;
         this.dimension = new Dimension(dimension);
+    }
+
+    // for working with transform image coordiantes
+    public static PixelRange fromArray(double[] arr){
+        int minX = (int) Math.min(arr[0], arr[2]);
+        int minY = (int) Math.min(arr[1], arr[3]);
+        int maxX = (int) Math.max(arr[0], arr[2]);
+        int maxY = (int) Math.max(arr[1], arr[3]);
+        return new PixelRange(minX, minY, maxX - minX, maxY - minY);
     }
 
     public static PixelRange union(PixelRange b1, PixelRange b2) {
@@ -110,6 +121,20 @@ public class PixelRange {
                 .append(", MaxY=")
                 .append(this.getMaxY());
         return b.toString();
+    }
+
+    public Dimension getDimension() {
+        return new Dimension(getWidth(), getHeight());
+    }
+
+    public double[] toArray(double[] dst){
+        if(dst == null)
+            return new double[]{getMinX(), getMinY(), getMaxX(), getMaxY()};
+        dst[0] = getMinX();
+        dst[1] = getMinY();
+        dst[2] = getMaxX();
+        dst[3] = getMaxY();
+        return dst;
     }
 
     @Override

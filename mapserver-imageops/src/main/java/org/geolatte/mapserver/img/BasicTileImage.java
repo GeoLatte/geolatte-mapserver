@@ -21,6 +21,7 @@ package org.geolatte.mapserver.img;
 
 import org.geolatte.mapserver.core.ImageFormat;
 import org.geolatte.mapserver.tilemap.TileImage;
+import org.geolatte.mapserver.util.PixelRange;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -29,9 +30,13 @@ import java.io.OutputStream;
 
 class BasicTileImage implements TileImage {
     final private BufferedImage image;
+    final int minX;
+    final int minY;
 
-    public BasicTileImage(BufferedImage image) {
+    public BasicTileImage(BufferedImage image, int minX, int minY) {
         this.image = image;
+        this.minX = minX;
+        this.minY = minY;
     }
 
     /**
@@ -80,7 +85,7 @@ class BasicTileImage implements TileImage {
      */
     @Override
     public int getMinX() {
-        return this.image.getMinX();
+        return this.minX;
     }
 
     /**
@@ -88,7 +93,9 @@ class BasicTileImage implements TileImage {
      */
     @Override
     public int getMinY() {
-        return this.image.getMinY();
+        return this.minY;
     }
+
+
 
 }

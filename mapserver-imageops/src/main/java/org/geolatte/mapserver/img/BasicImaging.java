@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.image.*;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +34,7 @@ public class BasicImaging implements Imaging {
     @Override
     public TileImage createEmptyImage(Dimension dimension, ImageFormat tileImageFormat) {
         BufferedImage img = createEmptyImage(dimension);
-        return new BasicTileImage(img);
+        return new BasicTileImage(img, 0,0);
     }
 
     private BufferedImage createEmptyImage(Dimension dimension) {
@@ -43,7 +44,7 @@ public class BasicImaging implements Imaging {
     @Override
     public TileImage createEmptyImage(TileImage baseImage, Dimension dimension) {
         BufferedImage img = createCompatibleBufferedImage(baseImage, dimension);
-        return new BasicTileImage(img);
+        return new BasicTileImage(img, 0, 0);
     }
 
     private BufferedImage createCompatibleBufferedImage(TileImage baseImage, Dimension dimension) {
@@ -60,11 +61,13 @@ public class BasicImaging implements Imaging {
     @Override
     public TileImage crop(TileImage source, PixelRange cropBnds) {
         BufferedImage srcImg = (BufferedImage) source.getInternalRepresentation();
-        return new BasicTileImage(srcImg.getSubimage(cropBnds.getMinX(),
-                cropBnds.getMinY(),
+        int minX = cropBnds.getMinX() - source.getMinX();
+        int minY = cropBnds.getMinY() - source.getMinY();
+        BufferedImage cropped = srcImg.getSubimage(minX,
+                minY,
                 cropBnds.getWidth(),
-                cropBnds.getHeight())
-        );
+                cropBnds.getHeight());
+        return new BasicTileImage(cropped, cropBnds.getMinX(), cropBnds.getMinY());
     }
 
     @Override
@@ -80,7 +83,7 @@ public class BasicImaging implements Imaging {
         graphics2D.drawImage((BufferedImage) source.getInternalRepresentation(), 0, 0, null);
         graphics2D.dispose();
         ;
-        return new BasicTileImage(target);
+        return new BasicTileImage(target, source.getMinX(), source.getMinY());
     }
 
     @Override
@@ -96,7 +99,7 @@ public class BasicImaging implements Imaging {
             logger.debug("Attempting Overlay by pixel copy");
             overlayByPixelCopy(img1, img2, target);
         }
-        return new BasicTileImage(target);
+        return new BasicTileImage(target, src1.getMinX(), src1.getMinY());
     }
 
     private void overlayByGraphicsDrawImage(BufferedImage img2, BufferedImage target) {
@@ -145,9 +148,16 @@ public class BasicImaging implements Imaging {
 
     @Override
     public TileImage affineTransform(TileImage tileImage, AffineTransform atf) {
+
         BufferedImage src = get(tileImage);
         AffineTransformOp op = new AffineTransformOp(atf, TYPE_BICUBIC);
-        return new BasicTileImage(op.filter(src, null));
+        double[] box = new double[4];
+        tileImage.toArray(box);
+        atf.transform(box, 0, box, 0, 2);
+        PixelRange trPixelRange = PixelRange.fromArray(box);
+        BufferedImage dst = createCompatibleBufferedImage(tileImage, trPixelRange.getDimension());
+        op.filter(src,dst);
+        return new BasicTileImage(dst, trPixelRange.getMinX(), trPixelRange.getMaxX());
     }
 
     @Override
@@ -159,7 +169,8 @@ public class BasicImaging implements Imaging {
             rgbImage.createGraphics().drawImage(bi, 0, 0, null, null);
             bi = rgbImage;
         }
-        return new BasicTileImage(bi);
+
+        return new BasicTileImage(bi, minX, minY);
     }
 
     @Override

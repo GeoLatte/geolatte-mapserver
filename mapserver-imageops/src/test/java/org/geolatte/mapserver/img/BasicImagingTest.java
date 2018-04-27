@@ -111,6 +111,6 @@ public class BasicImagingTest {
 
     private TileImage readTileImage(File in) throws IOException {
         BufferedImage bufferedImage = ImageIO.read(in);
-        return new BasicTileImage(bufferedImage);
+        return new BasicTileImage(bufferedImage, 0,0);
     }
 }

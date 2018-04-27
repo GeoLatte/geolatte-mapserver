@@ -20,6 +20,7 @@
 package org.geolatte.mapserver.tilemap;
 
 import org.geolatte.mapserver.core.ImageFormat;
+import org.geolatte.mapserver.util.PixelRange;
 
 import java.awt.*;
 import java.io.IOException;
@@ -31,7 +32,6 @@ import java.io.OutputStream;
  * @author Karel Maesen, Geovise BVBA
  */
 public interface TileImage {
-
 
     public Object getInternalRepresentation();
 
@@ -54,5 +54,13 @@ public interface TileImage {
 
     default Dimension getDimension() {
         return new Dimension(getWidth(), getHeight());
+    }
+
+    default PixelRange getPixelRange(){
+        return new PixelRange(getMinX(), getMinY(), getWidth(), getHeight());
+    }
+
+    default double[] toArray(double[] arr){
+        return getPixelRange().toArray(arr);
     }
 }
