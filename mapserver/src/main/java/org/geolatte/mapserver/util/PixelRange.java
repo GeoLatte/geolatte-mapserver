@@ -47,10 +47,10 @@ public class PixelRange {
 
     // for working with transform image coordiantes
     public static PixelRange fromArray(double[] arr){
-        int minX = (int) Math.min(arr[0], arr[2]);
-        int minY = (int) Math.min(arr[1], arr[3]);
-        int maxX = (int) Math.max(arr[0], arr[2]);
-        int maxY = (int) Math.max(arr[1], arr[3]);
+        int minX = (int)Math.floor( Math.min(arr[0], arr[2]));
+        int minY = (int) Math.floor(Math.min(arr[1], arr[3]));
+        int maxX = (int) Math.ceil(Math.max(arr[0], arr[2]));
+        int maxY = (int) Math.ceil(Math.max(arr[1], arr[3]));
         return new PixelRange(minX, minY, maxX - minX, maxY - minY);
     }
 

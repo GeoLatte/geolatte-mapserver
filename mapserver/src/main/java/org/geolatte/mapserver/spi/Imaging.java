@@ -62,7 +62,10 @@ public interface Imaging {
      */
     TileImage overlay(TileImage source1, TileImage source2);
 
+    @Deprecated
     TileImage affineTransform(TileImage tileImage, AffineTransform atf);
+
+    TileImage affineTransform(TileImage tileImage, int tx, int ty, double sx, double sy);
 
     TileImage read(InputStream is, int minX, int minY, boolean forceArgb) throws IOException;
 

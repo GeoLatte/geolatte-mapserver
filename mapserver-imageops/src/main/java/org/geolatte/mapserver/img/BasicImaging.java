@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.awt.image.*;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +33,7 @@ public class BasicImaging implements Imaging {
     @Override
     public TileImage createEmptyImage(Dimension dimension, ImageFormat tileImageFormat) {
         BufferedImage img = createEmptyImage(dimension);
-        return new BasicTileImage(img, 0,0);
+        return new BasicTileImage(img, 0, 0);
     }
 
     private BufferedImage createEmptyImage(Dimension dimension) {
@@ -148,7 +147,6 @@ public class BasicImaging implements Imaging {
 
     @Override
     public TileImage affineTransform(TileImage tileImage, AffineTransform atf) {
-
         BufferedImage src = get(tileImage);
         AffineTransformOp op = new AffineTransformOp(atf, TYPE_BICUBIC);
         double[] box = new double[4];
@@ -156,8 +154,22 @@ public class BasicImaging implements Imaging {
         atf.transform(box, 0, box, 0, 2);
         PixelRange trPixelRange = PixelRange.fromArray(box);
         BufferedImage dst = createCompatibleBufferedImage(tileImage, trPixelRange.getDimension());
-        op.filter(src,dst);
-        return new BasicTileImage(dst, trPixelRange.getMinX(), trPixelRange.getMaxX());
+        op.filter(src, dst);
+        return new BasicTileImage(dst, trPixelRange.getMinX(), trPixelRange.getMinY());
+    }
+
+    @Override
+    public TileImage affineTransform(TileImage tileImage, int tx, int ty, double sx, double sy) {
+        BufferedImage src = get(tileImage);
+        BufferedImage scaled;
+        if (sx == 1.0d && sy == 1.0d) {
+            scaled = src;
+        } else {
+            AffineTransform atf = new AffineTransform(sx, 0, 0, sy, 0, 0);
+            AffineTransformOp op = new AffineTransformOp(atf, TYPE_BICUBIC);
+            scaled = op.filter(src, null);
+        }
+        return new BasicTileImage(scaled, tileImage.getMinX() + tx, tileImage.getMinY() + ty);
     }
 
     @Override

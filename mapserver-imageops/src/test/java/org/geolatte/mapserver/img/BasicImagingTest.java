@@ -68,13 +68,16 @@ public class BasicImagingTest {
     }
 
     @Test
-    public void testAffineTransform() throws IOException {
+    public void testAffineTransformTranslateAndScale() throws IOException {
         TileImage img1 = readTileImage("test3.png", false);
-        AffineTransform atf = new AffineTransform();
-        atf.rotate(Math.PI/2, 128, 128);
-        TileImage result = imaging.affineTransform(img1, atf);
+        AffineTransform atf = new AffineTransform(0.5, 0, 0, 1.0, 100, 50);
+        TileImage result = imaging.affineTransform(img1, 100, 50, 0.5, 1.0);
+        assertEquals(100, result.getMinX());
+        assertEquals(50, result.getMinY());
+        assertEquals(256, result.getHeight());
+        assertEquals(128, result.getWidth(), 0.00001);
         TileImage received = testImageAfterIO(result, ImageFormat.PNG);
-        TileImage expected = readTileImage("test3-transform.png", true);
+        TileImage expected = readTileImage("test3-transform-scale-translate.png", true);
         assertTileImageEquals(expected, received);
     }
 
