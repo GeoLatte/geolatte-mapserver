@@ -87,7 +87,7 @@ public class BasicImagingTest {
     }
 
     @Test
-    public void testMosaic() throws IOException {
+    public void testMosaicNoCrop() throws IOException {
         TileImage img00 = readTileImage("00.png", false, 0,256);
         TileImage img01 = readTileImage("01.png", false, 0, 0);
         TileImage img10 = readTileImage("10.png", false, 256, 256);
@@ -100,6 +100,23 @@ public class BasicImagingTest {
         assertEquals(512, result.getHeight());
         TileImage received = testImageAfterIO(result, ImageFormat.PNG);
         TileImage expected = readTileImage("mosaic-no-crop.png", true);
+        assertTileImageEquals(expected, received);
+    }
+
+    @Test
+    public void testMosaicCrop() throws IOException {
+        TileImage img00 = readTileImage("00.png", false, 0,256);
+        TileImage img01 = readTileImage("01.png", false, 0, 0);
+        TileImage img10 = readTileImage("10.png", false, 256, 256);
+        TileImage img11 = readTileImage("11.png", false, 256, 0);
+        List<TileImage> images = Arrays.asList(img00, img01, img10 , img11);
+        TileImage result = imaging.mosaic(images, new PixelRange(128, 128, 256,  256));
+        assertEquals(128, result.getMinX());
+        assertEquals(128, result.getMinY());
+        assertEquals(256,result.getWidth());
+        assertEquals(256, result.getHeight());
+        TileImage received = testImageAfterIO(result, ImageFormat.PNG);
+        TileImage expected = readTileImage("mosaic-crop.png", true);
         assertTileImageEquals(expected, received);
     }
 
