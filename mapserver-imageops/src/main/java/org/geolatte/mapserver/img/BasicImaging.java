@@ -58,6 +58,9 @@ public class BasicImaging implements Imaging {
     public TileImage mosaic(java.util.List<TileImage> images, PixelRange imgBounds) {
         if (images.isEmpty()) throw new IllegalArgumentException("Require at least one image");
         BasicTileImage baseTile = (BasicTileImage) images.get(0);
+        if(imgBounds.getWidth() == 0 || imgBounds.getHeight() == 0) {
+            return createEmptyImage(baseTile, atLeastOnePixel(imgBounds));
+        }
         BufferedImage baseImage = getIndexedColorsConverted(baseTile);
         Dimension dimension = imgBounds.getDimension();
         WritableRaster raster = baseImage.getData().createCompatibleWritableRaster(dimension.width, dimension.height);
@@ -66,7 +69,13 @@ public class BasicImaging implements Imaging {
         return new BasicTileImage(res, imgBounds.getMinX(), imgBounds.getMinY());
     }
 
+    private Dimension atLeastOnePixel(PixelRange imgBounds) {
+        return new Dimension(Math.max(imgBounds.getWidth(), 1), Math.max(imgBounds.getHeight(),1));
+    }
+
     private void mosaic(List<TileImage> images, PixelRange imgBounds, BufferedImage target) {
+        //Note -- this was first implemented with a setRect() directly on the image raster, but this
+        //    failed on jpeg images (pixel values at source and target were different after setRect).
         Graphics2D g2 = (Graphics2D) target.getGraphics();
         for (TileImage ti : images) {
             BufferedImage current = getIndexedColorsConverted(ti);
