@@ -54,10 +54,7 @@ public class TileSetCoordinateSpace {
         double height = tileDimension.getHeight() * unitsPerPixel;
         double x = origin.getPosition().getX() + (coordinate.i * width);
         double y = origin.getPosition().getY() + (coordinate.j * height);
-        Envelope<C2D> result = new Envelope<>(x, y, x + width, y + height,origin.getCoordinateReferenceSystem());
-//        if (!result.isWithin(extent))
-//            throw new IllegalArgumentException("Specified TileCoordinate falls outside of TileSet extent.");
-        return result;
+        return new Envelope<>(x, y, x + width, y + height,origin.getCoordinateReferenceSystem());
     }
 
     public PixelRange tilePixelRange(TileCoordinate coordinate) {
@@ -91,9 +88,9 @@ public class TileSetCoordinateSpace {
     public TileCoordinate tileCoordinateContaining(Point<C2D> point, boolean lowerLeftInclusive) {
         if (!this.extent.contains(point.getPosition()))
             throw new IllegalArgumentException(String.format("Point %s outside the extent of this TileSet", point.toString()));
-        Point<C2D> relativeToOrigin = relativeToOrigin(point);
-        double x = relativeToOrigin.getPosition().getX();
-        double y = relativeToOrigin.getPosition().getY();
+        C2D relativeToOrigin = relativeToOrigin(point);
+        double x = relativeToOrigin.getX();
+        double y = relativeToOrigin.getY();
         double width = tileWidthInMapUnits();
         double height = tileHeightInMapUnits();
         double approxI = removeRoundingError(x / width);
@@ -137,9 +134,9 @@ public class TileSetCoordinateSpace {
         return this.mupTransform.toPoint(pixel);
     }
 
-    private Point<C2D> relativeToOrigin(Point<C2D> point) {
+    private C2D relativeToOrigin(Point<C2D> point) {
         C2D p = point.getPosition();
         C2D o = origin.getPosition();
-        return point(point.getCoordinateReferenceSystem(), c(p.getX() - o.getX(), p.getY() - o.getY()));
+        return new C2D(p.getX() - o.getX(), p.getY() - o.getY());
     }
 }

@@ -102,7 +102,6 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
         chrono.reset();
         loadTileImages();
         mosaic();
-//        crop();
         scale();
         LOGGER.debug("Image processing took " + chrono.stop() + " ms.");
         LOGGER.debug("Total execution is: " + chrono.total() + " ms.");
@@ -127,14 +126,8 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
 
     private void mosaic() {
         imgBounds = tileSet.pixelBounds(tileSetClippedBbox);
-//        imgBounds = Tile.pixelBounds(tiles);
         result = imaging.mosaic(images, imgBounds);
     }
-
-//    private void crop() {
-//        PixelRange cropBnds = tileSet.pixelBounds(tileSetClippedBbox);
-//        result = imaging.crop(result, cropBnds);
-//    }
 
 
     private void scale() {

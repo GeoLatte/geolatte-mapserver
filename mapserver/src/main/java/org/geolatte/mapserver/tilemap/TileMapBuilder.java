@@ -54,6 +54,7 @@ public class TileMapBuilder {
     public TileMap build() {
         verify();
         Envelope<C2D> bbox = new Envelope<>(minX, minY, maxX, maxY, crs);
+        if(bbox.isEmpty()) throw new IllegalStateException("require non-empty bounding box");
         Point<C2D> origin = point(crs, originPos);
         Dimension tileDim = getTileDimension();
         TileFormat tileFormat = new TileFormat(tileDim, tileMimeType, tileExtension);

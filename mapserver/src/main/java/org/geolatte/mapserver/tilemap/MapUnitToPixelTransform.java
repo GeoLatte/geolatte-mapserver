@@ -201,15 +201,4 @@ public class MapUnitToPixelTransform {
         return new PixelRange(minX, minY, width, height);
     }
 
-    //TODO add unit tests
-    //TODO -- refactor to remove code duplication with toPixel
-    public AffineTransform toAffineTransform() {
-        double m00 = 1.0 / mapUnitsPerPixelX;
-        double m01 = 0;
-        double m02 = pixelRange.getMinX() - extent.lowerLeft().getX() / mapUnitsPerPixelX;
-        double m10 = 0;
-        double m11 = -1.0 / mapUnitsPerPixelY;
-        double m12 = pixelRange.getMinY() + extent.upperRight().getY() / mapUnitsPerPixelY;
-        return new AffineTransform(m00, m10, m01, m11, m02, m12);
-    }
 }

@@ -113,7 +113,7 @@ public class TMSTestSupport {
         builder.name("tms-vlaanderen")
                 .crs(L72)
                 .root(tmpDir.getAbsolutePath())
-                .envelope(1000, 152999.75, 259500.250, 244500.0)
+                .envelope(18000, 152999.75, 259500.250, 284071.75)
                 .origin(18000.0, 152999.75)
                 .tileHeight(256).tileWidth(256)
                 .tileMimeType("image/jpeg")

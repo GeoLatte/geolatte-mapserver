@@ -61,18 +61,20 @@ public class BasicImaging implements Imaging {
         BufferedImage baseImage = getIndexedColorsConverted(baseTile);
         Dimension dimension = imgBounds.getDimension();
         WritableRaster raster = baseImage.getData().createCompatibleWritableRaster(dimension.width, dimension.height);
-        mosaic(images, imgBounds, raster);
         BufferedImage res = new BufferedImage(baseImage.getColorModel(), raster, baseImage.isAlphaPremultiplied(), null);
+        mosaic(images, imgBounds, res);
         return new BasicTileImage(res, imgBounds.getMinX(), imgBounds.getMinY());
     }
 
-    private void mosaic(List<TileImage> images, PixelRange imgBounds, WritableRaster raster) {
+    private void mosaic(List<TileImage> images, PixelRange imgBounds, BufferedImage target) {
+        Graphics2D g2 = (Graphics2D) target.getGraphics();
         for (TileImage ti : images) {
             BufferedImage current = getIndexedColorsConverted(ti);
             int tx = ti.getMinX() - imgBounds.getMinX();
             int ty = ti.getMinY() - imgBounds.getMinY();
-            raster.setRect(tx, ty, current.getRaster());
+            g2.drawImage(current, tx, ty, null);
         }
+        g2.dispose();
     }
 
     /**

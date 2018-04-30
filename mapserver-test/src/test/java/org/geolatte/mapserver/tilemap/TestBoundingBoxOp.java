@@ -47,6 +47,7 @@ public class TestBoundingBoxOp {
         executeAndWriteToFile(bbox, f, tileMap);
 
         bbox = new Envelope(20000, 160000, 180000, 240000, orthoMap.getCoordinateReferenceSystem());
+//        bbox = new Envelope(40000, 180000, 80000, 200000, orthoMap.getCoordinateReferenceSystem());
         f = new File("/tmp/normal-execute-ortho.png");
         executeAndWriteToFile(bbox, f, orthoMap);
 

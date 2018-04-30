@@ -55,8 +55,6 @@ public class TestTileCoordinate {
         assertEquals(TileCoordinate.valueOf(1, 1), range.get(0));
         assertEquals(25, range.size());
         assertEquals(TileCoordinate.valueOf(5, 5), range.get(range.size() - 1));
-
-
     }
 
 
