@@ -23,23 +23,52 @@ import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.ProjectedCoordinateReferenceSystem;
 import org.geolatte.mapserver.tilemap.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 public class TMSTestSupport {
 
+    public final static Logger logger = LoggerFactory.getLogger(TMSTestSupport.class);
     public final static ProjectedCoordinateReferenceSystem WMERC = CoordinateReferenceSystems.WEB_MERCATOR;
     public final static ProjectedCoordinateReferenceSystem L72 = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
 
 
     static public final String URL = "http://localhost/cgi-bin/tilecache.cgi/1.0.0/basic";
+    static public final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
 
+    static {
+        java.net.URL archived = Thread.currentThread().getContextClassLoader().getResource("tiles/orthos/ortho-jpeg.tgz");
+        try {
+            File p = new File(archived.toURI());
+            String cmdLine =String.format("tar -C  %s -x -f %s" ,tmpDir.getAbsolutePath(),  p.getAbsolutePath());
+            logger.info("Extracting using: " + cmdLine);
+            Process process = Runtime.getRuntime().exec(cmdLine);
+            StreamGobbler streamGobbler =
+                    new StreamGobbler(process.getInputStream(), logger::info);
+            logger.info("Extracted tiles to tmp directory " + tmpDir.getAbsolutePath());
+            Executors.newSingleThreadExecutor().submit(streamGobbler);
+            int exitCode = process.waitFor();
+            if (exitCode != 0) throw new RuntimeException("Error on unarchive operation");
+        } catch (Exception e) {
+            logger.error("Failure to unarchive to tmp directory", e);
+            throw new RuntimeException(e);
+        }
+    }
 
     public static Set<Tile> getTestTiles() {
         Set<Tile> tiles = new HashSet<Tile>();
@@ -67,15 +96,15 @@ public class TMSTestSupport {
         TileMapBuilder builder = new TileMapBuilder();
         builder
                 .name("osm")
-                .root("src/test/resources/tiles/")
+                .root("mapserver-test/src/test/resources/tiles/osm")
                 .crs(WMERC)
                 .envelope(-20037508.340000, -20037508.340000, 20037508.340000, 20037508.340000)
                 .origin(-20037508.340000, -20037508.340000)
                 .tileWidth(256).tileHeight(256)
-                .addSet("src/test/resources/tiles/osm/0", 0, 156543.03390000000945292413)
-                .addSet("src/test/resources/tiles/osm/1", 1, 78271.51695000000472646207)
-                .addSet("src/test/resources/tiles/osm/2", 2, 39135.75847500000236323103)
-                .addSet("src/test/resources/tiles/osm/3", 3, 19567.87923750000118161552);
+                .addSet("0", 0, 156543.03390000000945292413)
+                .addSet("1", 1, 78271.51695000000472646207)
+                .addSet("2", 2, 39135.75847500000236323103)
+                .addSet("3", 3, 19567.87923750000118161552);
         return builder.build();
     }
 
@@ -83,14 +112,15 @@ public class TMSTestSupport {
         TileMapBuilder builder = new TileMapBuilder();
         builder.name("tms-vlaanderen")
                 .crs(L72)
+                .root(tmpDir.getAbsolutePath())
                 .envelope(1000, 152999.75, 259500.250, 244500.0)
                 .origin(18000.0, 152999.75)
                 .tileHeight(256).tileWidth(256)
                 .tileMimeType("image/jpeg")
                 .tileExtension("jpg")
-                .addSet("/tmp/tiles/orthos/0", 0, 1024.00000000000000)
-                .addSet("/tmp/tiles/orthos/1", 1, 512.00000000000000)
-                .addSet("/tmp/tiles/orthos/2", 2, 256.00000000000000);
+                .addSet("0", 0, 1024.00000000000000)
+                .addSet("1", 1, 512.00000000000000)
+                .addSet("2", 2, 256.00000000000000);
         return builder.build();
     }
 
@@ -126,5 +156,20 @@ public class TMSTestSupport {
         }
     }
 
+    private static class StreamGobbler implements Runnable {
+        private InputStream inputStream;
+        private Consumer<String> consumer;
+
+        public StreamGobbler(InputStream inputStream, Consumer<String> consumer) {
+            this.inputStream = inputStream;
+            this.consumer = consumer;
+        }
+
+        @Override
+        public void run() {
+            new BufferedReader(new InputStreamReader(inputStream)).lines()
+                    .forEach(consumer);
+        }
+    }
 
 }

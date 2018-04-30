@@ -118,7 +118,7 @@ public class MapUnitToPixelTransform {
      */
     public Point<C2D> toPoint(Pixel pixel) {
         double x = extent.lowerLeft().getX() + mapUnitsPerPixelX * (pixel.x - this.pixelRange.getMinX());
-        double y = extent.lowerLeft().getY() - mapUnitsPerPixelY * (pixel.y - this.pixelRange.getMinY());
+        double y = extent.upperRight().getY() -  mapUnitsPerPixelY * (pixel.y - this.pixelRange.getMinY());
         return point(extent.getCoordinateReferenceSystem(), c(x, y));
     }
 

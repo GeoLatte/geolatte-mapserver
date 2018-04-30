@@ -102,7 +102,7 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
         chrono.reset();
         loadTileImages();
         mosaic();
-        crop();
+//        crop();
         scale();
         LOGGER.debug("Image processing took " + chrono.stop() + " ms.");
         LOGGER.debug("Total execution is: " + chrono.total() + " ms.");
@@ -126,14 +126,15 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
     }
 
     private void mosaic() {
-        imgBounds = Tile.pixelBounds(tiles);
+        imgBounds = tileSet.pixelBounds(tileSetClippedBbox);
+//        imgBounds = Tile.pixelBounds(tiles);
         result = imaging.mosaic(images, imgBounds);
     }
 
-    private void crop() {
-        PixelRange cropBnds = tileSet.pixelBounds(tileSetClippedBbox);
-        result = imaging.crop(result, cropBnds);
-    }
+//    private void crop() {
+//        PixelRange cropBnds = tileSet.pixelBounds(tileSetClippedBbox);
+//        result = imaging.crop(result, cropBnds);
+//    }
 
 
     private void scale() {
@@ -154,19 +155,13 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
     }
 
     private void applyEmbeddingTransform() {
-        AffineTransform atf = createEmbeddingTransform();
-        result = imaging.affineTransform(result, atf);
-    }
-
-    private AffineTransform createEmbeddingTransform() {
         MapUnitToPixelTransform mupTransform = new MapUnitToPixelTransform(requestedBbox, new PixelRange(0, 0, (int) dimension.getWidth(), (int) dimension.getHeight()));
         PixelRange destRange = mupTransform.toPixelRange(tileSetClippedBbox);
-        double m00 = (double) destRange.getWidth() / (double) result.getWidth();
-        double m02 = destRange.getMinX() - result.getMinX() * m00;
-        double m11 = (double) destRange.getHeight() / (double) result.getHeight();
-        double m12 = destRange.getMinY() - result.getMinY() * m11;
-        AffineTransform atf = new AffineTransform(m00, 0.0, 0.0, m11, m02, m12);
-        return atf;
+        double sx = (double) destRange.getWidth() / (double) result.getWidth();
+        int tx = destRange.getMinX() - (int)Math.floor(result.getMinX() * sx);
+        double sy = (double) destRange.getHeight() / (double) result.getHeight();
+        int ty = destRange.getMinY() - (int)Math.floor(result.getMinY() * sy);
+        result = imaging.affineTransform(result, tx, ty, sx, sy);
     }
 
     private TileImage createEmptyBackgroundImage() {

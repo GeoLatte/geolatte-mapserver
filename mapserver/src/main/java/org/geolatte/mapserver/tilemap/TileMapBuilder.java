@@ -26,6 +26,10 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.mapserver.core.ImageFormat;
 
 import java.awt.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +57,7 @@ public class TileMapBuilder {
         Point<C2D> origin = point(crs, originPos);
         Dimension tileDim = getTileDimension();
         TileFormat tileFormat = new TileFormat(tileDim, tileMimeType, tileExtension);
-        List<TileSet> tileSets = buildTileSets(tileDim, origin, bbox);
+        List<TileSet> tileSets = buildTileSets(tileDim, root, origin, bbox);
         return new TileMap(root,
                 name,
                 crs,
@@ -140,17 +144,29 @@ public class TileMapBuilder {
     }
 
 
-    private List<TileSet> buildTileSets(Dimension pixelDim, Point<C2D> origin, Envelope<C2D> bbox) {
+    private List<TileSet> buildTileSets(Dimension pixelDim, String root, Point<C2D> origin, Envelope<C2D> bbox) {
         List<TileSet> tileSetList = new ArrayList<TileSet>();
         for (TileSetInfo ti : tileSetInfo) {
-            tileSetList.add(buildTileSet(ti, origin, pixelDim, bbox));
+            tileSetList.add(buildTileSet(ti, root, origin, pixelDim, bbox));
         }
         return tileSetList;
     }
 
-    private TileSet buildTileSet(TileSetInfo ti, Point<C2D> origin, Dimension pixelDim, Envelope<C2D> bbox) {
+    private TileSet buildTileSet(TileSetInfo ti, String root, Point<C2D> origin, Dimension pixelDim, Envelope<C2D> bbox) {
+        String path = buildPath(root, ti.path);
         TileSetCoordinateSpace cs = new TileSetCoordinateSpace(origin, pixelDim, bbox, ti.unitsPerPixel);
-        return new TileSet(ti.path, ti.order, cs);
+        return new TileSet(path, ti.order, cs);
+    }
+
+    private String buildPath(String root, String path) {
+        if(path.startsWith("http://") || path.startsWith("https://")) {
+            try {
+                return new URI(root).resolve(path).toString();
+            } catch (URISyntaxException e) {
+                // fall-through for path resolve
+            }
+        }
+        return Paths.get(root, path).toString();
     }
 
     static class TileSetInfo {

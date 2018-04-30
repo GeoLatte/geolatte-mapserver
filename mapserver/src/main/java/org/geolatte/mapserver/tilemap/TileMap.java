@@ -26,6 +26,8 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.core.ImageFormat;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 import static org.geolatte.geom.builder.DSL.point;
@@ -46,7 +48,7 @@ public class TileMap {
     private final TileFormat tileFormat;
     private final List<TileSet> tileSets;
 
-    private TileImageSourceFactory tileImageSourceFactory = new URLTileImageSourceFactory();
+    private TileImageSourceFactory tileImageSourceFactory;
     private BoundingBoxOpFactory boundingBoxOpFactory = new DefaultBoundingBoxOpFactory();
     private boolean forceArgb;
 
@@ -54,6 +56,7 @@ public class TileMap {
             Point origin, TileFormat tileFormat, boolean forceArgb,
             List<TileSet> tileSets) throws IllegalArgumentException {
         this.serviceUrl = serviceURL;
+        tileImageSourceFactory = makeTileImageSourceFactory(this.serviceUrl);
         this.title = title;
         this.maxBoundingBox = bbox;
         this.tileFormat = tileFormat;
@@ -61,6 +64,16 @@ public class TileMap {
         this.origin = origin;
         this.tileSets = tileSets;
         this.forceArgb = forceArgb;
+    }
+
+    private TileImageSourceFactory makeTileImageSourceFactory(String serviceUrl) {
+            try {
+                URL url = new URL(serviceUrl);
+                return new URLTileImageSourceFactory();
+            } catch (MalformedURLException e) {
+                return new FileTileImageSourceFactory();
+            }
+
     }
 
 

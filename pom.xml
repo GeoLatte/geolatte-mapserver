@@ -42,6 +42,7 @@
         <module>mapserver-coordinatetransforms</module>
         <module>mapserver-protocols</module>
         <module>mapserver-config</module>
+        <module>mapserver-test</module>
     </modules>
 
     <build>

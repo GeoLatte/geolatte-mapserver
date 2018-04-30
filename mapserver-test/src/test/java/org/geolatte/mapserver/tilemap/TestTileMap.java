@@ -1,4 +1,4 @@
-///*
+package org.geolatte.mapserver.tilemap;///*
 // * Copyright 2009-2010  Geovise BVBA, QMINO BVBA
 // *
 // * This file is part of GeoLatte Mapserver.
