@@ -44,7 +44,7 @@ public class Tile {
         this.tileSetCoordinateSpace = tileSetCoordinateSpace;
     }
 
-    static PixelRange pixelBounds(Set<Tile> tiles) {
+    static PixelRange pixelBounds(java.util.List<Tile> tiles) {
         if (tiles.isEmpty()) return new PixelRange(0, 0, new Dimension(0, 0));
         PixelRange boundsTile = null;
         for (Tile tile : tiles) {

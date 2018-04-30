@@ -23,7 +23,7 @@ public interface Imaging {
 
     TileImage createEmptyImage(TileImage result, Dimension dimension);
 
-    TileImage mosaic(Set<TileImage> images, PixelRange imgBounds);
+    TileImage mosaic(java.util.List<TileImage> images, PixelRange imgBounds);
 
     /**
      * Crops a <code>TileImage</code> to the specified <code>PixelRange</code>.

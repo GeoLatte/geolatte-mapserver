@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 13/04/2018.
@@ -38,7 +38,7 @@ public class TileMapLayerSource implements LayerSource {
     }
 
 
-    public Set<Tile> getTiles(Envelope<C2D> envelope, Dimension dimension) {
+    public List<Tile> getTiles(Envelope<C2D> envelope, Dimension dimension) {
         TileSetChooser tsc = new TileSetChooser(tileMap, envelope, dimension);
         TileSet tileSet = tsc.chooseTileSet();
         logger.debug("TileSet chosen has order = " + tileSet.getOrder());

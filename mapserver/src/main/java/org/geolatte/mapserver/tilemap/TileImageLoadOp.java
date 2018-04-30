@@ -15,27 +15,27 @@ import java.util.concurrent.Future;
  * @author Karel Maesen, Geovise BVBA
  * creation-date: 7/1/11
  */
-public class TileImageLoadOp implements TileMapOperation<Set<TileImage>> {
+public class TileImageLoadOp implements TileMapOperation<java.util.List<TileImage>> {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(TileImageLoadOp.class);
 
     private final static TileReadExecutor READ_EXECUTOR = new TileReadExecutor();
 
-    private final Set<Tile> tiles;
+    private final List<Tile> tiles;
     private final Imaging imaging;
     private boolean forceArgb;
 
-    TileImageLoadOp(Set<Tile> tiles, Imaging imaging, boolean forceArgb) {
+    TileImageLoadOp(List<Tile> tiles, Imaging imaging, boolean forceArgb) {
         this.tiles = tiles;
         this.imaging = imaging;
         this.forceArgb = forceArgb;
     }
 
     @Override
-    public Set<TileImage> execute() {
+    public java.util.List<TileImage> execute() {
         LOGGER.debug("Start loading " + tiles.size() + " tiles.");
         List<Future<TileImage>> futures = new ArrayList<Future<TileImage>>();
-        Set<TileImage> results = new HashSet<TileImage>();
+        java.util.List<TileImage> results = new ArrayList<>();
 
         for (Tile tile : tiles) {
             TileImageReaderTask readerTask = new TileImageReaderTask(tile, imaging, forceArgb);
@@ -52,7 +52,6 @@ public class TileImageLoadOp implements TileMapOperation<Set<TileImage>> {
                 throw new RuntimeException(e.getCause());
             }
         }
-
         return results;
     }
 }

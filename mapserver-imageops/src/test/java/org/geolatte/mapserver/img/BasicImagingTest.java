@@ -1,5 +1,6 @@
 package org.geolatte.mapserver.img;
 
+import com.sun.javafx.collections.FloatArraySyncer;
 import org.geolatte.mapserver.core.ImageFormat;
 import org.geolatte.mapserver.spi.Imaging;
 import org.geolatte.mapserver.tilemap.TileImage;
@@ -17,6 +18,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static org.geolatte.mapserver.img.ImageComparator.assertTileImageEquals;
@@ -81,7 +86,24 @@ public class BasicImagingTest {
         assertTileImageEquals(expected, received);
     }
 
-    public void testScale(double factor, String expectedImageFile) throws IOException {
+    @Test
+    public void testMosaic() throws IOException {
+        TileImage img00 = readTileImage("00.png", false, 0,256);
+        TileImage img01 = readTileImage("01.png", false, 0, 0);
+        TileImage img10 = readTileImage("10.png", false, 256, 256);
+        TileImage img11 = readTileImage("11.png", false, 256, 0);
+        List<TileImage> images = Arrays.asList(img00, img01, img10 , img11);
+        TileImage result = imaging.mosaic(images, new PixelRange(0, 0, 512, 512));
+        assertEquals(0, result.getMinX());
+        assertEquals(0, result.getMinY());
+        assertEquals(512,result.getWidth());
+        assertEquals(512, result.getHeight());
+        TileImage received = testImageAfterIO(result, ImageFormat.PNG);
+        TileImage expected = readTileImage("mosaic-no-crop.png", true);
+        assertTileImageEquals(expected, received);
+    }
+
+    private void testScale(double factor, String expectedImageFile) throws IOException {
         Dimension dim = img.getDimension();
         Dimension newDim = new Dimension((int)(dim.width * factor), (int)(dim.height * factor));
         TileImage result = imaging.scale(img, newDim);
@@ -92,16 +114,22 @@ public class BasicImagingTest {
     }
 
 
+
+
     //writing an image to file, and reading it back in doesn't result in exactly the same image. Therefore, first write
     //to disk, read result, and then compare to the expected file.
     private TileImage testImageAfterIO(TileImage result, ImageFormat fmt) throws IOException {
         File out = File.createTempFile("test-", "." + fmt.getExt());
         logger.info("Writing outfile: " + out.getAbsolutePath());
         ImageIO.write(result.getInternalRepresentation(BufferedImage.class), fmt.name(), out);
-        return readTileImage(out);
+        return readTileImage(out, 0, 0);
     }
 
+
     private TileImage readTileImage(String filename, boolean isExpected) throws IOException {
+        return readTileImage(filename, isExpected, 0, 0);
+    }
+    private TileImage readTileImage(String filename, boolean isExpected, int minX, int minY) throws IOException {
 
         Path root = Paths.get("mapserver-imageops", "src", "test", "resources", "img");
         if (isExpected) {
@@ -109,11 +137,11 @@ public class BasicImagingTest {
         }
         File in = root.resolve(filename).toFile();
         logger.info("Reading file: " + in.getAbsolutePath());
-        return readTileImage(in);
+        return readTileImage(in, minX, minY);
     }
 
-    private TileImage readTileImage(File in) throws IOException {
+    private TileImage readTileImage(File in, int minX, int minY) throws IOException {
         BufferedImage bufferedImage = ImageIO.read(in);
-        return new BasicTileImage(bufferedImage, 0,0);
+        return new BasicTileImage(bufferedImage, minX,minY);
     }
 }

@@ -16,9 +16,11 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
+import java.util.List;
+import java.util.function.Supplier;
 
 import static java.awt.image.AffineTransformOp.TYPE_BICUBIC;
+import static java.lang.String.format;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 13/04/2018.
@@ -53,8 +55,40 @@ public class BasicImaging implements Imaging {
     }
 
     @Override
-    public TileImage mosaic(Set<TileImage> images, PixelRange imgBounds) {
-        return null;
+    public TileImage mosaic(java.util.List<TileImage> images, PixelRange imgBounds) {
+        if (images.isEmpty()) throw new IllegalArgumentException("Require at least one image");
+        BasicTileImage baseTile = (BasicTileImage) images.get(0);
+        BufferedImage baseImage = getIndexedColorsConverted(baseTile);
+        Dimension dimension = imgBounds.getDimension();
+        WritableRaster raster = baseImage.getData().createCompatibleWritableRaster(dimension.width, dimension.height);
+        mosaic(images, imgBounds, raster);
+        BufferedImage res = new BufferedImage(baseImage.getColorModel(), raster, baseImage.isAlphaPremultiplied(), null);
+        return new BasicTileImage(res, imgBounds.getMinX(), imgBounds.getMinY());
+    }
+
+    private void mosaic(List<TileImage> images, PixelRange imgBounds, WritableRaster raster) {
+        for (TileImage ti : images) {
+            BufferedImage current = getIndexedColorsConverted(ti);
+            int tx = ti.getMinX() - imgBounds.getMinX();
+            int ty = ti.getMinY() - imgBounds.getMinY();
+            raster.setRect(tx, ty, current.getRaster());
+        }
+    }
+
+    /**
+     * In the case of an IndexColorModel, we immediately transform to explicit RGB values, otherwise image colors won't
+     * match when copying data elements from source to destination raster.
+     *
+     * @param tileImage
+     * @return
+     */
+    private BufferedImage getIndexedColorsConverted(TileImage tileImage) {
+        BufferedImage bi = tileImage.getInternalRepresentation(BufferedImage.class);
+        if (IndexColorModel.class.isAssignableFrom(bi.getColorModel().getClass())) {
+            BufferedImage tmp = ((IndexColorModel) bi.getColorModel()).convertToIntDiscrete(bi.getData(), false);
+            bi = tmp;
+        }
+        return bi;
     }
 
     @Override
@@ -74,8 +108,8 @@ public class BasicImaging implements Imaging {
         float xScale = (float) (dimension.getWidth() / source.getWidth());
         float yScale = (float) (dimension.getHeight() / source.getHeight());
         if (xScale == 1.0f && yScale == 1.0f) return source;
-        logger.debug(String.format("Source dimenseion: %s; target dimension: %s", source.getDimension(), dimension));
-        logger.debug(String.format("needed to rescale image in x-dim: %f, y-dim: %f", xScale, yScale));
+        logger.debug(format("Source dimenseion: %s; target dimension: %s", source.getDimension(), dimension));
+        logger.debug(format("needed to rescale image in x-dim: %f, y-dim: %f", xScale, yScale));
         BufferedImage target = createCompatibleBufferedImage(source, dimension);
         Graphics2D graphics2D = (Graphics2D) target.getGraphics();
         graphics2D.scale(xScale, yScale);

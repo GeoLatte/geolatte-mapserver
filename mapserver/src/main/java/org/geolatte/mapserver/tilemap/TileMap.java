@@ -26,10 +26,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.core.ImageFormat;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.geolatte.geom.builder.DSL.point;
 
@@ -74,10 +71,10 @@ public class TileMap {
      * @param bbox the <code>BoundingBox</code>
      * @return the <code>Tile</code>s in the <code>TileSet</code> specified by the set argument that overlap the <code>BoundingBox</code> specified by the bbox argument
      */
-    public Set<Tile> getTilesFor(TileSet set, Envelope<C2D> bbox) {
+    public List<Tile> getTilesFor(TileSet set, Envelope<C2D> bbox) {
         if (outsideMaxBoundingBox(bbox))
             throw new IllegalArgumentException(String.format("Request BoundingBox: %s exceeds maximum bounding box: %s", bbox.toString(), getBoundingBox().toString()));
-        Set<Tile> result = new HashSet<Tile>();
+        List<Tile> result = new ArrayList<>();
         TileCoordinate llIdx = lowerLeftTileCoordinate(bbox, set);
         TileCoordinate urIdx = upperRightTileCoordinate(bbox, set);
         List<TileCoordinate> coordinateBlock = TileCoordinate.range(llIdx, urIdx);

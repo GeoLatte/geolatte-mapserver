@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -61,8 +62,8 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
     final private TileMap tileMap;
     private Envelope<C2D> tileSetClippedBbox;
     private TileSet tileSet;
-    private Set<Tile> tiles;
-    private Set<TileImage> images = new HashSet<TileImage>();
+    private java.util.List<Tile> tiles;
+    private java.util.List<TileImage> images = new ArrayList<>();
     private TileImage result;
     private Chrono chrono;
     private PixelRange imgBounds;
