@@ -50,14 +50,14 @@ public class TileSetChooser {
 
 
     //TODO  -- reduce the visibility
-    public TileSet chooseTileSet() {
+    public int chooseTileSet() {
         List<TileSet> tileSets = tileMap.getTileSets();
         if (tileSets.isEmpty()) throw new RuntimeException("No tilesets.");
         TileSet candidate = tileSets.get(0);
         for (TileSet tileSet : tileSets) {
             candidate = chooseCandidate(candidate, tileSet);
         }
-        return candidate;
+        return candidate.getOrder();
     }
 
 

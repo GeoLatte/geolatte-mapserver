@@ -25,11 +25,15 @@ import org.geolatte.geom.Point;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.core.ImageFormat;
+import org.geolatte.mapserver.util.PixelRange;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+import static java.util.Comparator.comparingInt;
 import static org.geolatte.geom.builder.DSL.point;
 
 
@@ -62,17 +66,19 @@ public class TileMap {
         this.tileFormat = tileFormat;
         this.crs = crs;
         this.origin = origin;
+        //ensure that tileSets are sorted by order
+        tileSets.sort(comparingInt(TileSet::getOrder));
         this.tileSets = tileSets;
         this.forceArgb = forceArgb;
     }
 
     private TileImageSourceFactory makeTileImageSourceFactory(String serviceUrl) {
-            try {
-                URL url = new URL(serviceUrl);
-                return new URLTileImageSourceFactory();
-            } catch (MalformedURLException e) {
-                return new FileTileImageSourceFactory();
-            }
+        try {
+            URL url = new URL(serviceUrl);
+            return new URLTileImageSourceFactory();
+        } catch (MalformedURLException e) {
+            return new FileTileImageSourceFactory();
+        }
 
     }
 
@@ -80,11 +86,15 @@ public class TileMap {
     /**
      * Returns the {@link Tile}s in the {@link TileSet} that overlap the <code>BoundingBox</code>.
      *
-     * @param set  the <code>TileSet</code>
-     * @param bbox the <code>BoundingBox</code>
+     * @param order the order of the <code>TileSet</code>
+     * @param bbox  the <code>BoundingBox</code>
      * @return the <code>Tile</code>s in the <code>TileSet</code> specified by the set argument that overlap the <code>BoundingBox</code> specified by the bbox argument
      */
-    public List<Tile> getTilesFor(TileSet set, Envelope<C2D> bbox) {
+    public List<Tile> getTilesFor(int order, Envelope<C2D> bbox) {
+        return getTilesFor(tileSets.get(order), bbox);
+    }
+
+    private List<Tile> getTilesFor(TileSet set, Envelope<C2D> bbox) {
         if (outsideMaxBoundingBox(bbox))
             throw new IllegalArgumentException(String.format("Request BoundingBox: %s exceeds maximum bounding box: %s", bbox.toString(), getBoundingBox().toString()));
         List<Tile> result = new ArrayList<>();
@@ -95,6 +105,10 @@ public class TileMap {
             result.add(makeTile(set, tileCoordinate));
         }
         return result;
+    }
+
+    public PixelRange pixelBounds(int tileSetOrder, Envelope<C2D> bbox){
+        return getTileSets().get(tileSetOrder).pixelBounds(bbox);
     }
 
     /**
@@ -115,11 +129,15 @@ public class TileMap {
     /**
      * Creates a {@link Tile} for the specified {@link TileCoordinate} in the specified {@link TileSet}.
      *
-     * @param set            the <code>TileSet</code>.
+     * @param order          the <code>TileSet</code>.
      * @param tileCoordinate the <code>TileCoordinate</code>
      * @return a <code>Tile</code> in the <code>TileSet</code> specified by the set argument for the coordinate specified by tileCoordinate argument
      */
-    public Tile makeTile(TileSet set, TileCoordinate tileCoordinate) {
+    public Tile makeTile(int order, TileCoordinate tileCoordinate) {
+        return makeTile(tileSets.get(order), tileCoordinate);
+    }
+
+    private Tile makeTile(TileSet set, TileCoordinate tileCoordinate) {
         TileImageSource source = tileImageSourceFactory.create(set, tileCoordinate, tileFormat.extension);
         return new Tile(source, tileCoordinate, set.getTileCoordinateSpace());
     }
@@ -145,11 +163,12 @@ public class TileMap {
     public CoordinateReferenceSystem<C2D> getCoordinateReferenceSystem() {
         return crs;
     }
+
     /**
      * Returns the coordinate reference system of this <code>TileMap</code>
      *
-     * @deprecated
      * @return the coordinate reference system
+     * @deprecated
      */
     public CrsId getSRS() {
         return this.crs.getCrsId();
@@ -205,4 +224,7 @@ public class TileMap {
         return forceArgb;
     }
 
+    public TileSetCoordinateSpace getTileCoordinateSpace(int tileSet) {
+        return getTileSets().get(tileSet).getTileCoordinateSpace();
+    }
 }

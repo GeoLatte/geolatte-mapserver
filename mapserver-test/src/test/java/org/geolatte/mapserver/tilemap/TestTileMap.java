@@ -19,17 +19,12 @@
 
 package org.geolatte.mapserver.tilemap;
 
-import org.geolatte.geom.Envelope;
-import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.TMSTestSupport;
 import org.geolatte.mapserver.util.PixelRange;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.awt.*;
-import java.util.HashSet;
-import java.util.Set;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -47,8 +42,8 @@ public class TestTileMap {
 
     @Test
     public void test_tile_width_and_height_in_map_units() {
-        TileSet tileSet = tileMap.getTileSets().get(3);
-        TileSetCoordinateSpace cs = tileSet.getTileCoordinateSpace();
+        int tileSet = 3;
+        TileSetCoordinateSpace cs = tileMap.getTileCoordinateSpace(tileSet);
         double w = cs.tileWidthInMapUnits();
         assertEquals(5009377.0848, w, 0.000005);
         double h = cs.tileHeightInMapUnits();
@@ -57,7 +52,7 @@ public class TestTileMap {
 
     @Test
     public void test_tile_image_bounds() {
-        TileSet tileSet = tileMap.getTileSets().get(2);
+        int tileSet = 2;
 
         Tile tile = tileMap.makeTile(tileSet, TileCoordinate.valueOf(0, 3));
         PixelRange expected = new PixelRange(0, 0, new Dimension(256, 256));

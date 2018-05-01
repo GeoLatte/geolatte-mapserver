@@ -19,15 +19,7 @@
 
 package org.geolatte.mapserver.tilemap;
 
-import org.geolatte.geom.Envelope;
-import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.TMSTestSupport;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.awt.*;
-
-import static org.junit.Assert.assertEquals;
 
 public class TestTileSetChooser {
 

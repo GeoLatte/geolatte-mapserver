@@ -40,8 +40,8 @@ public class TileMapLayerSource implements LayerSource {
 
     public List<Tile> getTiles(Envelope<C2D> envelope, Dimension dimension) {
         TileSetChooser tsc = new TileSetChooser(tileMap, envelope, dimension);
-        TileSet tileSet = tsc.chooseTileSet();
-        logger.debug("TileSet chosen has order = " + tileSet.getOrder());
+        int tileSet = tsc.chooseTileSet();
+        logger.debug("TileSet chosen has order = " + tileSet);
         return tileMap.getTilesFor(tileSet, envelope);
     }
 }

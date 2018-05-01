@@ -61,7 +61,7 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
     private final Imaging imaging;
     final private TileMap tileMap;
     private Envelope<C2D> tileSetClippedBbox;
-    private TileSet tileSet;
+    private int tileSet;
     private java.util.List<Tile> tiles;
     private java.util.List<TileImage> images = new ArrayList<>();
     private TileImage result;
@@ -111,7 +111,7 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
     private void chooseTileSet() {
         TileSetChooser tsc = new TileSetChooser(tileMap, requestedBbox, dimension);
         tileSet = tsc.chooseTileSet();
-        LOGGER.debug("TileSet chosen has order = " + tileSet.getOrder());
+        LOGGER.debug("TileSet chosen has order = " + tileSet);
     }
 
     private void getTiles() {
@@ -125,7 +125,7 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
     }
 
     private void mosaic() {
-        imgBounds = tileSet.pixelBounds(tileSetClippedBbox);
+        imgBounds = tileMap.pixelBounds(tileSet, tileSetClippedBbox);
         result = imaging.mosaic(images, imgBounds);
     }
 

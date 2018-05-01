@@ -42,10 +42,10 @@ import java.util.function.Consumer;
 
 public class TMSTestSupport {
 
-    public final static Logger logger = LoggerFactory.getLogger(TMSTestSupport.class);
-    public final static ProjectedCoordinateReferenceSystem WMERC = CoordinateReferenceSystems.WEB_MERCATOR;
-    public final static ProjectedCoordinateReferenceSystem L72 = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
-    public static final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+    private final static Logger logger = LoggerFactory.getLogger(TMSTestSupport.class);
+    private final static ProjectedCoordinateReferenceSystem WMERC = CoordinateReferenceSystems.WEB_MERCATOR;
+    private final static ProjectedCoordinateReferenceSystem L72 = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+    private static final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
 
     static {
         extractResourceArchiveToTempDir("tiles/orthos/ortho-jpeg.tgz");
@@ -73,21 +73,19 @@ public class TMSTestSupport {
     public static Set<Tile> getTestTiles() {
         Set<Tile> tiles = new HashSet<Tile>();
         TileMap tileMap = makeOSMTileMap();
-        TileSet tileSet = tileMap.getTileSets().get(1);
-        tiles.add(tileMap.makeTile(tileSet, TileCoordinate.valueOf(0, 0)));
-        tiles.add(tileMap.makeTile(tileSet, TileCoordinate.valueOf(1, 0)));
+        tiles.add(tileMap.makeTile(1, TileCoordinate.valueOf(0, 0)));
+        tiles.add(tileMap.makeTile(1, TileCoordinate.valueOf(1, 0)));
         return tiles;
     }
 
     public static Set<Tile> getTestTiles(int level, int min_i, int min_j, int max_i, int max_j) {
         Set<Tile> tiles = new HashSet<Tile>();
         TileMap tileMap = makeOSMTileMap();
-        TileSet tileSet = tileMap.getTileSets().get(level);
         TileCoordinate start = TileCoordinate.valueOf(min_i, min_j);
         TileCoordinate stop = TileCoordinate.valueOf(max_i, max_j);
         List<TileCoordinate> coords = TileCoordinate.range(start, stop);
         for (TileCoordinate t : coords) {
-            tiles.add(tileMap.makeTile(tileSet, t));
+            tiles.add(tileMap.makeTile(level, t));
         }
         return tiles;
     }
@@ -130,9 +128,7 @@ public class TMSTestSupport {
             Field fld = object.getClass().getDeclaredField(fieldName);
             fld.setAccessible(true);
             return fld.get(object);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
@@ -147,11 +143,7 @@ public class TMSTestSupport {
             Method method = object.getClass().getDeclaredMethod(methodName, argList.toArray(new Class<?>[argList.size()]));
             method.setAccessible(true);
             return method.invoke(object, args);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }

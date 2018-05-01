@@ -33,7 +33,7 @@ import org.geolatte.mapserver.util.PixelRange;
  * units per pixel).
  * </p>
  */
-public class TileSet {
+class TileSet {
 
     final String href;
     final private int order;
