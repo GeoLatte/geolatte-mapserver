@@ -33,7 +33,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -52,7 +51,11 @@ public class TMSTestSupport {
     static public final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
 
     static {
-        java.net.URL archived = Thread.currentThread().getContextClassLoader().getResource("tiles/orthos/ortho-jpeg.tgz");
+        extractResourceArchiveToTempDir("tiles/orthos/ortho-jpeg.tgz");
+    }
+
+    private static void extractResourceArchiveToTempDir(String name) {
+        java.net.URL archived = Thread.currentThread().getContextClassLoader().getResource(name);
         try {
             File p = new File(archived.toURI());
             String cmdLine =String.format("tar -C  %s -x -f %s" ,tmpDir.getAbsolutePath(),  p.getAbsolutePath());

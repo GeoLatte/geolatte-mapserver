@@ -148,7 +148,7 @@ public class BasicImagingTest {
     }
     private TileImage readTileImage(String filename, boolean isExpected, int minX, int minY) throws IOException {
 
-        Path root = Paths.get("mapserver-imageops", "src", "test", "resources", "img");
+        Path root = Paths.get( "src", "test", "resources", "img");
         if (isExpected) {
             root = root.resolve("expected");
         }
