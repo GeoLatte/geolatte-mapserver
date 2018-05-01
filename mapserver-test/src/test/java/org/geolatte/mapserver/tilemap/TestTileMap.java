@@ -1,88 +1,86 @@
-package org.geolatte.mapserver.tilemap;///*
-// * Copyright 2009-2010  Geovise BVBA, QMINO BVBA
-// *
-// * This file is part of GeoLatte Mapserver.
-// *
-// * GeoLatte Mapserver is free software: you can redistribute it and/or modify
-// * it under the terms of the GNU Lesser General Public License as published by
-// * the Free Software Foundation, either version 3 of the License, or
-// * (at your option) any later version.
-// *
-// * GeoLatte Mapserver is distributed in the hope that it will be useful,
-// * but WITHOUT ANY WARRANTY; without even the implied warranty of
-// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// * GNU Lesser General Public License for more details.
-// *
-// * You should have received a copy of the GNU Lesser General Public License
-// * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
-// */
-//
-//package org.geolatte.mapserver.tilemap;
-//
-//import org.geolatte.geom.Envelope;
-//import org.geolatte.geom.Points;
-//import org.geolatte.geom.crs.CrsId;
-//import org.geolatte.mapserver.TMSTestSupport;
-//import org.geolatte.mapserver.util.PixelRange;
-//import org.junit.Assert;
-//import org.junit.Before;
-//import org.junit.Test;
-//
-//import java.awt.*;
-//import java.util.HashSet;
-//import java.util.Set;
-//
-//import static junit.framework.Assert.assertEquals;
-//
-//public class TestTileMap {
-//
-//
-//    TileMap tileMap;
-//
-//
-//    @Before
-//    public void setUp() throws TileMapCreationException {
-//        TileMapBuilder builder = TileMapBuilder.fromURL(TMSTestSupport.URL);
-//        tileMap = builder.build();
-//    }
-//
-//
-//    @Test
-//    public void test_tile_width_and_height_in_map_units() {
-//        TileSet tileSet = tileMap.getTileSets().get(3);
-//        TileSetCoordinateSpace cs = tileSet.getTileCoordinateSpace();
-//        double w = cs.tileWidthInMapUnits();
-//        assertEquals(22.5, w, 0.000005);
-//        double h = cs.tileHeightInMapUnits();
-//        assertEquals(22.5, h, 0.000005);
-//    }
-//
-//    @Test
-//    public void test_tile_image_bounds() {
-//        TileSet tileSet = tileMap.getTileSets().get(2);
-//
-//        Tile tile = tileMap.makeTile(tileSet, TileCoordinate.valueOf(0, 3));
-//        PixelRange expected = new PixelRange(0, 0, new Dimension(256, 256));
-//        PixelRange received = tile.getPixelBounds();
-//        assertEquals(expected, received);
-//
-//        tile = tileMap.makeTile(tileSet, TileCoordinate.valueOf(7, 3));
-//        expected = new PixelRange(7 * 256, 0, new Dimension(256, 256));
-//        received = tile.getPixelBounds();
-//        assertEquals(expected, received);
-//
-//        tile = tileMap.makeTile(tileSet, TileCoordinate.valueOf(0, 0));
-//        expected = new PixelRange(0, 3 * 256, new Dimension(256, 256));
-//        received = tile.getPixelBounds();
-//        assertEquals(expected, received);
-//
-//        tile = tileMap.makeTile(tileSet, TileCoordinate.valueOf(2, 2));
-//        expected = new PixelRange(512, 256, new Dimension(256, 256));
-//        received = tile.getPixelBounds();
-//        assertEquals(expected, received);
-//
-//    }
-//
+/*
+ * Copyright 2009-2010  Geovise BVBA, QMINO BVBA
+ *
+ * This file is part of GeoLatte Mapserver.
+ *
+ * GeoLatte Mapserver is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * GeoLatte Mapserver is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.geolatte.mapserver.tilemap;
+
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.crs.CrsId;
+import org.geolatte.mapserver.TMSTestSupport;
+import org.geolatte.mapserver.util.PixelRange;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.awt.*;
+import java.util.HashSet;
+import java.util.Set;
+
+import static junit.framework.Assert.assertEquals;
+
+public class TestTileMap {
+
+
+    private TileMap tileMap;
+
+
+    @Before
+    public void setUp() throws TileMapCreationException {
+        tileMap = TMSTestSupport.makeOSMTileMap();
+    }
+
+
+    @Test
+    public void test_tile_width_and_height_in_map_units() {
+        TileSet tileSet = tileMap.getTileSets().get(3);
+        TileSetCoordinateSpace cs = tileSet.getTileCoordinateSpace();
+        double w = cs.tileWidthInMapUnits();
+        assertEquals(5009377.0848, w, 0.000005);
+        double h = cs.tileHeightInMapUnits();
+        assertEquals(5009377.0848, h, 0.000005);
+    }
+
+    @Test
+    public void test_tile_image_bounds() {
+        TileSet tileSet = tileMap.getTileSets().get(2);
+
+        Tile tile = tileMap.makeTile(tileSet, TileCoordinate.valueOf(0, 3));
+        PixelRange expected = new PixelRange(0, 0, new Dimension(256, 256));
+        PixelRange received = tile.getPixelBounds();
+        assertEquals(expected, received);
+
+        tile = tileMap.makeTile(tileSet, TileCoordinate.valueOf(7, 3));
+        expected = new PixelRange(7 * 256, 0, new Dimension(256, 256));
+        received = tile.getPixelBounds();
+        assertEquals(expected, received);
+
+        tile = tileMap.makeTile(tileSet, TileCoordinate.valueOf(0, 0));
+        expected = new PixelRange(0, 3 * 256, new Dimension(256, 256));
+        received = tile.getPixelBounds();
+        assertEquals(expected, received);
+
+        tile = tileMap.makeTile(tileSet, TileCoordinate.valueOf(2, 2));
+        expected = new PixelRange(512, 256, new Dimension(256, 256));
+        received = tile.getPixelBounds();
+        assertEquals(expected, received);
+
+    }
+
 //    @Test
 //    public void test_tile_bbox() {
 //        TileSet tileSet = tileMap.getTileSets().get(2);
@@ -128,6 +126,6 @@ package org.geolatte.mapserver.tilemap;///*
 //        result = tileMap.getTilesFor(tileSet, bbox);
 //        Assert.assertEquals(expected, result);
 //    }
-//
-//
-//}
+
+
+}

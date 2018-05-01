@@ -45,10 +45,7 @@ public class TMSTestSupport {
     public final static Logger logger = LoggerFactory.getLogger(TMSTestSupport.class);
     public final static ProjectedCoordinateReferenceSystem WMERC = CoordinateReferenceSystems.WEB_MERCATOR;
     public final static ProjectedCoordinateReferenceSystem L72 = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
-
-
-    static public final String URL = "http://localhost/cgi-bin/tilecache.cgi/1.0.0/basic";
-    static public final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+    public static final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
 
     static {
         extractResourceArchiveToTempDir("tiles/orthos/ortho-jpeg.tgz");
@@ -99,7 +96,7 @@ public class TMSTestSupport {
         TileMapBuilder builder = new TileMapBuilder();
         builder
                 .name("osm")
-                .root("mapserver-test/src/test/resources/tiles/osm")
+                .root("src/test/resources/tiles/osm")
                 .crs(WMERC)
                 .envelope(-20037508.340000, -20037508.340000, 20037508.340000, 20037508.340000)
                 .origin(-20037508.340000, -20037508.340000)
