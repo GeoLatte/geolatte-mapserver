@@ -17,25 +17,43 @@
  * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.geolatte.mapserver.protocols.wms;
+package org.geolatte.mapserver.protocols.wms_1_3_0;
+
+import java.util.Arrays;
 
 /**
+ * Enumeration of all possible WMS Request Parameters.
+ *
  * @author Karel Maesen, Geovise BVBA
- * creation-date: Jul 14, 2010
  */
-public class OGCMIMETypes {
-    public static final String CAPABILITIES = "application/vnd.ogc.wms_xml";
+public enum WmsParam {
+    REQUEST,
+    VERSION("WMTVER"),
+    FORMAT,
+    TRANSPARENT,
+    WIDTH,
+    HEIGHT,
+    SRS,
+    SERVICE,
+    BBOX,
+    LAYERS,
+    EXCEPTIONS,
+    BGCOLOR,
+    SLD,
+    STYLES,
+    UPDATESEQUENCE;
 
-    public static final String GML = "application/vnd.ogc.gml";
 
-    public static final String SERVICE_EXCEPTION_XML = "application/vnd.ogc.se_xml";
+    private String[] names = new String[]{};
 
-    public static final String SERVICE_EXCEPTION_BLANK = "application/vnd.ogc.se_blank";
+    WmsParam(String... altNames) {
+        this.names = new String[altNames.length + 1];
+        this.names[0] = this.toString();
+        System.arraycopy(altNames, 0, this.names, 1, altNames.length);
+    }
 
-    public static final String SERVICE_EXCEPTION_INIMAGE = "application/vnd.ogc.se_inimage";
-
-    public static final String JPEG = "image/jpeg";
-
-    public static final String PNG = "image/png";
+    public String[] getNames() {
+        return Arrays.copyOf(names, names.length);
+    }
 
 }

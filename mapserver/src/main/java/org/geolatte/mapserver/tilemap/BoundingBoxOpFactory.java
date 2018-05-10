@@ -17,4 +17,6 @@ public interface BoundingBoxOpFactory {
 
     public TileMapOperation<TileImage> create(MapRequest request, TileMap tileMap, Imaging imaging);
 
+
+
 }

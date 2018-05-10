@@ -17,21 +17,21 @@
  * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.geolatte.mapserver.protocols.wms;
+package org.geolatte.mapserver.protocols.wms_1_3_0;
 
-public class WMSGetCapabilitiesRequest extends WMSRequest {
+public class WmsGetCapabilitiesRequest extends WmsRequest {
 
 
-    @WMSParameter(required = true, param = WMSParam.REQUEST)
+    @WmsParameter(required = true, param = WmsParam.REQUEST)
     private String request;
 
-    @WMSParameter(required = false, param = WMSParam.VERSION)
+    @WmsParameter(required = false, param = WmsParam.VERSION)
     private String version;
 
-    @WMSParameter(required = true, param = WMSParam.SERVICE)
+    @WmsParameter(required = true, param = WmsParam.SERVICE)
     private String service;
 
-    @WMSParameter(required = false, param = WMSParam.UPDATESEQUENCE)
+    @WmsParameter(required = false, param = WmsParam.UPDATESEQUENCE)
     private String updateSeq;
 
     public String getRequest() {
@@ -46,14 +46,13 @@ public class WMSGetCapabilitiesRequest extends WMSRequest {
         return service;
     }
 
-    //Note that this request parameter is
-    //currently ignored.
+    //This request parameter is currently ignored.
     public String getUpdateSequence() {
         return updateSeq;
     }
 
     @Override
     public String getResponseContentType() {
-        return OGCMIMETypes.CAPABILITIES;
+        return OgcMimeTypes.CAPABILITIES;
     }
 }

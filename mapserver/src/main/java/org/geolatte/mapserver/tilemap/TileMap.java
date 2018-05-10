@@ -25,6 +25,8 @@ import org.geolatte.geom.Point;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.core.ImageFormat;
+import org.geolatte.mapserver.core.MapRequest;
+import org.geolatte.mapserver.spi.Imaging;
 import org.geolatte.mapserver.util.PixelRange;
 
 import java.net.MalformedURLException;

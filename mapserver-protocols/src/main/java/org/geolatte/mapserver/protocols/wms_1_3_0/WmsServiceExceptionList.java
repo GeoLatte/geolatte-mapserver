@@ -17,7 +17,7 @@
  * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.geolatte.mapserver.protocols.wms;
+package org.geolatte.mapserver.protocols.wms_1_3_0;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,12 +27,12 @@ import java.util.List;
  * @author Karel Maesen, Geovise BVBA
  * creation-date: Jul 22, 2010
  */
-public class WMSServiceExceptionList implements Iterable<WMSServiceExceptionList.Item> {
+public class WmsServiceExceptionList implements Iterable<WmsServiceExceptionList.Item> {
 
 
     List<Item> items = new ArrayList<Item>();
 
-    public WMSServiceExceptionList add(String message, WMSServiceException.CODE... code) {
+    public WmsServiceExceptionList add(String message, WmsServiceException.Code... code) {
         items.add(new Item(message, code));
         return this;
     }
@@ -49,15 +49,15 @@ public class WMSServiceExceptionList implements Iterable<WMSServiceExceptionList
     public static class Item {
 
         private final String message;
-        private WMSServiceException.CODE code = null;
+        private WmsServiceException.Code code = null;
 
-        Item(String message, WMSServiceException.CODE... code) {
+        Item(String message, WmsServiceException.Code... code) {
             this.message = message;
             if (code.length > 0)
                 this.code = code[0];
         }
 
-        public WMSServiceException.CODE getCode() {
+        public WmsServiceException.Code getCode() {
             return code;
         }
 

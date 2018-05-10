@@ -17,9 +17,11 @@
  * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.geolatte.mapserver.wms;
+package org.geolatte.mapserver.protocols.wms_1_3_0;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -28,17 +30,15 @@ import org.junit.Test;
  * @author Karel Maesen, Geovise BVBA
  * creation-date: Jul 14, 2010
  */
-public class TestOGCMIMETypes {
+public class TestOgcMimeTypes {
 
     @Test
     public void test_available_mime_types() {
-        assertEquals("application/vnd.ogc.wms_xml", OGCMIMETypes.CAPABILITIES);
-        assertEquals("application/vnd.ogc.gml", OGCMIMETypes.GML);
-        assertEquals("application/vnd.ogc.se_xml", OGCMIMETypes.SERVICE_EXCEPTION_XML);
-        assertEquals("application/vnd.ogc.se_inimage", OGCMIMETypes.SERVICE_EXCEPTION_INIMAGE);
-        assertEquals("application/vnd.ogc.se_blank", OGCMIMETypes.SERVICE_EXCEPTION_BLANK);
-        assertEquals("image/jpeg", OGCMIMETypes.JPEG);
-        assertEquals("image/png", OGCMIMETypes.PNG);
+        assertEquals("application/vnd.ogc.wms_xml", OgcMimeTypes.CAPABILITIES);
+        assertEquals("application/vnd.ogc.gml", OgcMimeTypes.GML);
+        assertEquals("application/vnd.ogc.se_xml", OgcMimeTypes.SERVICE_EXCEPTION_XML);
+        assertEquals("application/vnd.ogc.se_inimage", OgcMimeTypes.SERVICE_EXCEPTION_INIMAGE);
+        assertEquals("application/vnd.ogc.se_blank", OgcMimeTypes.SERVICE_EXCEPTION_BLANK);
 
     }
 }

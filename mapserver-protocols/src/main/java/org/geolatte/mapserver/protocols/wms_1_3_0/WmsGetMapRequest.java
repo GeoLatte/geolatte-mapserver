@@ -17,42 +17,39 @@
  * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.geolatte.mapserver.protocols.wms;
-
-import org.geolatte.geom.Envelope;
-import org.geolatte.geom.crs.CrsId;
+package org.geolatte.mapserver.protocols.wms_1_3_0;
 
 import java.awt.*;
 
-public class WMSGetMapRequest extends WMSRequest {
+public class WmsGetMapRequest extends WmsRequest {
 
-    @WMSParameter(required = false, param = WMSParam.VERSION)
+    @WmsParameter(required = false, param = WmsParam.VERSION)
     private String version;
-    @WMSParameter(required = true, param = WMSParam.REQUEST)
+    @WmsParameter(required = true, param = WmsParam.REQUEST)
     private String request;
-    @WMSParameter(required = true, param = WMSParam.LAYERS)
+    @WmsParameter(required = true, param = WmsParam.LAYERS)
     private String[] layers;
-    @WMSParameter(required = false, param = WMSParam.STYLES)
+    @WmsParameter(required = false, param = WmsParam.STYLES)
     // making this optional is not in conformance with WMS spec!
     private String[] styles;
-    @WMSParameter(required = true, param = WMSParam.SRS)
-    private CrsId srs;
-    @WMSParameter(required = true, param = WMSParam.BBOX)
-    private Envelope bbox;
-    @WMSParameter(required = true, param = WMSParam.WIDTH)
+    @WmsParameter(required = true, param = WmsParam.SRS)
+    private String srs;
+    @WmsParameter(required = true, param = WmsParam.BBOX)
+    private WmsBbox bbox;
+    @WmsParameter(required = true, param = WmsParam.WIDTH)
     private Integer width;
-    @WMSParameter(required = true, param = WMSParam.HEIGHT)
+    @WmsParameter(required = true, param = WmsParam.HEIGHT)
     private Integer height;
-    @WMSParameter(required = true, param = WMSParam.FORMAT)
+    @WmsParameter(required = true, param = WmsParam.FORMAT)
     private String format;
-    @WMSParameter(required = false, param = WMSParam.TRANSPARENT)
+    @WmsParameter(required = false, param = WmsParam.TRANSPARENT)
     private String transparent;
-    @WMSParameter(required = false, param = WMSParam.EXCEPTIONS)
-    private String exceptions = OGCMIMETypes.SERVICE_EXCEPTION_XML;
-    @WMSParameter(required = false, param = WMSParam.BGCOLOR)
+    @WmsParameter(required = false, param = WmsParam.EXCEPTIONS)
+    private String exceptions = OgcMimeTypes.SERVICE_EXCEPTION_XML;
+    @WmsParameter(required = false, param = WmsParam.BGCOLOR)
     private String bgcolor;
 
-    WMSGetMapRequest() {
+    WmsGetMapRequest() {
     }
 
     public Dimension getDimension() {
@@ -87,12 +84,13 @@ public class WMSGetMapRequest extends WMSRequest {
         return width;
     }
 
-    public CrsId getSrs() {
+    public String getSrs() {
         return srs;
     }
 
-    public Envelope getBbox() {
-        return new Envelope(bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY(), this.getSrs());
+
+    public WmsBbox getBbox() {
+        return bbox;
     }
 
     public String getBgcolor() {
@@ -110,7 +108,7 @@ public class WMSGetMapRequest extends WMSRequest {
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for (WMSParam p : WMSParam.values()) {
+        for (WmsParam p : WmsParam.values()) {
             if (builder.length() == 0) {
                 builder.append("GetMap[");
             } else {
@@ -128,7 +126,8 @@ public class WMSGetMapRequest extends WMSRequest {
     @Override
     public String getResponseContentType() {
         if (this.format == null) {
-            return WMSCapabilities.getSupportedFormat("WMS", "GetMap")[0];
+            throw new UnsupportedOperationException();
+//            return WMSCapabilities.getSupportedFormat("WMS", "GetMap")[0];
         } else {
             return format;
         }

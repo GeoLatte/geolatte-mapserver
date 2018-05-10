@@ -17,7 +17,7 @@
  * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.geolatte.mapserver.wms;
+package org.geolatte.mapserver.protocols.wms_1_3_0;
 
 import org.junit.Test;
 
@@ -25,27 +25,28 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class TestWMSGetCapabilitiesRequest {
+public class TestWmsGetCapabilitiesRequest {
 
     @Test
-    public void test_adapt_normal() throws InvalidWMSRequestException {
+    public void test_adapt_normal() throws InvalidWmsRequestException {
         HttpServletRequest request = mock(HttpServletRequest.class);
 
         String params = "REQUEST,VERSION,SERVICE,UPDATESEQUENCE";
 
-        when(request.getParameterNames()).thenReturn(new StringTokenizer(params, ","), new StringTokenizer(params, ","));
+        when(request.getParameterNames()).thenReturn((Enumeration) new StringTokenizer(params, ","), (Enumeration) new StringTokenizer(params, ","));
         when(request.getParameter("REQUEST")).thenReturn("GetCapabilities", "GetCapabilities");
         when(request.getParameter("VERSION")).thenReturn("1.1.1");
         when(request.getParameter("SERVICE")).thenReturn("WMS");
         when(request.getParameter("UPDATESEQUENCE")).thenReturn("0");
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8090/wms"));
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8090/wms_1_3_0"));
 
 
-        WMSGetCapabilitiesRequest wmsGetCapabilities = (WMSGetCapabilitiesRequest) WMSRequest.adapt(request);
+        WmsGetCapabilitiesRequest wmsGetCapabilities = (WmsGetCapabilitiesRequest) WmsRequest.adapt(request);
         assertEquals("GetCapabilities", wmsGetCapabilities.getRequest());
         assertEquals("1.1.1", wmsGetCapabilities.getVersion());
         assertEquals("WMS", wmsGetCapabilities.getService());
@@ -54,17 +55,16 @@ public class TestWMSGetCapabilitiesRequest {
     }
 
     @Test
-    public void test_adapt_only_required_params() throws InvalidWMSRequestException {
+    public void test_adapt_only_required_params() throws InvalidWmsRequestException {
         HttpServletRequest request = mock(HttpServletRequest.class);
 
         String params = "REQUEST,SERVICE";
-
-        when(request.getParameterNames()).thenReturn(new StringTokenizer(params, ","), new StringTokenizer(params, ","));
+        when(request.getParameterNames()).thenReturn((Enumeration) new StringTokenizer(params, ","), (Enumeration) new StringTokenizer(params, ","));
         when(request.getParameter("REQUEST")).thenReturn("GetCapabilities", "GetCapabilities");
         when(request.getParameter("SERVICE")).thenReturn("WMS");
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8090/wms"));
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8090/wms_1_3_0"));
 
-        WMSGetCapabilitiesRequest wmsGetCapabilities = (WMSGetCapabilitiesRequest) WMSRequest.adapt(request);
+        WmsGetCapabilitiesRequest wmsGetCapabilities = (WmsGetCapabilitiesRequest) WmsRequest.adapt(request);
         assertEquals("GetCapabilities", wmsGetCapabilities.getRequest());
         assertEquals("WMS", wmsGetCapabilities.getService());
 
@@ -78,15 +78,15 @@ public class TestWMSGetCapabilitiesRequest {
         String params = "REQUEST";
         Enumeration e = new StringTokenizer(params, ",");
 
-        when(request.getParameterNames()).thenReturn(new StringTokenizer(params, ","), new StringTokenizer(params, ","));
+        when(request.getParameterNames()).thenReturn((Enumeration)new StringTokenizer(params, ","), (Enumeration)new StringTokenizer(params, ","));
         when(request.getParameter("REQUEST")).thenReturn("GetCapabilities", "GetCapabilities");
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8090/wms"));
+        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8090/wms_1_3_0"));
 
 
         try {
-            WMSGetCapabilitiesRequest wmsGetCapabilities = (WMSGetCapabilitiesRequest) WMSRequest.adapt(request);
+            WmsGetCapabilitiesRequest wmsGetCapabilities = (WmsGetCapabilitiesRequest) WmsRequest.adapt(request);
             fail();
-        } catch (InvalidWMSRequestException e1) {
+        } catch (InvalidWmsRequestException e1) {
             //OK
         }
 

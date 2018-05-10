@@ -17,32 +17,21 @@
  * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.geolatte.mapserver.protocols.wms;
+package org.geolatte.mapserver.protocols.wms_1_3_0;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import org.junit.Test;
+
+import static org.junit.Assert.assertArrayEquals;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- * creation-date: Jul 22, 2010
+ * creation-date: Jul 14, 2010
  */
-public class WMSGetCapabilitiesRequestHandler implements WMSRequestHandler {
+public class TestWmsParam {
 
-    private final WMSGetCapabilitiesResponse capabilitiesResponse;
-
-    WMSGetCapabilitiesRequestHandler(WMSGetCapabilitiesResponse response) {
-        this.capabilitiesResponse = response;
+    @Test
+    public void test_names() {
+        assertArrayEquals(new String[]{"REQUEST"}, WmsParam.REQUEST.getNames());
+        assertArrayEquals(new String[]{"VERSION", "WMTVER"}, WmsParam.VERSION.getNames());
     }
-
-    @Override
-    public void executeAndWriteTo(WMSRequest request, OutputStream out) throws WMSServiceException {
-        WMSCapabilities.check(request);
-        try {
-            capabilitiesResponse.write(out, request.getRequestURL());
-        } catch (IOException e) {
-            throw new WMSServiceException(e.getMessage());
-        }
-    }
-
-
 }

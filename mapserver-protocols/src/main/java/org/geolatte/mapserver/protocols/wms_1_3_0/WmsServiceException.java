@@ -17,10 +17,10 @@
  * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.geolatte.mapserver.protocols.wms;
+package org.geolatte.mapserver.protocols.wms_1_3_0;
 
-import net.opengis.wms.v_1_1_1.ServiceException;
-import net.opengis.wms.v_1_1_1.ServiceExceptionReport;
+
+import net.opengis.wms.v_1_3_0.ServiceExceptionReport;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -30,58 +30,42 @@ import java.util.List;
  * @author Karel Maesen, Geovise BVBA
  * creation-date: Jul 17, 2010
  */
-public class WMSServiceException extends Exception {
+public class WmsServiceException extends Exception {
 
-    private WMSServiceExceptionList exceptionItems;
+    protected WmsServiceExceptionList exceptionItems;
 
-    public WMSServiceException(String message) {
+    public WmsServiceException(String message) {
         super(message);
     }
 
-    public WMSServiceException(String message, Throwable cause) {
+    public WmsServiceException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public WMSServiceException(WMSServiceExceptionList exceptionItems) {
+    public WmsServiceException(WmsServiceExceptionList exceptionItems) {
         this.exceptionItems = exceptionItems;
     }
 
     public void writeToOutputStream(OutputStream outputStream) {
-        ServiceExceptionReport report = JAXB.instance().createServiceExceptionReport();
-        addExceptions(report);
-        JAXB.instance().marshal(report, outputStream);
+        ServiceExceptionReport report = WmsJaxb.instance().createServiceExceptionReport(exceptionItems);
+        WmsJaxb.instance().marshal(report, outputStream);
     }
 
     public List<String> getCodes() {
         List<String> list = new ArrayList<String>();
         if (this.exceptionItems == null) return list;
-        for (WMSServiceExceptionList.Item item : this.exceptionItems) {
+        for (WmsServiceExceptionList.Item item : this.exceptionItems) {
             if (item.getCode() != null)
                 list.add(item.getCode().toString());
         }
         return list;
     }
 
-    private void addExceptions(ServiceExceptionReport report) {
-        if (exceptionItems == null || exceptionItems.isEmpty()) {
-            addException(report, getMessage(), null);
-        } else {
-            for (WMSServiceExceptionList.Item item : exceptionItems) {
-                addException(report, item.getMessage(), item.getCode());
-            }
-        }
+    public WmsServiceExceptionList getExceptionItems() {
+        return exceptionItems;
     }
 
-    private void addException(ServiceExceptionReport report, String message, CODE code) {
-        ServiceException exception = JAXB.instance().createServiceException();
-        exception.setvalue(message);
-        if (code != null) {
-            exception.setCode(code.toString());
-        }
-        report.getServiceException().add(exception);
-    }
-
-    public enum CODE {
+    public enum Code {
         InvalidFormat,
         InvalidSRS,
         LayerNotDefined,

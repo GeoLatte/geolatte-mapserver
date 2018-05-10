@@ -17,15 +17,24 @@
  * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.geolatte.mapserver.protocols.wms;
+package org.geolatte.mapserver.protocols.wms_1_3_0;
 
-import java.io.OutputStream;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
+ * Annotation used to identify fields in a <code>WMSRequest</code> that
+ * map to a <code>WMSParam</code>.
+ *
  * @author Karel Maesen, Geovise BVBA
- * creation-date: Jul 22, 2010
+ * creation-date: Jul 14, 2010
  */
-public interface WMSRequestHandler {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface WmsParameter {
+    public boolean required();
 
-    public abstract void executeAndWriteTo(WMSRequest request, OutputStream out) throws WMSServiceException;
+    public WmsParam param();
 }

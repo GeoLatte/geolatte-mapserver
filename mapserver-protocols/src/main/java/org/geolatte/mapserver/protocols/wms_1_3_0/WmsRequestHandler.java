@@ -17,19 +17,15 @@
  * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.geolatte.mapserver.wms;
+package org.geolatte.mapserver.protocols.wms_1_3_0;
 
-import org.junit.Test;
+import java.io.OutputStream;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- * creation-date: Jul 14, 2010
+ * creation-date: Jul 22, 2010
  */
-public class TestWMSParam {
+public interface WmsRequestHandler {
 
-    @Test
-    public void test_names() {
-        assertArrayEquals(new String[]{"REQUEST"}, WMSParam.REQUEST.getNames());
-        assertArrayEquals(new String[]{"VERSION", "WMTVER"}, WMSParam.VERSION.getNames());
-    }
+    public abstract void executeAndWriteTo(WmsRequest request, OutputStream out) throws WmsServiceException;
 }

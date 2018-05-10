@@ -17,19 +17,29 @@
  * along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.geolatte.mapserver.protocols.wms;
+package org.geolatte.mapserver.protocols.wms_1_3_0;
 
 /**
  * @author Karel Maesen, Geovise BVBA
  * creation-date: Jul 22, 2010
  */
-public class InvalidWMSRequestException extends WMSServiceException {
+public class InvalidWmsRequestException extends WmsServiceException {
 
-    InvalidWMSRequestException(String msg) {
+    InvalidWmsRequestException(String msg) {
         super(msg);
     }
 
-    InvalidWMSRequestException(String msg, Throwable cause) {
+    InvalidWmsRequestException(Code code, String msg) {
+        super(msg);
+        getExceptionItems().add(msg, code);
+    }
+
+    InvalidWmsRequestException(String msg, Throwable cause) {
         super(msg, cause);
+    }
+
+    InvalidWmsRequestException(Code code, String msg, Throwable cause) {
+        super(msg, cause);
+        getExceptionItems().add(msg, code);
     }
 }
