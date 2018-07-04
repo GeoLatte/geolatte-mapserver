@@ -1,5 +1,3 @@
-[![Build Status](http://teamcity.geolatte.org/app/rest/builds/buildType:\(id:bt6\)/statusIcon)](http://teamcity.geolatte.org/viewType.html?buildTypeId=bt6&guest=1)
-
 geolatte-mapserver
 ==================
 

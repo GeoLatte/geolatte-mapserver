@@ -1,13 +1,12 @@
 package org.geolatte.mapserver.tilemap;
 
-import org.geolatte.mapserver.spi.Imaging;
+import org.geolatte.mapserver.image.Image;
+import org.geolatte.mapserver.image.Imaging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -15,7 +14,7 @@ import java.util.concurrent.Future;
  * @author Karel Maesen, Geovise BVBA
  * creation-date: 7/1/11
  */
-public class TileImageLoadOp implements TileMapOperation<java.util.List<TileImage>> {
+public class TileImageLoadOp implements TileMapOperation<java.util.List<Image>> {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(TileImageLoadOp.class);
 
@@ -32,18 +31,18 @@ public class TileImageLoadOp implements TileMapOperation<java.util.List<TileImag
     }
 
     @Override
-    public java.util.List<TileImage> execute() {
+    public java.util.List<Image> execute() {
         LOGGER.debug("Start loading " + tiles.size() + " tiles.");
-        List<Future<TileImage>> futures = new ArrayList<Future<TileImage>>();
-        java.util.List<TileImage> results = new ArrayList<>();
+        List<Future<Image>> futures = new ArrayList<Future<Image>>();
+        java.util.List<Image> results = new ArrayList<>();
 
         for (Tile tile : tiles) {
             TileImageReaderTask readerTask = new TileImageReaderTask(tile, imaging, forceArgb);
-            Future<TileImage> future = READ_EXECUTOR.submit(readerTask);
+            Future<Image> future = READ_EXECUTOR.submit(readerTask);
             futures.add(future);
         }
 
-        for (Future<TileImage> future : futures) {
+        for (Future<Image> future : futures) {
             try {
                 results.add(future.get());
             } catch (InterruptedException e) {

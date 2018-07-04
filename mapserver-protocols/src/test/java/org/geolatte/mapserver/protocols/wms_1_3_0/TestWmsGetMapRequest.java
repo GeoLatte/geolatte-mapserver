@@ -19,14 +19,14 @@
 
 package org.geolatte.mapserver.protocols.wms_1_3_0;
 
+import org.geolatte.mapserver.http.HttpQueryParams;
+import org.geolatte.mapserver.http.HttpRequest;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -47,7 +47,7 @@ public class TestWmsGetMapRequest {
         baseRequestParameters.put("LAYERS", "basic");
         baseRequestParameters.put("WIDTH", "550");
         baseRequestParameters.put("HEIGHT", "250");
-        baseRequestParameters.put("SRS", "EPSG:4326");
+        baseRequestParameters.put("CRS", "EPSG:4326");
         baseRequestParameters.put("VERSION", "1.1.1");
         baseRequestParameters.put("STYLES", "");
     }
@@ -55,9 +55,9 @@ public class TestWmsGetMapRequest {
 
     @Test
     public void test_setting_params() throws InvalidWmsRequestException {
-        getMapRequest.set(WmsParam.VERSION, "1.0.0");
+        getMapRequest.set(WmsParam.VERSION, Optional.of("1.0.0"));
         assertEquals("1.0.0", getMapRequest.get(WmsParam.VERSION));
-        getMapRequest.set(WmsParam.VERSION, "1.1.1");
+        getMapRequest.set(WmsParam.VERSION, Optional.of("1.1.1"));
         assertEquals("1.1.1", getMapRequest.get(WmsParam.VERSION));
     }
 
@@ -65,7 +65,7 @@ public class TestWmsGetMapRequest {
     @Test
     public void test_adapt() throws InvalidWmsRequestException {
         baseRequestParameters.put("OPTIONAL", "TEST");
-        HttpServletRequest request = makeRequest(baseRequestParameters);
+        HttpRequest request = makeRequest(baseRequestParameters);
         WmsGetMapRequest wmsGetMap = (WmsGetMapRequest) WmsRequest.adapt(request);
         assertEquals(new WmsBbox(-130, 24, -66, 50), wmsGetMap.getBbox());
         assertEquals("image/png", wmsGetMap.getFormat());
@@ -83,7 +83,7 @@ public class TestWmsGetMapRequest {
     public void test_version_under_alternative_name() throws InvalidWmsRequestException {
         baseRequestParameters.remove("VERSION");
         baseRequestParameters.put("WMTVER", "1.1.1");
-        HttpServletRequest request = makeRequest(baseRequestParameters);
+        HttpRequest request = makeRequest(baseRequestParameters);
 
         WmsGetMapRequest wmsGetMap = (WmsGetMapRequest) WmsRequest.adapt(request);
         assertEquals("EPSG:4326", wmsGetMap.getSrs());
@@ -95,7 +95,7 @@ public class TestWmsGetMapRequest {
     public void test_multiple_layers_and_styles_name() throws InvalidWmsRequestException {
         baseRequestParameters.put("LAYERS", "basic,osm");
         baseRequestParameters.put("STYLES", "basic_style,osm_style");
-        HttpServletRequest request = makeRequest(baseRequestParameters);
+        HttpRequest request = makeRequest(baseRequestParameters);
         WmsGetMapRequest wmsGetMap = (WmsGetMapRequest) WmsRequest.adapt(request);
 
         assertEquals("basic", wmsGetMap.getLayers()[0]);
@@ -108,7 +108,7 @@ public class TestWmsGetMapRequest {
     @Test
     public void test_required_param_missing_throws_InvalidWMSRequestException() {
         baseRequestParameters.remove("LAYERS");
-        HttpServletRequest request = makeRequest(baseRequestParameters);
+        HttpRequest request = makeRequest(baseRequestParameters);
 
         try {
             WmsGetMapRequest wmsGetMap = (WmsGetMapRequest) WmsRequest.adapt(request);
@@ -121,38 +121,33 @@ public class TestWmsGetMapRequest {
 
     @Test
     public void test_response_content_equals_request_format() throws InvalidWmsRequestException {
-        HttpServletRequest request = makeRequest(baseRequestParameters);
+        HttpRequest request = makeRequest(baseRequestParameters);
         WmsRequest wmsReq = WmsRequest.adapt(request);
         assertEquals("image/png", wmsReq.getResponseContentType());
 
         baseRequestParameters.put("FORMAT", "image/jpeg");
-        HttpServletRequest requestJpeg = makeRequest(baseRequestParameters);
+        HttpRequest requestJpeg = makeRequest(baseRequestParameters);
         wmsReq = WmsRequest.adapt(requestJpeg);
         assertEquals("image/jpeg", wmsReq.getResponseContentType());
 
     }
 
-    private HttpServletRequest makeRequest(Map<String, String> parameters) {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        String parameterNames = extractParameterNameTokens(parameters);
-        when(request.getParameterNames()).thenReturn((Enumeration)new StringTokenizer(parameterNames, ","), (Enumeration)new StringTokenizer(parameterNames, ","));
-        for (String param : parameters.keySet()) {
-            when(request.getParameter(param)).thenReturn(parameters.get(param), parameters.get(param));
-        }
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8090/wms_1_3_0"));
-        return request;
-    }
+    private HttpRequest makeRequest(Map<String, String> parameters)  {
+        HttpQueryParams qparams = mock(HttpQueryParams.class);
+        HttpRequest request = mock(HttpRequest.class);
 
-    private String extractParameterNameTokens(Map<String, String> parameters) {
-        StringBuilder stb = null;
-        for (String parameterName : parameters.keySet()) {
-            if (stb == null) {
-                stb = new StringBuilder(parameterName);
-            } else {
-                stb.append(",").append(parameterName);
-            }
+        when(request.parseQuery()).thenReturn(qparams);
+        for (String param : parameters.keySet()) {
+            when(qparams.firstValue(param)).thenReturn(Optional.ofNullable(parameters.get(param)), Optional.ofNullable(parameters.get(param)));
         }
-        return stb.toString();
+        when(qparams.allParams()).thenReturn(parameters.keySet());
+
+        try {
+            when(request.uri()).thenReturn(new URI("http://localhost:8090/wms_1_3_0?REQUEST=GETMAP&VERSION=1.3.0&"));
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        return request;
     }
 
 

@@ -19,6 +19,7 @@
 
 package org.geolatte.mapserver.tilemap;
 
+import org.geolatte.geom.Envelope;
 import org.geolatte.mapserver.TMSTestSupport;
 import org.geolatte.mapserver.util.PixelRange;
 import org.junit.Before;
@@ -76,6 +77,7 @@ public class TestTileMap {
 
     }
 
+    //TODO complete test
 //    @Test
 //    public void test_tile_bbox() {
 //        TileSet tileSet = tileMap.getTileSets().get(2);

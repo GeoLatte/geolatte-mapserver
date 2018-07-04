@@ -19,10 +19,11 @@
 
 package org.geolatte.mapserver.tilemap;
 
+import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.mapserver.TMSTestSupport;
-import org.geolatte.mapserver.boot.BootServiceRegistry;
-import org.geolatte.mapserver.boot.ServiceRegistry;
+import org.geolatte.mapserver.ServiceRegistry;
+import org.geolatte.mapserver.image.Image;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
@@ -35,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 
 public class TestBoundingBoxOp {
 
-    private ServiceRegistry registry = ServiceRegistry.getDefault();
+    private ServiceRegistry registry = ServiceRegistry.getInstance();
     private TileMap tileMap = TMSTestSupport.makeOSMTileMap();
     private TileMap orthoMap = TMSTestSupport.makeOrthoTileMap();
 
@@ -44,11 +45,11 @@ public class TestBoundingBoxOp {
     //  - ensure envelopes correspond to the TileMap CRS (this is not now the case for the tilecache test cases
     @Test
     public void test_normal_execute() throws IOException {
-        Envelope bbox = new Envelope(-170, -80, 170, 80, tileMap.getCoordinateReferenceSystem());
+        Envelope<C2D> bbox = new Envelope<>(-170, -80, 170, 80, tileMap.getCoordinateReferenceSystem());
         File f = new File("/tmp/normal-execute-tilecache.png");
         executeAndWriteToFile(bbox, f, tileMap);
 
-        bbox = new Envelope(20000, 160000, 180000, 240000, orthoMap.getCoordinateReferenceSystem());
+        bbox = new Envelope<>(20000, 160000, 180000, 240000, orthoMap.getCoordinateReferenceSystem());
 //        bbox = new Envelope(40000, 180000, 80000, 200000, orthoMap.getCoordinateReferenceSystem());
         f = new File("/tmp/normal-execute-ortho.png");
         executeAndWriteToFile(bbox, f, orthoMap);
@@ -56,9 +57,9 @@ public class TestBoundingBoxOp {
     }
 
     private void executeAndWriteToFile(Envelope bbox, File f, TileMap map) throws IOException {
-        BoundingBoxOp boundingBoxOp = new BoundingBoxOp(map, bbox, new Dimension(512, 256), registry.getImaging());
-        TileImage tileImage = boundingBoxOp.execute();
-        BufferedImage received =  tileImage.getInternalRepresentation(BufferedImage.class);
+        BoundingBoxOp boundingBoxOp = new BoundingBoxOp(map, bbox, new Dimension(512, 256), registry.imaging());
+        Image image = boundingBoxOp.execute();
+        BufferedImage received =  image.getInternalRepresentation(BufferedImage.class);
         assertEquals(256, received.getHeight(), 0.0000005);
         assertEquals(512, received.getWidth(), 0.0000005);
         ImageIO.write(received, "PNG", f);
@@ -67,11 +68,11 @@ public class TestBoundingBoxOp {
     @Test
     public void test_bbox_partially_exceeds_tileset_bounds() throws IOException {
 
-        Envelope bbox = new Envelope(0, 0, 190, 110, tileMap.getCoordinateReferenceSystem());
+        Envelope<C2D> bbox = new Envelope<>(0, 0, 190, 110, tileMap.getCoordinateReferenceSystem());
         File f = new File("/tmp/partially-exceeds-execute-tilecache.png");
         executeAndWriteToFile(bbox, f, tileMap);
 
-        bbox = new Envelope(10000, 140000, 190000, 230000, orthoMap.getCoordinateReferenceSystem());
+        bbox = new Envelope<>(10000, 140000, 190000, 230000, orthoMap.getCoordinateReferenceSystem());
         f = new File("/tmp/partially-exceeds-execute-ortho.png");
         executeAndWriteToFile(bbox, f, orthoMap);
 
@@ -80,11 +81,11 @@ public class TestBoundingBoxOp {
     @Test
     public void test_bbox_fully_exceeds_tileset_bounds() throws IOException {
 
-        Envelope bbox = new Envelope(-180, -100, 200, 90, tileMap.getCoordinateReferenceSystem());
+        Envelope<C2D> bbox = new Envelope<>(-180, -100, 200, 90, tileMap.getCoordinateReferenceSystem());
         File f = new File("/tmp/fully-exceeds-execute-tilecache.png");
         executeAndWriteToFile(bbox, f, tileMap);
 
-        bbox = new Envelope(10000, 140000, 270000, 270000, orthoMap.getCoordinateReferenceSystem());
+        bbox = new Envelope<>(10000, 140000, 270000, 270000, orthoMap.getCoordinateReferenceSystem());
         f = new File("/tmp/fully-exceeds-execute-ortho.png");
         executeAndWriteToFile(bbox, f, orthoMap);
 
@@ -93,11 +94,11 @@ public class TestBoundingBoxOp {
     @Test
     public void test_bbox_outside_of_tilemap_extent_returns_empty_image() throws IOException {
 
-        Envelope bbox = new Envelope(300, 300, 400, 400, tileMap.getCoordinateReferenceSystem());
+        Envelope<C2D> bbox = new Envelope<>(300, 300, 400, 400, tileMap.getCoordinateReferenceSystem());
         File f = new File("/tmp/empty-image-because-bbox-not-in-extent-tilecache.png");
         executeAndWriteToFile(bbox, f, tileMap);
 
-        bbox = new Envelope(300, 300, 400, 400, orthoMap.getCoordinateReferenceSystem());
+        bbox = new Envelope<>(300, 300, 400, 400, orthoMap.getCoordinateReferenceSystem());
         f = new File("/tmp/empty-image-because-bbox-not-in-extent-orthos.png");
         executeAndWriteToFile(bbox, f, orthoMap);
 
@@ -106,15 +107,15 @@ public class TestBoundingBoxOp {
     @Test
     public void test_empty_bbox_returns_empty_image() throws IOException {
 
-        Envelope bbox = new Envelope(1, 1, -1, -1, tileMap.getCoordinateReferenceSystem());
+        Envelope<C2D> bbox = new Envelope<>(1, 1, -1, -1, tileMap.getCoordinateReferenceSystem());
         File f = new File("/tmp/empty-image-because-empty-bbox-tilecache.png");
         executeAndWriteToFile(bbox, f, tileMap);
 
-        bbox = new Envelope(50000, 200000, 50000, 200000, orthoMap.getCoordinateReferenceSystem());
+        bbox = new Envelope<>(50000, 200000, 50000, 200000, orthoMap.getCoordinateReferenceSystem());
         f = new File("/tmp/empty-image-because-empty-bbox-orthos.png");
         executeAndWriteToFile(bbox, f, orthoMap);
 
-        bbox = new Envelope(50000, 200000, 50002, 200002, orthoMap.getCoordinateReferenceSystem());
+        bbox = new Envelope<>(50000, 200000, 50002, 200002, orthoMap.getCoordinateReferenceSystem());
         f = new File("/tmp/empty-image-because-empty-bbox-orthos.png");
         executeAndWriteToFile(bbox, f, orthoMap);
 

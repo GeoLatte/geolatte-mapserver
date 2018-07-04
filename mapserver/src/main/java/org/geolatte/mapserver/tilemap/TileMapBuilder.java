@@ -23,12 +23,11 @@ import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Point;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.mapserver.core.ImageFormat;
+import org.geolatte.mapserver.image.ImageFormat;
 
 import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,14 +56,14 @@ public class TileMapBuilder {
         if(bbox.isEmpty()) throw new IllegalStateException("require non-empty bounding box");
         Point<C2D> origin = point(crs, originPos);
         Dimension tileDim = getTileDimension();
-        TileFormat tileFormat = new TileFormat(tileDim, tileMimeType, tileExtension);
+        TileMetadata tileMetadata = new TileMetadata(tileDim, tileMimeType, tileExtension);
         List<TileSet> tileSets = buildTileSets(tileDim, root, origin, bbox);
         return new TileMap(root,
                 name,
                 crs,
                 bbox,
                 origin,
-                tileFormat,
+                tileMetadata,
                 forceArgb,
                 tileSets);
     }
@@ -105,6 +104,10 @@ public class TileMapBuilder {
         this.maxX = maxX;
         this.maxY = maxY;
         return this;
+    }
+
+    public TileMapBuilder envelope(List<Double> coordinates) {
+        return envelope(coordinates.get(0), coordinates.get(1), coordinates.get(2), coordinates.get(3));
     }
 
     public TileMapBuilder origin(double x, double y) {

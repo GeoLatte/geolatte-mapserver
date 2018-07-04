@@ -24,7 +24,7 @@ import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.mapserver.spi.CoordinateTransforms;
+import org.geolatte.mapserver.transform.CoordinateTransforms;
 
 /**
  * Transforms bounding boxes to Lat/Lon

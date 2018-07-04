@@ -25,7 +25,7 @@ public class TestTileSetChooser {
 
     static TileMap tileMap = TMSTestSupport.makeOrthoTileMap();
 
-    //these tests need to be redone
+    //TODO these tests need to be redone
 
 //    @Test
 //    public void test_determine_request_UnitsPerPixel_squarebox() {

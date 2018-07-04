@@ -32,6 +32,14 @@ import static org.geolatte.geom.builder.DSL.point;
 import static org.geolatte.mapserver.util.EnvelopUtils.height;
 import static org.geolatte.mapserver.util.EnvelopUtils.width;
 
+/**
+ * The Coordinate Space for a TileSet
+ *
+ *<p>
+ * This conforms to the original <a href="https://wiki.osgeo.org/wiki/Tile_Map_Service_Specification">TMS specification</a>.
+ *
+ *</p>
+ */
 public class TileSetCoordinateSpace {
 
     private final Point<C2D> origin;

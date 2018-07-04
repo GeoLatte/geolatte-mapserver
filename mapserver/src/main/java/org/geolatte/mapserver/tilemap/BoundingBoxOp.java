@@ -21,17 +21,15 @@ package org.geolatte.mapserver.tilemap;
 
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
-import org.geolatte.mapserver.spi.Imaging;
+import org.geolatte.mapserver.image.Image;
+import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.util.Chrono;
 import org.geolatte.mapserver.util.PixelRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.geolatte.mapserver.util.EnvelopUtils.height;
 import static org.geolatte.mapserver.util.EnvelopUtils.width;
@@ -52,7 +50,7 @@ import static org.geolatte.mapserver.util.EnvelopUtils.width;
  *
  * @author Karel Maesen, Geovise BVBA
  */
-public class BoundingBoxOp implements TileMapOperation<TileImage> {
+public class BoundingBoxOp implements TileMapOperation<Image> {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(BoundingBoxOp.class);
 
@@ -63,8 +61,8 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
     private Envelope<C2D> tileSetClippedBbox;
     private int tileSet;
     private java.util.List<Tile> tiles;
-    private java.util.List<TileImage> images = new ArrayList<>();
-    private TileImage result;
+    private java.util.List<Image> images = new ArrayList<>();
+    private Image result;
     private Chrono chrono;
     private PixelRange imgBounds;
 
@@ -91,7 +89,7 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
      * the specified image dimensions.
      */
     @Override
-    public TileImage execute() {
+    public Image execute() {
         if (tileSetClippedBbox.isEmpty() || width(tileSetClippedBbox) < 1 || height(tileSetClippedBbox) < 1) {
             return imaging.createEmptyImage(this.dimension, this.tileMap.getTileImageFormat());
         }
@@ -142,7 +140,7 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
     }
 
     private void embedInEmptyImage() {
-        TileImage empty = createEmptyBackgroundImage();
+        Image empty = createEmptyBackgroundImage();
         applyEmbeddingTransform();
         result = imaging.overlay(empty, result);
     }
@@ -157,8 +155,8 @@ public class BoundingBoxOp implements TileMapOperation<TileImage> {
         result = imaging.affineTransform(result, tx, ty, sx, sy);
     }
 
-    private TileImage createEmptyBackgroundImage() {
-        TileImage empty = imaging.createEmptyImage(result, dimension);
+    private Image createEmptyBackgroundImage() {
+        Image empty = imaging.createEmptyImage(result, dimension);
         return empty;
     }
 

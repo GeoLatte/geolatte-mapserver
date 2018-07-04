@@ -24,9 +24,7 @@ import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Point;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsId;
-import org.geolatte.mapserver.core.ImageFormat;
-import org.geolatte.mapserver.core.MapRequest;
-import org.geolatte.mapserver.spi.Imaging;
+import org.geolatte.mapserver.image.ImageFormat;
 import org.geolatte.mapserver.util.PixelRange;
 
 import java.net.MalformedURLException;
@@ -51,7 +49,7 @@ public class TileMap {
     private final String title;
     private final Envelope<C2D> maxBoundingBox;
     private final Point origin;
-    private final TileFormat tileFormat;
+    private final TileMetadata tileMetadata;
     private final List<TileSet> tileSets;
 
     private TileImageSourceFactory tileImageSourceFactory;
@@ -59,13 +57,13 @@ public class TileMap {
     private boolean forceArgb;
 
     TileMap(String serviceURL, String title, CoordinateReferenceSystem<C2D> crs, Envelope<C2D> bbox,
-            Point origin, TileFormat tileFormat, boolean forceArgb,
+            Point origin, TileMetadata tileMetadata, boolean forceArgb,
             List<TileSet> tileSets) throws IllegalArgumentException {
         this.serviceUrl = serviceURL;
         tileImageSourceFactory = makeTileImageSourceFactory(this.serviceUrl);
         this.title = title;
         this.maxBoundingBox = bbox;
-        this.tileFormat = tileFormat;
+        this.tileMetadata = tileMetadata;
         this.crs = crs;
         this.origin = origin;
         //ensure that tileSets are sorted by order
@@ -73,17 +71,6 @@ public class TileMap {
         this.tileSets = tileSets;
         this.forceArgb = forceArgb;
     }
-
-    private TileImageSourceFactory makeTileImageSourceFactory(String serviceUrl) {
-        try {
-            URL url = new URL(serviceUrl);
-            return new URLTileImageSourceFactory();
-        } catch (MalformedURLException e) {
-            return new FileTileImageSourceFactory();
-        }
-
-    }
-
 
     /**
      * Returns the {@link Tile}s in the {@link TileSet} that overlap the <code>BoundingBox</code>.
@@ -96,52 +83,21 @@ public class TileMap {
         return getTilesFor(tileSets.get(order), bbox);
     }
 
-    private List<Tile> getTilesFor(TileSet set, Envelope<C2D> bbox) {
-        if (outsideMaxBoundingBox(bbox))
-            throw new IllegalArgumentException(String.format("Request BoundingBox: %s exceeds maximum bounding box: %s", bbox.toString(), getBoundingBox().toString()));
-        List<Tile> result = new ArrayList<>();
-        TileCoordinate llIdx = lowerLeftTileCoordinate(bbox, set);
-        TileCoordinate urIdx = upperRightTileCoordinate(bbox, set);
-        List<TileCoordinate> coordinateBlock = TileCoordinate.range(llIdx, urIdx);
-        for (TileCoordinate tileCoordinate : coordinateBlock) {
-            result.add(makeTile(set, tileCoordinate));
-        }
-        return result;
+
+    public String getServiceUrl() {
+        return serviceUrl;
     }
 
-    public PixelRange pixelBounds(int tileSetOrder, Envelope<C2D> bbox){
-        return getTileSets().get(tileSetOrder).pixelBounds(bbox);
+    public Envelope<C2D> getMaxBoundingBox() {
+        return maxBoundingBox;
     }
 
-    /**
-     * Determines whether the given <code>BoundingBox</code> falls outside the extent
-     * of the extent of this <code>TileMap</code>.
-     *
-     * @param bbox the <code>BoundingBox</code> to test
-     * @return true if the <code>BoundingBox</code> specified by the bbox argument falls at least partly wihtin
-     * the extent of this <code>TileMap</code>, and false otherwise.
-     */
-    public boolean outsideMaxBoundingBox(Envelope<C2D> bbox) {
-        return (bbox.lowerLeft().getX() < getBoundingBox().lowerLeft().getX()
-                || bbox.lowerLeft().getY() < getBoundingBox().lowerLeft().getY()
-                || bbox.upperRight().getX() > getBoundingBox().upperRight().getX()
-                || bbox.upperRight().getY() > getBoundingBox().upperRight().getY());
+    public Point getOrigin() {
+        return origin;
     }
 
-    /**
-     * Creates a {@link Tile} for the specified {@link TileCoordinate} in the specified {@link TileSet}.
-     *
-     * @param order          the <code>TileSet</code>.
-     * @param tileCoordinate the <code>TileCoordinate</code>
-     * @return a <code>Tile</code> in the <code>TileSet</code> specified by the set argument for the coordinate specified by tileCoordinate argument
-     */
-    public Tile makeTile(int order, TileCoordinate tileCoordinate) {
-        return makeTile(tileSets.get(order), tileCoordinate);
-    }
-
-    private Tile makeTile(TileSet set, TileCoordinate tileCoordinate) {
-        TileImageSource source = tileImageSourceFactory.create(set, tileCoordinate, tileFormat.extension);
-        return new Tile(source, tileCoordinate, set.getTileCoordinateSpace());
+    public TileMetadata getTileMetadata() {
+        return tileMetadata;
     }
 
     /**
@@ -192,11 +148,71 @@ public class TileMap {
      * @return the <code>ImageFormat</code> of this <code>TileMap</code>'s tiles
      */
     public ImageFormat getTileImageFormat() {
-        if ("image/jpeg".equalsIgnoreCase(tileFormat.mimeType))
+        if ("image/jpeg".equalsIgnoreCase(tileMetadata.mimeType))
             return ImageFormat.JPEG;
         else
             return ImageFormat.PNG;
     }
+
+
+
+    private TileImageSourceFactory makeTileImageSourceFactory(String serviceUrl) {
+        try {
+            URL url = new URL(serviceUrl);
+            return new URLTileImageSourceFactory();
+        } catch (MalformedURLException e) {
+            return new FileTileImageSourceFactory();
+        }
+    }
+
+    private List<Tile> getTilesFor(TileSet set, Envelope<C2D> bbox) {
+        if (outsideMaxBoundingBox(bbox))
+            throw new IllegalArgumentException(String.format("Request BoundingBox: %s exceeds maximum bounding box: %s", bbox.toString(), getBoundingBox().toString()));
+        List<Tile> result = new ArrayList<>();
+        TileCoordinate llIdx = lowerLeftTileCoordinate(bbox, set);
+        TileCoordinate urIdx = upperRightTileCoordinate(bbox, set);
+        List<TileCoordinate> coordinateBlock = TileCoordinate.range(llIdx, urIdx);
+        for (TileCoordinate tileCoordinate : coordinateBlock) {
+            result.add(makeTile(set, tileCoordinate));
+        }
+        return result;
+    }
+
+    PixelRange pixelBounds(int tileSetOrder, Envelope<C2D> bbox){
+        return getTileSets().get(tileSetOrder).pixelBounds(bbox);
+    }
+
+    /**
+     * Determines whether the given <code>BoundingBox</code> falls outside the extent
+     * of the extent of this <code>TileMap</code>.
+     *
+     * @param bbox the <code>BoundingBox</code> to test
+     * @return true if the <code>BoundingBox</code> specified by the bbox argument falls at least partly wihtin
+     * the extent of this <code>TileMap</code>, and false otherwise.
+     */
+    boolean outsideMaxBoundingBox(Envelope<C2D> bbox) {
+        return (bbox.lowerLeft().getX() < getBoundingBox().lowerLeft().getX()
+                || bbox.lowerLeft().getY() < getBoundingBox().lowerLeft().getY()
+                || bbox.upperRight().getX() > getBoundingBox().upperRight().getX()
+                || bbox.upperRight().getY() > getBoundingBox().upperRight().getY());
+    }
+
+    /**
+     * Creates a {@link Tile} for the specified {@link TileCoordinate} in the specified {@link TileSet}.
+     *
+     * @param order          the <code>TileSet</code>.
+     * @param tileCoordinate the <code>TileCoordinate</code>
+     * @return a <code>Tile</code> in the <code>TileSet</code> specified by the set argument for the coordinate specified by tileCoordinate argument
+     */
+    public Tile makeTile(int order, TileCoordinate tileCoordinate) {
+        return makeTile(tileSets.get(order), tileCoordinate);
+    }
+
+    private Tile makeTile(TileSet set, TileCoordinate tileCoordinate) {
+        TileImageSource source = tileImageSourceFactory.create(set, tileCoordinate, tileMetadata.extension);
+        return new Tile(source, tileCoordinate, set.getTileCoordinateSpace());
+    }
+
 
     private TileCoordinate lowerLeftTileCoordinate(Envelope<C2D> bbox, TileSet set) {
         Point<C2D> ll = point(bbox.getCoordinateReferenceSystem(), bbox.lowerLeft());

@@ -1,6 +1,16 @@
 package org.geolatte.mapserver.protocols.wms_1_3_0;
 
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
+import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CrsRegistry;
+
 import java.util.Objects;
+
+import static java.lang.String.format;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 10/05/2018.
@@ -50,5 +60,19 @@ public class WmsBbox {
     public int hashCode() {
 
         return Objects.hash(minX, minY, maxX, maxY);
+    }
+
+    Envelope<C2D> toEnvelope(String srs) {
+        CrsId crsId = CrsId.parse(srs);
+        if(! crsId.getAuthority().equalsIgnoreCase("EPSG") ) {
+            throw new RuntimeException(format("Only EPSG CRS strings are supported (%s)", srs));
+        }
+        CoordinateReferenceSystem<?> crs = CrsRegistry.getCoordinateReferenceSystemForEPSG(crsId.getCode(), CoordinateReferenceSystems.PROJECTED_2D_METER);
+        if (C2D.class.isAssignableFrom(crs.getPositionClass())) {
+            return new Envelope<>(minX, minY, maxX, maxY, (CoordinateReferenceSystem<C2D>)crs);
+        }  else {
+            return new Envelope<>(minX, minY, maxX, maxY, CoordinateReferenceSystems.WEB_MERCATOR);
+        }
+
     }
 }

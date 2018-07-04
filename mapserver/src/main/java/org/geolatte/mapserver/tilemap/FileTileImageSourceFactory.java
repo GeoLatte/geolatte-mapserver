@@ -34,7 +34,6 @@ public class FileTileImageSourceFactory implements TileImageSourceFactory {
         File tileImageFile = pathToTile(tileSetDirectory, coordinate, extension);
         if (!tileSetDirectory.exists()) {
             //TODO return an empty TileImageSource and log a warning
-            //check if behaviour is the same with the URLTISF
             throw new RuntimeException(String.format("Tile %s does not exist.", tileImageFile.getAbsolutePath()));
         }
         return new FileTileImageSource(tileImageFile);

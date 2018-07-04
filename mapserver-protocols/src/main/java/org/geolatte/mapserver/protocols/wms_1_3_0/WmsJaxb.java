@@ -20,8 +20,8 @@
 package org.geolatte.mapserver.protocols.wms_1_3_0;
 
 import net.opengis.wms.v_1_3_0.*;
-import org.geolatte.mapserver.core.ImageFormat;
-import org.geolatte.mapserver.core.ServiceMetadata;
+import org.geolatte.mapserver.image.ImageFormat;
+import org.geolatte.mapserver.ServiceMetadata;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -29,7 +29,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;

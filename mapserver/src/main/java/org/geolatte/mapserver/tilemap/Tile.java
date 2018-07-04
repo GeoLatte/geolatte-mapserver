@@ -22,11 +22,11 @@ package org.geolatte.mapserver.tilemap;
 
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
-import org.geolatte.mapserver.spi.Imaging;
+import org.geolatte.mapserver.image.Image;
+import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.util.PixelRange;
 
 import java.awt.*;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
@@ -70,7 +70,7 @@ public class Tile {
      * @param imaging the <code>Imaging</code> implementation to use for decoding the image
      * @return
      */
-    public TileImage getImage(Imaging imaging, boolean forceArgb) {
+    public Image getImage(Imaging imaging, boolean forceArgb) {
         InputStream is = null;
         PixelRange pb = getPixelBounds();
         try {

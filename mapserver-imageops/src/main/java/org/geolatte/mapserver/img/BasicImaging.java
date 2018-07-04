@@ -2,10 +2,10 @@ package org.geolatte.mapserver.img;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsId;
-import org.geolatte.mapserver.core.ImageFormat;
-import org.geolatte.mapserver.spi.Imaging;
+import org.geolatte.mapserver.image.Image;
+import org.geolatte.mapserver.image.ImageFormat;
+import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.tilemap.MapUnitToPixelTransform;
-import org.geolatte.mapserver.tilemap.TileImage;
 import org.geolatte.mapserver.util.PixelRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,15 +17,14 @@ import java.awt.image.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static java.awt.image.AffineTransformOp.TYPE_BICUBIC;
 import static java.lang.String.format;
 
 /**
- * Created by Karel Maesen, Geovise BVBA on 13/04/2018.
+ * Created by Karel Maesen, Geovise BVBA on 06/07/2018.
  */
-public class BasicImaging implements Imaging {
+class BasicImaging implements Imaging {
 
     private static final Logger logger = LoggerFactory.getLogger(BasicImaging.class);
 
@@ -33,9 +32,9 @@ public class BasicImaging implements Imaging {
 
 
     @Override
-    public TileImage createEmptyImage(Dimension dimension, ImageFormat tileImageFormat) {
+    public Image createEmptyImage(Dimension dimension, ImageFormat tileImageFormat) {
         BufferedImage img = createEmptyImage(dimension);
-        return new BasicTileImage(img, 0, 0);
+        return new BasicImage(img, 0, 0);
     }
 
     private BufferedImage createEmptyImage(Dimension dimension) {
@@ -43,22 +42,22 @@ public class BasicImaging implements Imaging {
     }
 
     @Override
-    public TileImage createEmptyImage(TileImage baseImage, Dimension dimension) {
+    public Image createEmptyImage(Image baseImage, Dimension dimension) {
         BufferedImage img = createCompatibleBufferedImage(baseImage, dimension);
-        return new BasicTileImage(img, 0, 0);
+        return new BasicImage(img, 0, 0);
     }
 
-    private BufferedImage createCompatibleBufferedImage(TileImage baseImage, Dimension dimension) {
+    private BufferedImage createCompatibleBufferedImage(Image baseImage, Dimension dimension) {
         BufferedImage img = (BufferedImage) baseImage.getInternalRepresentation();
         WritableRaster raster = img.getData().createCompatibleWritableRaster(dimension.width, dimension.height);
         return new BufferedImage(img.getColorModel(), raster, img.isAlphaPremultiplied(), null);
     }
 
     @Override
-    public TileImage mosaic(java.util.List<TileImage> images, PixelRange imgBounds) {
+    public Image mosaic(java.util.List<Image> images, PixelRange imgBounds) {
         if (images.isEmpty()) throw new IllegalArgumentException("Require at least one image");
-        BasicTileImage baseTile = (BasicTileImage) images.get(0);
-        if(imgBounds.getWidth() == 0 || imgBounds.getHeight() == 0) {
+        BasicImage baseTile = (BasicImage) images.get(0);
+        if (imgBounds.getWidth() == 0 || imgBounds.getHeight() == 0) {
             return createEmptyImage(baseTile, atLeastOnePixel(imgBounds));
         }
         BufferedImage baseImage = getIndexedColorsConverted(baseTile);
@@ -66,18 +65,18 @@ public class BasicImaging implements Imaging {
         WritableRaster raster = baseImage.getData().createCompatibleWritableRaster(dimension.width, dimension.height);
         BufferedImage res = new BufferedImage(baseImage.getColorModel(), raster, baseImage.isAlphaPremultiplied(), null);
         mosaic(images, imgBounds, res);
-        return new BasicTileImage(res, imgBounds.getMinX(), imgBounds.getMinY());
+        return new BasicImage(res, imgBounds.getMinX(), imgBounds.getMinY());
     }
 
     private Dimension atLeastOnePixel(PixelRange imgBounds) {
-        return new Dimension(Math.max(imgBounds.getWidth(), 1), Math.max(imgBounds.getHeight(),1));
+        return new Dimension(Math.max(imgBounds.getWidth(), 1), Math.max(imgBounds.getHeight(), 1));
     }
 
-    private void mosaic(List<TileImage> images, PixelRange imgBounds, BufferedImage target) {
+    private void mosaic(List<Image> images, PixelRange imgBounds, BufferedImage target) {
         //Note -- this was first implemented with a setRect() directly on the image raster, but this
         //    failed on jpeg images (pixel values at source and target were different after setRect).
         Graphics2D g2 = (Graphics2D) target.getGraphics();
-        for (TileImage ti : images) {
+        for (Image ti : images) {
             BufferedImage current = getIndexedColorsConverted(ti);
             int tx = ti.getMinX() - imgBounds.getMinX();
             int ty = ti.getMinY() - imgBounds.getMinY();
@@ -90,11 +89,11 @@ public class BasicImaging implements Imaging {
      * In the case of an IndexColorModel, we immediately transform to explicit RGB values, otherwise image colors won't
      * match when copying data elements from source to destination raster.
      *
-     * @param tileImage
+     * @param image
      * @return
      */
-    private BufferedImage getIndexedColorsConverted(TileImage tileImage) {
-        BufferedImage bi = tileImage.getInternalRepresentation(BufferedImage.class);
+    private BufferedImage getIndexedColorsConverted(Image image) {
+        BufferedImage bi = image.getInternalRepresentation(BufferedImage.class);
         if (IndexColorModel.class.isAssignableFrom(bi.getColorModel().getClass())) {
             BufferedImage tmp = ((IndexColorModel) bi.getColorModel()).convertToIntDiscrete(bi.getData(), false);
             bi = tmp;
@@ -103,7 +102,7 @@ public class BasicImaging implements Imaging {
     }
 
     @Override
-    public TileImage crop(TileImage source, PixelRange cropBnds) {
+    public Image crop(Image source, PixelRange cropBnds) {
         BufferedImage srcImg = (BufferedImage) source.getInternalRepresentation();
         int minX = cropBnds.getMinX() - source.getMinX();
         int minY = cropBnds.getMinY() - source.getMinY();
@@ -111,11 +110,11 @@ public class BasicImaging implements Imaging {
                 minY,
                 cropBnds.getWidth(),
                 cropBnds.getHeight());
-        return new BasicTileImage(cropped, cropBnds.getMinX(), cropBnds.getMinY());
+        return new BasicImage(cropped, cropBnds.getMinX(), cropBnds.getMinY());
     }
 
     @Override
-    public TileImage scale(TileImage source, Dimension dimension) {
+    public Image scale(Image source, Dimension dimension) {
         float xScale = (float) (dimension.getWidth() / source.getWidth());
         float yScale = (float) (dimension.getHeight() / source.getHeight());
         if (xScale == 1.0f && yScale == 1.0f) return source;
@@ -127,11 +126,11 @@ public class BasicImaging implements Imaging {
         graphics2D.drawImage((BufferedImage) source.getInternalRepresentation(), 0, 0, null);
         graphics2D.dispose();
         ;
-        return new BasicTileImage(target, source.getMinX(), source.getMinY());
+        return new BasicImage(target, source.getMinX(), source.getMinY());
     }
 
     @Override
-    public TileImage overlay(TileImage src1, TileImage src2) {
+    public Image overlay(Image src1, Image src2) {
         BufferedImage img1 = get(src1);
         BufferedImage img2 = get(src2);
 
@@ -143,7 +142,7 @@ public class BasicImaging implements Imaging {
             logger.debug("Attempting Overlay by pixel copy");
             overlayByPixelCopy(img1, img2, target);
         }
-        return new BasicTileImage(target, src1.getMinX(), src1.getMinY());
+        return new BasicImage(target, src1.getMinX(), src1.getMinY());
     }
 
     private void overlayByGraphicsDrawImage(BufferedImage img2, BufferedImage target) {
@@ -191,21 +190,21 @@ public class BasicImaging implements Imaging {
     }
 
     @Override
-    public TileImage affineTransform(TileImage tileImage, AffineTransform atf) {
-        BufferedImage src = get(tileImage);
+    public Image affineTransform(Image image, AffineTransform atf) {
+        BufferedImage src = get(image);
         AffineTransformOp op = new AffineTransformOp(atf, TYPE_BICUBIC);
         double[] box = new double[4];
-        tileImage.toArray(box);
+        image.toArray(box);
         atf.transform(box, 0, box, 0, 2);
         PixelRange trPixelRange = PixelRange.fromArray(box);
-        BufferedImage dst = createCompatibleBufferedImage(tileImage, trPixelRange.getDimension());
+        BufferedImage dst = createCompatibleBufferedImage(image, trPixelRange.getDimension());
         op.filter(src, dst);
-        return new BasicTileImage(dst, trPixelRange.getMinX(), trPixelRange.getMinY());
+        return new BasicImage(dst, trPixelRange.getMinX(), trPixelRange.getMinY());
     }
 
     @Override
-    public TileImage affineTransform(TileImage tileImage, int tx, int ty, double sx, double sy) {
-        BufferedImage src = get(tileImage);
+    public Image affineTransform(Image image, int tx, int ty, double sx, double sy) {
+        BufferedImage src = get(image);
         BufferedImage scaled;
         if (sx == 1.0d && sy == 1.0d) {
             scaled = src;
@@ -214,11 +213,11 @@ public class BasicImaging implements Imaging {
             AffineTransformOp op = new AffineTransformOp(atf, TYPE_BICUBIC);
             scaled = op.filter(src, null);
         }
-        return new BasicTileImage(scaled, tileImage.getMinX() + tx, tileImage.getMinY() + ty);
+        return new BasicImage(scaled, image.getMinX() + tx, image.getMinY() + ty);
     }
 
     @Override
-    public TileImage read(InputStream is, int minX, int minY, boolean forceArgb) throws IOException {
+    public Image read(InputStream is, int minX, int minY, boolean forceArgb) throws IOException {
         BufferedImage bi = ImageIO.read(is);
 
         if (forceArgb) {
@@ -227,15 +226,15 @@ public class BasicImaging implements Imaging {
             bi = rgbImage;
         }
 
-        return new BasicTileImage(bi, minX, minY);
+        return new BasicImage(bi, minX, minY);
     }
 
     @Override
-    public TileImage reprojectByWarping(TileImage srcImg, MapUnitToPixelTransform mupTransform, CrsId srs, CoordinateReferenceSystem<?> requestedSRS, MapUnitToPixelTransform targetMupTransform, double v) {
+    public Image reprojectByWarping(Image srcImg, MapUnitToPixelTransform mupTransform, CrsId srs, CoordinateReferenceSystem<?> requestedSRS, MapUnitToPixelTransform targetMupTransform, double v) {
         throw new UnsupportedOperationException("Warping is not supported");
     }
 
-    private BufferedImage get(TileImage tile) {
+    private BufferedImage get(Image tile) {
         return tile.getInternalRepresentation(BufferedImage.class);
     }
 }

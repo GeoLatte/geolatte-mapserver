@@ -19,11 +19,12 @@
 
 package org.geolatte.mapserver.tilemap;
 
-import org.geolatte.mapserver.spi.Imaging;
+import org.geolatte.mapserver.image.Image;
+import org.geolatte.mapserver.image.Imaging;
 
 import java.util.concurrent.Callable;
 
-public class TileImageReaderTask implements Callable<TileImage> {
+public class TileImageReaderTask implements Callable<Image> {
 
     private final Tile tile;
     private final Imaging imageTool;
@@ -35,7 +36,7 @@ public class TileImageReaderTask implements Callable<TileImage> {
         this.forceArgb = forceArgb;
     }
 
-    public TileImage call() throws Exception {
+    public Image call() throws Exception {
         return tile.getImage(imageTool, forceArgb);
     }
 }

@@ -19,6 +19,10 @@
 
 package org.geolatte.mapserver.protocols.wms_1_3_0;
 
+import org.geolatte.mapserver.protocols.OsmGetCapabiltiesRequest;
+import org.geolatte.mapserver.request.MapServerRequest;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 public class WmsGetCapabilitiesRequest extends WmsRequest {
 
 
@@ -55,4 +59,11 @@ public class WmsGetCapabilitiesRequest extends WmsRequest {
     public String getResponseContentType() {
         return OgcMimeTypes.CAPABILITIES;
     }
+
+    @Override
+    MapServerRequest toMapServerRequest() {
+        return new OsmGetCapabiltiesRequest(getService(), getVersion(), getResponseContentType());
+    }
+
+
 }

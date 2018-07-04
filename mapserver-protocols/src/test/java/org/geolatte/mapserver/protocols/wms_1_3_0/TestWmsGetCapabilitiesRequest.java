@@ -19,11 +19,13 @@
 
 package org.geolatte.mapserver.protocols.wms_1_3_0;
 
+import org.geolatte.mapserver.http.HttpQueryParams;
+import org.geolatte.mapserver.http.HttpRequest;
 import org.junit.Test;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Enumeration;
-import java.util.StringTokenizer;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -33,62 +35,65 @@ import static org.mockito.Mockito.when;
 public class TestWmsGetCapabilitiesRequest {
 
     @Test
-    public void test_adapt_normal() throws InvalidWmsRequestException {
-        HttpServletRequest request = mock(HttpServletRequest.class);
+    public void test_adapt_normal() throws InvalidWmsRequestException, URISyntaxException {
 
-        String params = "REQUEST,VERSION,SERVICE,UPDATESEQUENCE";
+        HttpQueryParams qparams = mock(HttpQueryParams.class);
+        HttpRequest request = mock(HttpRequest.class);
 
-        when(request.getParameterNames()).thenReturn((Enumeration) new StringTokenizer(params, ","), (Enumeration) new StringTokenizer(params, ","));
-        when(request.getParameter("REQUEST")).thenReturn("GetCapabilities", "GetCapabilities");
-        when(request.getParameter("VERSION")).thenReturn("1.1.1");
-        when(request.getParameter("SERVICE")).thenReturn("WMS");
-        when(request.getParameter("UPDATESEQUENCE")).thenReturn("0");
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8090/wms_1_3_0"));
+        Set<String> params = new HashSet<>(Arrays.asList("REQUEST", "VERSION", "SERVICE", "UPDATESEQUENCE"));
 
+        when(qparams.allParams()).thenReturn(params);
+        when(qparams.firstValue("REQUEST")).thenReturn(Optional.of("GetCapabilities"), Optional.of("GetCapabilities"));
+        when(qparams.firstValue("VERSION")).thenReturn(Optional.of("1.3.0"));
+        when(qparams.firstValue("SERVICE")).thenReturn(Optional.of("WMS"));
+        when(qparams.firstValue("UPDATESEQUENCE")).thenReturn(Optional.of("0"));
+        when(request.uri()).thenReturn( new URI("http://localhost:8090/wms_1_3_0"));
 
+        when(request.parseQuery()).thenReturn(qparams);
         WmsGetCapabilitiesRequest wmsGetCapabilities = (WmsGetCapabilitiesRequest) WmsRequest.adapt(request);
         assertEquals("GetCapabilities", wmsGetCapabilities.getRequest());
-        assertEquals("1.1.1", wmsGetCapabilities.getVersion());
+        assertEquals("1.3.0", wmsGetCapabilities.getVersion());
         assertEquals("WMS", wmsGetCapabilities.getService());
         assertEquals("0", wmsGetCapabilities.getUpdateSequence());
 
     }
 
     @Test
-    public void test_adapt_only_required_params() throws InvalidWmsRequestException {
-        HttpServletRequest request = mock(HttpServletRequest.class);
+    public void test_adapt_only_required_params() throws InvalidWmsRequestException, URISyntaxException {
+        HttpQueryParams qparams = mock(HttpQueryParams.class);
+        HttpRequest request = mock(HttpRequest.class);
 
-        String params = "REQUEST,SERVICE";
-        when(request.getParameterNames()).thenReturn((Enumeration) new StringTokenizer(params, ","), (Enumeration) new StringTokenizer(params, ","));
-        when(request.getParameter("REQUEST")).thenReturn("GetCapabilities", "GetCapabilities");
-        when(request.getParameter("SERVICE")).thenReturn("WMS");
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8090/wms_1_3_0"));
+        Set<String> params = new HashSet<>(Arrays.asList("REQUEST", "SERVICE", "VERSION"));
+
+        when(qparams.allParams()).thenReturn(params);
+        when(qparams.firstValue("REQUEST")).thenReturn(Optional.of("GetCapabilities"), Optional.of("GetCapabilities"));
+        when(qparams.firstValue("VERSION")).thenReturn(Optional.of("1.3.0"));
+        when(qparams.firstValue("SERVICE")).thenReturn(Optional.of("WMS"));
+        when(request.parseQuery()).thenReturn(qparams);
+        when(request.uri()).thenReturn( new URI("http://localhost:8090/wms_1_3_0"));
 
         WmsGetCapabilitiesRequest wmsGetCapabilities = (WmsGetCapabilitiesRequest) WmsRequest.adapt(request);
         assertEquals("GetCapabilities", wmsGetCapabilities.getRequest());
         assertEquals("WMS", wmsGetCapabilities.getService());
 
-
     }
 
-    @Test
-    public void test_adapt_missing_required_param() {
-        HttpServletRequest request = mock(HttpServletRequest.class);
+    @Test(expected = IllegalArgumentException.class)
+    public void test_adapt_missing_required_param() throws InvalidWmsRequestException, URISyntaxException {
+        HttpQueryParams qparams = mock(HttpQueryParams.class);
+        HttpRequest request = mock(HttpRequest.class);
 
-        String params = "REQUEST";
-        Enumeration e = new StringTokenizer(params, ",");
+        Set<String> params = new HashSet<>(Arrays.asList("VERSION", "SERVICE"));
 
-        when(request.getParameterNames()).thenReturn((Enumeration)new StringTokenizer(params, ","), (Enumeration)new StringTokenizer(params, ","));
-        when(request.getParameter("REQUEST")).thenReturn("GetCapabilities", "GetCapabilities");
-        when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost:8090/wms_1_3_0"));
+        when(qparams.firstValue("REQUEST")).thenReturn(Optional.empty());
+        when(qparams.firstValue("VERSION")).thenReturn(Optional.of("1.3.0"));
+        when(qparams.firstValue("SERVICE")).thenReturn(Optional.of("WMS"));
+        when(qparams.allParams()).thenReturn(params);
+        when(request.parseQuery()).thenReturn(qparams);
+        when(request.uri()).thenReturn( new URI("http://localhost:8090/wms_1_3_0"));
 
+        WmsGetCapabilitiesRequest wmsGetCapabilities = (WmsGetCapabilitiesRequest) WmsRequest.adapt(request);
 
-        try {
-            WmsGetCapabilitiesRequest wmsGetCapabilities = (WmsGetCapabilitiesRequest) WmsRequest.adapt(request);
-            fail();
-        } catch (InvalidWmsRequestException e1) {
-            //OK
-        }
 
     }
 

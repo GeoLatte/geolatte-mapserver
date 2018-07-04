@@ -22,10 +22,10 @@ package org.geolatte.mapserver.protocols.wms_1_3_0;
 import net.opengis.wms.v_1_3_0.Request;
 import net.opengis.wms.v_1_3_0.Service;
 import net.opengis.wms.v_1_3_0.WMSCapabilities;
-import org.geolatte.mapserver.core.ImageFormat;
-import org.geolatte.mapserver.core.ServiceMetadata;
-import org.geolatte.mapserver.core.ServiceMetadataBuilder;
+import org.geolatte.mapserver.image.ImageFormat;
+import org.geolatte.mapserver.ServiceMetadata;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +37,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
@@ -57,27 +58,24 @@ public class TestWMSCapabilities {
 
     @Before
     public void setUp() {
-        serviceMetadata = new ServiceMetadataBuilder()
-                .serviceIdentifaction()
-                .title("Test WMS")
-                .abstractText("This is an abstract")
-                .serviceTypeURN("urn:ogc:service:wms_1_3_0")
-                .serviceTypeVersion("1.3.0")
-                .keywords("keyword1", "keyword2")
-                .end()
-                .operations()
-                .addGetCapabilitiesOperation("http://maps.example.com/cap?")
-                .addGetMapOperation("http://maps.example.com/wms/map?",
-                        ImageFormat.PNG, ImageFormat.JPEG)
-                .end()
-                .onlineResource("http://maps.example.com/wms")
-                .build();
-
+        serviceMetadata = new ServiceMetadata(
+                new ServiceMetadata.ServiceIdentification(
+                        "urn:ogc:service:wms_1_3_0", "1.3.0", "Test WMS", "This is an abstract", asList("keyword1", "keyword2")),
+                new ServiceMetadata.ServiceProvider("test")
+                , new ServiceMetadata.OperationsMetadata(
+                asList(
+                        new ServiceMetadata.GetMapOperation("http://maps.example.com/wms/map?", asList(ImageFormat.PNG, ImageFormat.JPEG)),
+                        new ServiceMetadata.GetCapabilitiesOperation("http://maps.example.com/cap?")
+                )
+        ),
+            "1.3.0",
+            "http://maps.example.com/wms"
+    );
     }
 
 
     @Test
-//    @Ignore // ignore because this is not really a test
+    @Ignore // ignore because this is not really a test
     public void testMarshalling() throws IOException, JAXBException {
         WMSCapabilities wmsCapabilities = jaxb.createWMSCapabilities(serviceMetadata);
         File testFile = File.createTempFile("capabilities", ".xml");

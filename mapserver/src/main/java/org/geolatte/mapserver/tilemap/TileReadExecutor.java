@@ -19,6 +19,8 @@
 
 package org.geolatte.mapserver.tilemap;
 
+import org.geolatte.mapserver.image.Image;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -35,7 +37,7 @@ public class TileReadExecutor {
         pool = Executors.newCachedThreadPool();
     }
 
-    synchronized public Future<TileImage> submit(TileImageReaderTask imageReaderTask) {
+    synchronized public Future<Image> submit(TileImageReaderTask imageReaderTask) {
         return pool.submit(imageReaderTask);
     }
 

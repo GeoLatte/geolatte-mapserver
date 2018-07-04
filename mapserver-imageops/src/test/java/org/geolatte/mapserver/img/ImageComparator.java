@@ -1,6 +1,6 @@
 package org.geolatte.mapserver.img;
 
-import org.geolatte.mapserver.tilemap.TileImage;
+import org.geolatte.mapserver.image.Image;
 
 import java.awt.*;
 import java.awt.image.Raster;
@@ -26,16 +26,6 @@ public class ImageComparator {
         if (!sameRasterData(r1, r2)) return false;
 
         return true;
-    }
-
-    public static void assertTileImageEquals(TileImage expected, TileImage received) {
-        assertImageEquals(expected.getInternalRepresentation(RenderedImage.class),
-                received.getInternalRepresentation(RenderedImage.class)
-        );
-    }
-
-    public static void assertImageEquals(RenderedImage expected, RenderedImage received) {
-        assertTrue(equals(expected, received));
     }
 
     private static boolean sameBands(Raster r1, Raster r2) {

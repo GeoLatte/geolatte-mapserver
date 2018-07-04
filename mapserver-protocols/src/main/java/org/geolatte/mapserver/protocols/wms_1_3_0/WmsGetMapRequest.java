@@ -19,6 +19,10 @@
 
 package org.geolatte.mapserver.protocols.wms_1_3_0;
 
+import org.geolatte.geom.crs.CrsId;
+import org.geolatte.mapserver.request.MapServerRequest;
+import org.geolatte.mapserver.protocols.OsmGetMapRequest;
+
 import java.awt.*;
 
 public class WmsGetMapRequest extends WmsRequest {
@@ -32,7 +36,7 @@ public class WmsGetMapRequest extends WmsRequest {
     @WmsParameter(required = false, param = WmsParam.STYLES)
     // making this optional is not in conformance with WMS spec!
     private String[] styles;
-    @WmsParameter(required = true, param = WmsParam.SRS)
+    @WmsParameter(required = true, param = WmsParam.CRS)
     private String srs;
     @WmsParameter(required = true, param = WmsParam.BBOX)
     private WmsBbox bbox;
@@ -93,8 +97,11 @@ public class WmsGetMapRequest extends WmsRequest {
         return bbox;
     }
 
-    public String getBgcolor() {
-        return bgcolor;
+    public Color getBgcolor() {
+        if(bgcolor == null) {
+            return Color.WHITE; //TODO -- configurable background color?
+        }
+        return Color.decode(bgcolor);
     }
 
 
@@ -132,4 +139,22 @@ public class WmsGetMapRequest extends WmsRequest {
             return format;
         }
     }
+
+    @Override
+    MapServerRequest toMapServerRequest() {
+        return new OsmGetMapRequest(
+                this.bbox.toEnvelope(this.srs),
+                this.layers[0], // todo -- needs improvement -- support for more than one layer!!
+                CrsId.parse(this.srs),
+                this.getDimension(),
+                "true".equalsIgnoreCase(this.transparent),
+                this.getBgcolor(),
+                this.styles == null  || this.styles.length == 0 ? "" : this.styles[0],
+                format
+        );
+    }
+
+
+
+
 }

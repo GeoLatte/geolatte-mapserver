@@ -21,29 +21,21 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.johnzon</groupId>
-            <artifactId>johnzon-core</artifactId>
+            <groupId>com.typesafe</groupId>
+            <artifactId>config</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.johnzon</groupId>
-            <artifactId>johnzon-mapper</artifactId>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.johnzon</groupId>
-            <artifactId>johnzon-jsonb</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
         </dependency>
 
-
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-json_1.1_spec</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jsonb_1.0_spec</artifactId>
-        </dependency>
     </dependencies>
 </project>

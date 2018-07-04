@@ -164,79 +164,20 @@
                 <scope>test</scope>
             </dependency>
 
-            <!--  Jonhzon for json-b processing -->
+            <!-- for configuration -->
             <dependency>
-                <groupId>org.apache.johnzon</groupId>
-                <artifactId>johnzon-core</artifactId>
-                <version>${johnzon.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.johnzon</groupId>
-                <artifactId>johnzon-mapper</artifactId>
-                <version>${johnzon.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.johnzon</groupId>
-                <artifactId>johnzon-jsonb</artifactId>
-                <version>${johnzon.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-json_1.1_spec</artifactId>
-                <version>${jsonspecversion}</version>
-                <scope>compile</scope> <!-- or compile if your environment doesn't provide it -->
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-jsonb_1.0_spec</artifactId>
-                <version>${jsonbspecversion}</version>
-                <scope>compile</scope> <!-- or compile if your environment doesn't provide it -->
-            </dependency>
-
-            <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>${servlet.api.version}</version>
+                <groupId>com.typesafe</groupId>
+                <artifactId>config</artifactId>
+                <version>1.3.2</version>
             </dependency>
 
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-all</artifactId>
-                <version>1.8.5</version> <!--TODO : update Mockito library -->
+                <version>1.8.5</version> <!--TODO : update Mockito library, or remove -->
                 <scope>test</scope>
             </dependency>
 
-
-            <!-- -->
-
-
-            <!--<dependency>-->
-            <!--<groupId>dom4j</groupId>-->
-            <!--<artifactId>dom4j</artifactId>-->
-            <!--<version>1.6.1</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-            <!--<groupId>jaxen</groupId>-->
-            <!--<artifactId>jaxen</artifactId>-->
-            <!--<version>1.1.1</version>-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-            <!--<groupId>org.eclipse.jetty</groupId>-->
-            <!--<artifactId>jetty-webapp</artifactId>-->
-            <!--<version>7.0.0.RC6</version>-->
-            <!--</dependency>-->
-
-
-            <!--<dependency>-->
-            <!--<groupId>com.jayway.restassured</groupId>-->
-            <!--<artifactId>rest-assured</artifactId>-->
-            <!--<version>1.4</version>-->
-            <!--<scope>test</scope>-->
-            <!--</dependency>-->
 
         </dependencies>
     </dependencyManagement>

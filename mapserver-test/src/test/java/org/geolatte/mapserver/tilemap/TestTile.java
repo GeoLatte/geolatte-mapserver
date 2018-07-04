@@ -1,8 +1,9 @@
 package org.geolatte.mapserver.tilemap;
 
 import org.geolatte.mapserver.TMSTestSupport;
-import org.geolatte.mapserver.boot.ServiceRegistry;
-import org.geolatte.mapserver.spi.Imaging;
+import org.geolatte.mapserver.ServiceRegistry;
+import org.geolatte.mapserver.image.Image;
+import org.geolatte.mapserver.image.Imaging;
 import org.junit.Test;
 
 import java.awt.image.BufferedImage;
@@ -13,13 +14,13 @@ import static org.junit.Assert.assertTrue;
 
 public class TestTile {
 
-    private Imaging imaging = ServiceRegistry.getDefault().getImaging();
+    private Imaging imaging = ServiceRegistry.getInstance().imaging();
 
     @Test
     public void test_loading_images() throws IOException {
         Set<Tile> tiles = TMSTestSupport.getTestTiles();
         for (Tile tile : tiles) {
-            TileImage img = tile.getImage(imaging, false);
+            Image img = tile.getImage(imaging, false);
             assertTrue(img.getInternalRepresentation() instanceof BufferedImage);
         }
     }

@@ -4,8 +4,9 @@ package org.geolatte.mapserver.tilemap;
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.mapserver.spi.CoordinateTransforms;
-import org.geolatte.mapserver.spi.Imaging;
+import org.geolatte.mapserver.image.Image;
+import org.geolatte.mapserver.transform.CoordinateTransforms;
+import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.util.Chrono;
 import org.geolatte.mapserver.util.PixelRange;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ import static org.geolatte.mapserver.util.EnvelopUtils.width;
  * @author Karel Maesen, Geovise BVBA
  * creation-date: 7/1/11
  */
-public class BoundingBoxProjectOp implements TileMapOperation<TileImage> {
+public class BoundingBoxProjectOp implements TileMapOperation<Image> {
 
     private final static Logger logger = LoggerFactory.getLogger(BoundingBoxProjectOp.class);
 
@@ -35,7 +36,7 @@ public class BoundingBoxProjectOp implements TileMapOperation<TileImage> {
     private Dimension sourceDimension;
     private TileSet tileSet;
     private Set<Tile> tiles;
-    private Set<TileImage> images;
+    private Set<Image> images;
     private double requestXUnitsPerPixel;
     private double requestYUnitsPerPixel;
 
@@ -62,11 +63,11 @@ public class BoundingBoxProjectOp implements TileMapOperation<TileImage> {
     }
 
     @Override
-    public TileImage execute() {
+    public Image execute() {
         Chrono chrono = new Chrono();
 
         BoundingBoxOp bboxOp = new BoundingBoxOp(tileMap, sourceBBox, sourceDimension, imaging);
-        TileImage srcImg = bboxOp.execute();
+        Image srcImg = bboxOp.execute();
 
 
         //reproject using warp
@@ -81,7 +82,7 @@ public class BoundingBoxProjectOp implements TileMapOperation<TileImage> {
                 (int) (width(srcBBoxInTargetSRS) / requestXUnitsPerPixel),
                 (int) (height(srcBBoxInTargetSRS) / requestYUnitsPerPixel))
         );
-        TileImage projectedImage = imaging.reprojectByWarping(srcImg, mupTransform, tileMap.getSRS(), requestedSRS, targetMupTransform, 0.333);
+        Image projectedImage = imaging.reprojectByWarping(srcImg, mupTransform, tileMap.getSRS(), requestedSRS, targetMupTransform, 0.333);
         logger.debug("Image warping took " + chrono.stop() + " ms.");
 
         //crop to clipped bbox
@@ -93,7 +94,7 @@ public class BoundingBoxProjectOp implements TileMapOperation<TileImage> {
             logger.debug("Original BBOx:" + this.requestedBBox);
             logger.debug("Image pixelRange:" + projectedImage.getMinX() + "," + projectedImage.getMinY() + "," + projectedImage.getMinX() + projectedImage.getWidth() + "," + projectedImage.getMinY() + projectedImage.getHeight());
             logger.debug("Image request src PixelRange: " + srcPixelRange);
-            TileImage result = imaging.crop(projectedImage, srcPixelRange);
+            Image result = imaging.crop(projectedImage, srcPixelRange);
             logger.debug("Warped image clipping took " + chrono.stop() + " ms.");
             return result;
         } catch (Exception e) {

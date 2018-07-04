@@ -19,21 +19,17 @@
 
 package org.geolatte.mapserver.protocols.wms_1_3_0;
 
-import org.geolatte.geom.C2D;
-import org.geolatte.geom.Envelope;
-import org.geolatte.geom.crs.CrsId;
-import org.geolatte.mapserver.core.ServiceMetadata;
+import org.geolatte.mapserver.request.MapServerRequest;
+import org.geolatte.mapserver.ServiceMetadata;
+import org.geolatte.mapserver.http.HttpQueryParams;
+import org.geolatte.mapserver.http.HttpRequest;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public abstract class WmsRequest {
 
@@ -41,20 +37,36 @@ public abstract class WmsRequest {
 
     private String requestURL;
 
-    public static WmsRequest adapt(HttpServletRequest request) throws InvalidWmsRequestException {
+    //These static methods should at a later point be moved into the ProtocolAdapter proper. This has been
+    // postponed because of effect on test code
+
+    static WmsRequest adapt(HttpRequest request) throws InvalidWmsRequestException {
         WmsRequest adapted = makeWMSRequest(request);
-        Enumeration parameterNames = request.getParameterNames();
-        for (; parameterNames.hasMoreElements(); ) {
-            String pname = (String) parameterNames.nextElement();
+        HttpQueryParams httpQueryParams = request.parseQuery();
+        for (String pname: httpQueryParams.allParams() ) {
             WmsParam param = matchRequestParameter(pname);
-            adapted.set(param, request.getParameter(pname));
+            adapted.set(param, httpQueryParams.firstValue(pname));
         }
-        adapted.setRequestURL(request.getRequestURL().toString());
+        adapted.setRequestURL(request.uri().toString());
         adapted.verify();
         return adapted;
     }
 
-    protected static WmsRequest makeWMSRequest(HttpServletRequest request) {
+    static boolean canHandle(HttpRequest request) {
+        String requestParamValue = getRequestParamValue(request);
+        if (ServiceMetadata.GET_MAP_OP.equalsIgnoreCase(requestParamValue)) {
+            return true;
+        }
+        if (ServiceMetadata.GET_CAPABILITIES_OP.equalsIgnoreCase(requestParamValue) ||
+                "capabilities".equalsIgnoreCase(requestParamValue)) {
+            return true;
+        }
+        return false;
+    }
+
+
+
+    private static WmsRequest makeWMSRequest(HttpRequest request) {
         String requestParamValue = getRequestParamValue(request);
 
         //Note that this is more relaxed than the specification,
@@ -71,15 +83,10 @@ public abstract class WmsRequest {
         throw new IllegalArgumentException("Can't find the request parameter, or request not supported."); //OK, so which?
     }
 
-    private static String getRequestParamValue(HttpServletRequest request) {
-
-        for (Enumeration params = request.getParameterNames(); params.hasMoreElements(); ) {
-            String pname = (String) params.nextElement();
-            if (pname.equalsIgnoreCase("request")) {
-                return request.getParameter(pname);
-            }
-        }
-        return "";
+    private static String getRequestParamValue(HttpRequest request) {
+        HttpQueryParams httpQueryParams = request.parseQuery();
+        Optional<String> reqParam = httpQueryParams.firstValue("REQUEST");
+        return reqParam.orElse("");
     }
 
     /**
@@ -88,7 +95,7 @@ public abstract class WmsRequest {
      * @param pName HTTP Request parameter
      * @return the corresponding <code>WMSParam</code> instance
      */
-    protected static WmsParam matchRequestParameter(String pName) {
+    private static WmsParam matchRequestParameter(String pName) {
         for (WmsParam param : WmsParam.values()) {
             for (String candidateName : param.getNames()) {
                 if (pName.equalsIgnoreCase(candidateName.toString())) {
@@ -128,23 +135,20 @@ public abstract class WmsRequest {
 
     public abstract String getResponseContentType();
 
-    public Object get(WmsParam param) {
+    Object get(WmsParam param) {
         try {
             Field f = getFieldForParameter(param);
             if (f == null) return null;
             f.setAccessible(true);
             return f.get(this);
-        } catch (SecurityException e) {
-            throw new RuntimeException("Programming Error", e);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Programming Error", e);
-        } catch (IllegalAccessException e) {
+        } catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
             throw new RuntimeException("Programming Error", e);
         }
     }
 
-    public void set(WmsParam param, String value) throws InvalidWmsRequestException {
-        if (param == null) return;
+    void set(WmsParam param, Optional<String> optValue) throws InvalidWmsRequestException {
+        if (param == null || !optValue.isPresent()) return;
+        String value = optValue.get();
         try {
             Field field = getFieldForParameter(param);
             if (field == null) return;
@@ -153,9 +157,7 @@ public abstract class WmsRequest {
             field.set(this, convertedValue);
         } catch (InvocationTargetException e) {
             throw new InvalidWmsRequestException(String.format("Can't set parameter %s to value %s", param, value), e.getCause());
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException("Programming Error", e); //this shouldn't happen.
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException("Programming Error", e); //this shouldn't happen.
         }
     }
@@ -164,7 +166,7 @@ public abstract class WmsRequest {
         return this.requestURL;
     }
 
-    public void setRequestURL(String url) {
+    private void setRequestURL(String url) {
         this.requestURL = url;
     }
 
@@ -188,7 +190,7 @@ public abstract class WmsRequest {
         return null;
     }
 
-    protected Object convertToFieldType(String value, Field f) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    private Object convertToFieldType(String value, Field f) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Object convertedValue = null;
 
         Class<?> type = f.getType();
@@ -214,18 +216,21 @@ public abstract class WmsRequest {
         return m.invoke(this, value);
     }
 
-    public void verify() throws InvalidWmsRequestException {
+    private void verify() throws InvalidWmsRequestException {
         for (Field f : getClass().getDeclaredFields()) {
             WmsParameter pa = getWMSParamAnnotation(f);
             if (pa != null && pa.required()) {
                 Object value = get(pa.param());
                 if (value == null ||
                         value.toString().isEmpty()) {
-                    throw new InvalidWmsRequestException("Required parameter: " + pa.param().toString() + " not found in GetMap request");
+                    throw new InvalidWmsRequestException("Required parameter: " + pa.param().toString() + " not found in WMS request");
                 }
             }
 
         }
     }
 
+
+
+    abstract MapServerRequest toMapServerRequest();
 }

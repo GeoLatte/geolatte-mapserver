@@ -1,7 +1,8 @@
 package org.geolatte.mapserver.tilemap;
 
-import org.geolatte.mapserver.core.MapRequest;
-import org.geolatte.mapserver.spi.Imaging;
+import org.geolatte.mapserver.image.Image;
+import org.geolatte.mapserver.request.GetMapRequest;
+import org.geolatte.mapserver.image.Imaging;
 
 /**
  * <p/>
@@ -15,7 +16,7 @@ import org.geolatte.mapserver.spi.Imaging;
  */
 public class DefaultBoundingBoxOpFactory implements BoundingBoxOpFactory {
     @Override
-    public TileMapOperation<TileImage> create(MapRequest request, TileMap tileMap, Imaging imaging) {
+    public TileMapOperation<Image> create(GetMapRequest request, TileMap tileMap, Imaging imaging) {
         if (tileMap.getSRS().equals(request.getCrs())) {
             return new BoundingBoxOp(tileMap, request.getBbox(), request.getDimension(), imaging);
         } else {
