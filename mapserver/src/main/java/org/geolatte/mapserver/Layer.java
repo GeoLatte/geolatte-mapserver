@@ -12,7 +12,7 @@ public interface Layer {
 
     String getName();
 
-    LayerSourceType getType();
+    LayerType getType();
 
     Image createMapImage(GetMapRequest request);
 

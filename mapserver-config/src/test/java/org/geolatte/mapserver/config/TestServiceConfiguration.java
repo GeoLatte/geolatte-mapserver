@@ -1,8 +1,7 @@
 package org.geolatte.mapserver.config;
 
-import org.geolatte.mapserver.Layer;
-import org.geolatte.mapserver.LayerRegistry;
-import org.geolatte.mapserver.ServiceMetadata;
+import org.geolatte.mapserver.*;
+import org.geolatte.mapserver.features.FeatureSourceFactory;
 import org.geolatte.mapserver.tilemap.TileMetadata;
 import org.geolatte.mapserver.tilemap.TileMapLayer;
 import org.geolatte.mapserver.tilemap.TileSet;
@@ -17,7 +16,7 @@ import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static junit.framework.TestCase.assertTrue;
-import static org.geolatte.mapserver.LayerSourceType.TILE_MAP;
+import static org.geolatte.mapserver.LayerType.TILE_MAP;
 import static org.geolatte.mapserver.image.ImageFormat.JPEG;
 import static org.geolatte.mapserver.image.ImageFormat.PNG;
 import static org.junit.Assert.assertEquals;
@@ -37,6 +36,13 @@ public class TestServiceConfiguration {
     private ServiceMetadata.ServiceIdentification expectedSI;
     private List<ServiceMetadata.Operation> expectedOperations;
 
+    private final FeatureSourceFactoryRegistry fsfregistry = new FeatureSourceFactoryRegistry() {
+        @Override
+        public Optional<FeatureSourceFactory> featureSourceFactoryForType(String canonicalName) {
+            return Optional.empty();
+        }
+    };
+
     @Before
     public void setup() {
         expectedSI = new ServiceMetadata.ServiceIdentification(
@@ -54,7 +60,7 @@ public class TestServiceConfiguration {
 
         ConfigServicProvider provider = new ConfigServicProvider("test-mapserver");
         serviceMetadata = provider.serviceMetadata();
-        registry = provider.layerSourceRegistry();
+        registry = provider.layerSourceRegistry(fsfregistry);
     }
 
     @Test

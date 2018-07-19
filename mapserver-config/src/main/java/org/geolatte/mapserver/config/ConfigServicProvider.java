@@ -2,7 +2,7 @@ package org.geolatte.mapserver.config;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import org.geolatte.mapserver.Layer;
+import org.geolatte.mapserver.FeatureSourceFactoryRegistry;
 import org.geolatte.mapserver.LayerRegistry;
 import org.geolatte.mapserver.ServiceMetadata;
 import org.geolatte.mapserver.image.ImageFormat;
@@ -10,9 +10,6 @@ import org.geolatte.mapserver.spi.LayerRegistryProvider;
 import org.geolatte.mapserver.spi.ServiceMetadataProvider;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.stream.Collectors.toList;
 
@@ -40,10 +37,10 @@ public class ConfigServicProvider implements ServiceMetadataProvider, LayerRegis
     }
 
     @Override
-    public LayerRegistry layerSourceRegistry() {
+    public LayerRegistry layerSourceRegistry(FeatureSourceFactoryRegistry featureSourceFactoryRegistry) {
         Config cf = mainConfig.getConfig(PREFIX);
         Config layersCf = cf.getConfig("layers");
-        return new LayerRegistryBuilder(layersCf).build();
+        return new LayerRegistryBuilder(featureSourceFactoryRegistry, layersCf).build();
     }
 
 

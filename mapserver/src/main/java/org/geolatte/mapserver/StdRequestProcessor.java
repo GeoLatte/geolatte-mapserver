@@ -24,7 +24,6 @@ public class StdRequestProcessor implements RequestProcessor {
 
 
     private final ProtocolAdapter protocolAdapter;
-
     private final RequestHandlerFactory handlerFactory;
 
     public StdRequestProcessor() {
@@ -39,7 +38,8 @@ public class StdRequestProcessor implements RequestProcessor {
         return handlerFactory.create(request).handle();
     }
 
-
-
-
+    @Override
+    public void close() throws Exception {
+        handlerFactory.close();
+    }
 }

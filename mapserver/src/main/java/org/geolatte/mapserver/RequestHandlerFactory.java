@@ -6,12 +6,15 @@ import org.geolatte.mapserver.request.GetMapRequest;
 import org.geolatte.mapserver.request.MapServerRequest;
 
 
+import java.io.Closeable;
+import java.io.IOException;
+
 import static java.lang.String.format;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 19/07/2018.
  */
-public class RequestHandlerFactory {
+public class RequestHandlerFactory implements AutoCloseable {
 
     private final LayerRegistry layerRegistry;
     private final ServiceMetadata serviceMetadata;
@@ -33,6 +36,11 @@ public class RequestHandlerFactory {
         }
 
         throw new IllegalArgumentException(format("Can't handle Request of type %s", request.getClass().getName()));
+    }
+
+    @Override
+    public void close() throws Exception {
+        layerRegistry.close();
     }
 }
 

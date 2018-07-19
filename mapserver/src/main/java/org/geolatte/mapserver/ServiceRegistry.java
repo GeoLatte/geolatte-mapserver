@@ -1,8 +1,12 @@
 package org.geolatte.mapserver;
 
 import org.geolatte.mapserver.boot.BootServiceRegistry;
+import org.geolatte.mapserver.features.FeatureSource;
+import org.geolatte.mapserver.features.FeatureSourceFactory;
 import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.protocols.ProtocolAdapter;
+
+import java.util.Optional;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/05/2018.
@@ -21,4 +25,5 @@ public interface ServiceRegistry {
 
     ServiceMetadata serviceMetadata();
 
+    FeatureSourceFactoryRegistry featureSourceFactoryRegistry();
 }

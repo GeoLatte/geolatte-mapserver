@@ -1,5 +1,6 @@
 package org.geolatte.mapserver.spi;
 
+import org.geolatte.mapserver.FeatureSourceFactoryRegistry;
 import org.geolatte.mapserver.LayerRegistry;
 
 /**
@@ -7,5 +8,5 @@ import org.geolatte.mapserver.LayerRegistry;
  */
 public interface LayerRegistryProvider {
 
-    LayerRegistry layerSourceRegistry();
+    LayerRegistry layerSourceRegistry(FeatureSourceFactoryRegistry featureSourceFactoryRegistry);
 }

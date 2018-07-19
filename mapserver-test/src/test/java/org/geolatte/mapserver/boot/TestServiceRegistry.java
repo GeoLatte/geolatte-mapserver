@@ -1,11 +1,14 @@
 package org.geolatte.mapserver.boot;
 
 import org.geolatte.mapserver.ServiceRegistry;
+import org.geolatte.mapserver.features.FeatureSource;
 import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.protocols.ProtocolAdapter;
 import org.geolatte.mapserver.LayerRegistry;
+import org.geolatte.mapserver.rxhttp.RxHttpFeatureSource;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
