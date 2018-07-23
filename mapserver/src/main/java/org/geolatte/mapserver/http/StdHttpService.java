@@ -1,17 +1,13 @@
-package org.geolatte.mapserver;
+package org.geolatte.mapserver.http;
 
+import org.geolatte.mapserver.RequestHandlerFactory;
+import org.geolatte.mapserver.ServiceRegistry;
 import org.geolatte.mapserver.boot.BootServiceRegistry;
-import org.geolatte.mapserver.http.BasicHttpResponse;
 import org.geolatte.mapserver.http.HttpRequest;
 import org.geolatte.mapserver.http.HttpResponse;
-import org.geolatte.mapserver.image.Image;
-import org.geolatte.mapserver.image.ImageFormat;
+import org.geolatte.mapserver.http.HttpService;
 import org.geolatte.mapserver.protocols.ProtocolAdapter;
-import org.geolatte.mapserver.request.GetMapRequest;
 import org.geolatte.mapserver.request.MapServerRequest;
-
-import java.io.IOException;
-import java.util.Optional;
 
 import static java.lang.String.format;
 
@@ -20,13 +16,13 @@ import static java.lang.String.format;
  * <p>
  * Created by Karel Maesen, Geovise BVBA on 05/07/2018.
  */
-public class StdRequestProcessor implements RequestProcessor {
+public class StdHttpService implements HttpService {
 
 
     private final ProtocolAdapter protocolAdapter;
     private final RequestHandlerFactory handlerFactory;
 
-    public StdRequestProcessor() {
+    public StdHttpService() {
         ServiceRegistry registry = BootServiceRegistry.INSTANCE;
         protocolAdapter = registry.protocolAdapter();
         this.handlerFactory = new RequestHandlerFactory();

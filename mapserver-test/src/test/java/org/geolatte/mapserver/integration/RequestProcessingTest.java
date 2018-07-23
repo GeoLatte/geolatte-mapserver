@@ -1,12 +1,11 @@
 package org.geolatte.mapserver.integration;
 
-import org.geolatte.mapserver.RequestProcessor;
-import org.geolatte.mapserver.StdRequestProcessor;
+import org.geolatte.mapserver.http.HttpService;
+import org.geolatte.mapserver.http.StdHttpService;
 import org.geolatte.mapserver.http.BasicHttpRequest;
 import org.geolatte.mapserver.http.HttpRequest;
 import org.geolatte.mapserver.http.HttpResponse;
 import org.geolatte.mapserver.image.Image;
-import org.geolatte.mapserver.image.ImageFormat;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -22,7 +21,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class RequestProcessingTest {
 
-    private RequestProcessor processor = new StdRequestProcessor();
+    private HttpService processor = new StdHttpService();
     private Map<String, List<String>> baseRequestParameters;
 
     @Test

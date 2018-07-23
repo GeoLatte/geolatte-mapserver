@@ -1,4 +1,4 @@
-package org.geolatte.mapserver;
+package org.geolatte.mapserver.http;
 
 import org.geolatte.mapserver.http.HttpRequest;
 import org.geolatte.mapserver.http.HttpResponse;
@@ -10,7 +10,7 @@ import java.io.Closeable;
  *
  * Created by Karel Maesen, Geovise BVBA on 13/04/2018.
  */
-public interface RequestProcessor extends AutoCloseable {
+public interface HttpService extends AutoCloseable {
 
     HttpResponse process(HttpRequest request);
 

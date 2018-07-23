@@ -26,7 +26,7 @@ public class RequestHandlerFactory implements AutoCloseable {
         protocolAdapter = ServiceRegistry.getInstance().protocolAdapter();
     }
 
-    RequestHandler create(MapServerRequest request){
+    public RequestHandler create(MapServerRequest request){
         if (request instanceof GetMapRequest) {
             return new GetMapRequestHandler((GetMapRequest) request, layerRegistry);
         }
