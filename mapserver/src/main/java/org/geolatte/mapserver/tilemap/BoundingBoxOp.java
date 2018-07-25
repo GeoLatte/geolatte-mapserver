@@ -130,7 +130,7 @@ public class BoundingBoxOp implements TileMapOperation<Image> {
 
     private void scale() {
         if (!tileSetClippedBbox.equals(requestedBbox)) {
-            //if the request bbox is extends beyond the
+            //if the ows bbox is extends beyond the
             // bbox of the TileSet, then we must embed
             // the result in a larger, empty image
             embedInEmptyImage();

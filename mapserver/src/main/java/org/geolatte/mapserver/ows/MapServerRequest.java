@@ -1,4 +1,4 @@
-package org.geolatte.mapserver.request;
+package org.geolatte.mapserver.ows;
 
 /**
  * A Marker interface for all (protocol-independent) mapserver requests

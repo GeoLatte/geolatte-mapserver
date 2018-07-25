@@ -24,7 +24,7 @@ public class TestBasicHttpRequest {
     public void setUp() throws URISyntaxException {
         Map<String, List<String>> headers = new HashMap<>();
         headers.put("Accept", Arrays.asList("text/plain", "application/json"));
-        request = new BasicHttpRequest(new URI("http://localhost/wms?request=getMap&layer=a&layer=b"), "GET", headers);
+        request = new BasicHttpRequest(new URI("http://localhost/wms?ows=getMap&layer=a&layer=b"), "GET", headers);
     }
 
     @Test
@@ -65,12 +65,12 @@ public class TestBasicHttpRequest {
     @Test
     public void testParseQueryParamsRequest() {
         HttpQueryParams params = request.parseQuery();
-        assertThat(params.firstValue("request"), is(Optional.of("getMap")));
+        assertThat(params.firstValue("ows"), is(Optional.of("getMap")));
     }
     @Test
     public void testParseQueryParamNames() {
         HttpQueryParams params = request.parseQuery();
-        assertThat(params.allParams(), hasItems("layer", "request"));
+        assertThat(params.allParams(), hasItems("layer", "ows"));
     }
 
     @Test

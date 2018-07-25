@@ -1,14 +1,16 @@
-package org.geolatte.mapserver;
+package org.geolatte.mapserver.ows;
 
+import org.geolatte.mapserver.Capabilities;
+import org.geolatte.mapserver.RequestHandler;
+import org.geolatte.mapserver.ServiceMetadata;
 import org.geolatte.mapserver.http.BasicHttpResponse;
 import org.geolatte.mapserver.http.HttpResponse;
 import org.geolatte.mapserver.protocols.ProtocolAdapter;
-import org.geolatte.mapserver.request.GetCapabilitiesRequest;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 19/07/2018.
  */
-class GetCapabilitiesHandler implements RequestHandler {
+class GetCapabilitiesHandler implements RequestHandler<HttpResponse> {
 
     private final GetCapabilitiesRequest request;
     private final ServiceMetadata serviceMetadata;

@@ -74,7 +74,7 @@ public class WmsJaxb {
         Marshaller marshaller = null;
         try {
             //JAXB specification doesn't specify Marshaller thread-safety, so we create a new
-            //object for each request.                    
+            //object for each ows.
             marshaller = ctxt.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             marshaller.marshal(element, outputStream);

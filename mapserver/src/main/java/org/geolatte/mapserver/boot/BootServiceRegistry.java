@@ -1,13 +1,10 @@
 package org.geolatte.mapserver.boot;
 
-import org.geolatte.mapserver.FeatureSourceFactoryRegistry;
-import org.geolatte.mapserver.ServiceRegistry;
+import org.geolatte.mapserver.*;
 import org.geolatte.mapserver.features.FeatureSourceFactory;
 import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.protocols.ProtocolAdapter;
-import org.geolatte.mapserver.ServiceMetadata;
 import org.geolatte.mapserver.spi.*;
-import org.geolatte.mapserver.LayerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +73,11 @@ public class BootServiceRegistry implements ServiceRegistry {
     @Override
     public FeatureSourceFactoryRegistry featureSourceFactoryRegistry() {
         return featureSourceFactoryRegistry;
+    }
+
+    @Override
+    public AsyncOperationsStatus asyncOperationsStatus() {
+        return AsyncOperationsStatus.INSTANCE;
     }
 
 }

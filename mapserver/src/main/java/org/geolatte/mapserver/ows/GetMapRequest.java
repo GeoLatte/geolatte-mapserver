@@ -1,4 +1,4 @@
-package org.geolatte.mapserver.request;
+package org.geolatte.mapserver.ows;
 
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;

@@ -19,7 +19,7 @@
 
 package org.geolatte.mapserver.protocols.wms_1_3_0;
 
-import org.geolatte.mapserver.request.MapServerRequest;
+import org.geolatte.mapserver.ows.MapServerRequest;
 import org.geolatte.mapserver.ServiceMetadata;
 import org.geolatte.mapserver.http.HttpQueryParams;
 import org.geolatte.mapserver.http.HttpRequest;
@@ -70,7 +70,7 @@ public abstract class WmsRequest {
         String requestParamValue = getRequestParamValue(request);
 
         //Note that this is more relaxed than the specification,
-        //which states that request parameter values shall be
+        //which states that ows parameter values shall be
         //case sensitive (cfr. p. 13)
         if (ServiceMetadata.GET_MAP_OP.equalsIgnoreCase(requestParamValue)) {
             return new WmsGetMapRequest();
@@ -80,7 +80,7 @@ public abstract class WmsRequest {
                 "capabilities".equalsIgnoreCase(requestParamValue)) {
             return new WmsGetCapabilitiesRequest();
         }
-        throw new IllegalArgumentException("Can't find the request parameter, or request not supported."); //OK, so which?
+        throw new IllegalArgumentException("Can't find the ows parameter, or ows not supported."); //OK, so which?
     }
 
     private static String getRequestParamValue(HttpRequest request) {
@@ -90,7 +90,7 @@ public abstract class WmsRequest {
     }
 
     /**
-     * Maps the request parameter to a <code>WMSParam</code>
+     * Maps the ows parameter to a <code>WMSParam</code>
      *
      * @param pName HTTP Request parameter
      * @return the corresponding <code>WMSParam</code> instance
@@ -223,7 +223,7 @@ public abstract class WmsRequest {
                 Object value = get(pa.param());
                 if (value == null ||
                         value.toString().isEmpty()) {
-                    throw new InvalidWmsRequestException("Required parameter: " + pa.param().toString() + " not found in WMS request");
+                    throw new InvalidWmsRequestException("Required parameter: " + pa.param().toString() + " not found in WMS ows");
                 }
             }
 

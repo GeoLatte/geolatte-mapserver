@@ -26,4 +26,7 @@ public interface ServiceRegistry {
     ServiceMetadata serviceMetadata();
 
     FeatureSourceFactoryRegistry featureSourceFactoryRegistry();
+
+    AsyncOperationsStatus asyncOperationsStatus();
+
 }

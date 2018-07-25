@@ -4,7 +4,7 @@ import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.image.ImageFormat;
-import org.geolatte.mapserver.request.GetMapRequest;
+import org.geolatte.mapserver.ows.GetMapRequest;
 
 import java.awt.*;
 

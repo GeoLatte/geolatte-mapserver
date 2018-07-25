@@ -1,8 +1,8 @@
 package org.geolatte.mapserver.protocols;
 
 import org.geolatte.mapserver.Capabilities;
-import org.geolatte.mapserver.request.GetCapabilitiesRequest;
-import org.geolatte.mapserver.request.MapServerRequest;
+import org.geolatte.mapserver.ows.GetCapabilitiesRequest;
+import org.geolatte.mapserver.ows.MapServerRequest;
 import org.geolatte.mapserver.http.HttpRequest;
 
 import java.util.List;

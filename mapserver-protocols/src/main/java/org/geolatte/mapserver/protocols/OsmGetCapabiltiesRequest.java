@@ -1,6 +1,6 @@
 package org.geolatte.mapserver.protocols;
 
-import org.geolatte.mapserver.request.GetCapabilitiesRequest;
+import org.geolatte.mapserver.ows.GetCapabilitiesRequest;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 19/07/2018.

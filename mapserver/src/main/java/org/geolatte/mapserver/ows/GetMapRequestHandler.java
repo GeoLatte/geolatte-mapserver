@@ -1,10 +1,12 @@
-package org.geolatte.mapserver;
+package org.geolatte.mapserver.ows;
 
+import org.geolatte.mapserver.Layer;
+import org.geolatte.mapserver.LayerRegistry;
+import org.geolatte.mapserver.RequestHandler;
 import org.geolatte.mapserver.http.BasicHttpResponse;
 import org.geolatte.mapserver.http.HttpResponse;
 import org.geolatte.mapserver.image.Image;
 import org.geolatte.mapserver.image.ImageFormat;
-import org.geolatte.mapserver.request.GetMapRequest;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -12,7 +14,7 @@ import java.util.Optional;
 /**
  * Created by Karel Maesen, Geovise BVBA on 19/07/2018.
  */
-public class GetMapRequestHandler implements RequestHandler {
+public class GetMapRequestHandler implements RequestHandler<HttpResponse> {
 
 
     private final GetMapRequest request;

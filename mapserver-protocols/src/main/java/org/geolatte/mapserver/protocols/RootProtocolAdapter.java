@@ -1,10 +1,9 @@
 package org.geolatte.mapserver.protocols;
 
-import jdk.nashorn.internal.runtime.options.Option;
 import org.geolatte.mapserver.Capabilities;
 import org.geolatte.mapserver.http.HttpRequest;
-import org.geolatte.mapserver.request.GetCapabilitiesRequest;
-import org.geolatte.mapserver.request.MapServerRequest;
+import org.geolatte.mapserver.ows.GetCapabilitiesRequest;
+import org.geolatte.mapserver.ows.MapServerRequest;
 import org.geolatte.mapserver.protocols.wms_1_3_0.Wms130ProtocolAdapter;
 
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ public class RootProtocolAdapter implements ProtocolAdapter {
     public MapServerRequest adapt(HttpRequest request) {
         return getFirst( p -> p.canHandle(request) ).map(p -> p.adapt(request))
                 .orElseThrow( () ->
-                        new RuntimeException(format("No registered Adapter can handle this request %s", request.uri().toString()))
+                        new RuntimeException(format("No registered Adapter can handle this ows %s", request.uri().toString()))
                 );
     }
 

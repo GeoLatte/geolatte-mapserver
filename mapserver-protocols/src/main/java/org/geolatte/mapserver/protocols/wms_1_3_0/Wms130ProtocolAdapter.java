@@ -3,14 +3,13 @@ package org.geolatte.mapserver.protocols.wms_1_3_0;
 import net.opengis.wms.v_1_3_0.WMSCapabilities;
 import org.geolatte.mapserver.Capabilities;
 import org.geolatte.mapserver.ServiceMetadata;
-import org.geolatte.mapserver.request.GetCapabilitiesRequest;
-import org.geolatte.mapserver.request.MapServerRequest;
+import org.geolatte.mapserver.ows.GetCapabilitiesRequest;
+import org.geolatte.mapserver.ows.MapServerRequest;
 import org.geolatte.mapserver.protocols.ProtocolAdapter;
 import org.geolatte.mapserver.http.HttpRequest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 
 /**

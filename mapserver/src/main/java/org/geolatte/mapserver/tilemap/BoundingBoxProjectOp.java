@@ -93,7 +93,7 @@ public class BoundingBoxProjectOp implements TileMapOperation<Image> {
             logger.debug("Source BBox in Target SRS: " + srcBBoxInTargetSRS);
             logger.debug("Original BBOx:" + this.requestedBBox);
             logger.debug("Image pixelRange:" + projectedImage.getMinX() + "," + projectedImage.getMinY() + "," + projectedImage.getMinX() + projectedImage.getWidth() + "," + projectedImage.getMinY() + projectedImage.getHeight());
-            logger.debug("Image request src PixelRange: " + srcPixelRange);
+            logger.debug("Image ows src PixelRange: " + srcPixelRange);
             Image result = imaging.crop(projectedImage, srcPixelRange);
             logger.debug("Warped image clipping took " + chrono.stop() + " ms.");
             return result;

@@ -1,7 +1,7 @@
 package org.geolatte.mapserver.integration;
 
-import org.geolatte.mapserver.http.HttpService;
-import org.geolatte.mapserver.http.StdHttpService;
+import org.geolatte.mapserver.ows.HttpService;
+import org.geolatte.mapserver.ows.StdHttpService;
 import org.geolatte.mapserver.http.BasicHttpRequest;
 import org.geolatte.mapserver.http.HttpRequest;
 import org.geolatte.mapserver.http.HttpResponse;
@@ -11,6 +11,9 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.geolatte.mapserver.img.ImageOpsTestSupport.*;
 import static org.junit.Assert.assertEquals;
@@ -19,16 +22,16 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by Karel Maesen, Geovise BVBA on 19/07/2018.
  */
-public class RequestProcessingTest {
+public class HttpServiceTest {
 
-    private HttpService processor = new StdHttpService();
+    private HttpService service = new StdHttpService();
     private Map<String, List<String>> baseRequestParameters;
 
     @Test
-    public void testGetMapFromTileMap() throws IOException {
+    public void testGetMapFromTileMap() throws IOException, InterruptedException, ExecutionException, TimeoutException {
 
         HttpRequest request = buildGetMapRequest();
-        HttpResponse response = processor.process(request);
+        HttpResponse response = service.process(request).get(10, TimeUnit.SECONDS);
 
         assertNotNull(response);
         assertEquals("image/png", response.headers().firstValue("Content-type").get());
@@ -41,9 +44,9 @@ public class RequestProcessingTest {
     }
 
     @Test
-    public void testGetCapabilities() throws IOException {
+    public void testGetCapabilities() throws IOException, InterruptedException, ExecutionException, TimeoutException {
         HttpRequest request = buildGetCapabilitiesRequest();
-        HttpResponse response = processor.process(request);
+        HttpResponse response = service.process(request).get(10, TimeUnit.SECONDS);
 
         assertNotNull(response);
         writeTextFileToTmp(response.body(), "xml");

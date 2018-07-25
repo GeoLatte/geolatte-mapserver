@@ -20,8 +20,7 @@
 package org.geolatte.mapserver.protocols.wms_1_3_0;
 
 import org.geolatte.mapserver.protocols.OsmGetCapabiltiesRequest;
-import org.geolatte.mapserver.request.MapServerRequest;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import org.geolatte.mapserver.ows.MapServerRequest;
 
 public class WmsGetCapabilitiesRequest extends WmsRequest {
 
@@ -50,7 +49,7 @@ public class WmsGetCapabilitiesRequest extends WmsRequest {
         return service;
     }
 
-    //This request parameter is currently ignored.
+    //This ows parameter is currently ignored.
     public String getUpdateSequence() {
         return updateSeq;
     }

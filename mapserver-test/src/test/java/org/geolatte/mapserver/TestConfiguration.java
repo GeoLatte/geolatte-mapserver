@@ -1,6 +1,6 @@
 package org.geolatte.mapserver;
 
-import org.geolatte.mapserver.tilemap.DynamicTileMapLayer;
+import org.geolatte.mapserver.tilemap.RenderableTileMapLayer;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -17,7 +17,7 @@ public class TestConfiguration {
 
         LayerRegistry registry = ServiceRegistry.getInstance().layerRegistry();
         Layer vkb = registry.getLayer("vkb").get();
-        assertThat( vkb , instanceOf(DynamicTileMapLayer.class));
+        assertThat( vkb , instanceOf(RenderableTileMapLayer.class));
     }
 
 }

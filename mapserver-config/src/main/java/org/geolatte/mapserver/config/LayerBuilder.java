@@ -8,7 +8,7 @@ import org.geolatte.mapserver.FeatureSourceFactoryRegistry;
 import org.geolatte.mapserver.Layer;
 import org.geolatte.mapserver.features.FeatureSource;
 import org.geolatte.mapserver.features.FeatureSourceConfig;
-import org.geolatte.mapserver.tilemap.DynamicTileMapLayer;
+import org.geolatte.mapserver.tilemap.RenderableTileMapLayer;
 import org.geolatte.mapserver.tilemap.TileMapBuilder;
 import org.geolatte.mapserver.tilemap.TileMapLayer;
 import org.slf4j.Logger;
@@ -54,7 +54,7 @@ class LayerBuilder {
         optionallyConfigureSource();
 
         if (featureSource != null) {
-            return new DynamicTileMapLayer(name, builder.build(), featureSource);
+            return new RenderableTileMapLayer(name, builder.build(), featureSource);
         } else {
             return new TileMapLayer(name, builder.build());
         }

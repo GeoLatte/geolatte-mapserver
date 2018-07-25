@@ -1,7 +1,7 @@
 package org.geolatte.mapserver;
 
 import org.geolatte.mapserver.image.Image;
-import org.geolatte.mapserver.request.GetMapRequest;
+import org.geolatte.mapserver.ows.GetMapRequest;
 
 /**
  *

@@ -2,7 +2,6 @@ package org.geolatte.mapserver.config;
 
 import org.geolatte.mapserver.*;
 import org.geolatte.mapserver.features.FeatureSourceFactory;
-import org.geolatte.mapserver.tilemap.DynamicTileMapLayer;
 import org.geolatte.mapserver.tilemap.TileMetadata;
 import org.geolatte.mapserver.tilemap.TileMapLayer;
 import org.geolatte.mapserver.tilemap.TileSet;

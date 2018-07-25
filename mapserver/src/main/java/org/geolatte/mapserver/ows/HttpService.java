@@ -1,9 +1,9 @@
-package org.geolatte.mapserver.http;
+package org.geolatte.mapserver.ows;
 
 import org.geolatte.mapserver.http.HttpRequest;
 import org.geolatte.mapserver.http.HttpResponse;
 
-import java.io.Closeable;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * A RequestProcessor is the main entry point for a MapServer.
@@ -12,6 +12,6 @@ import java.io.Closeable;
  */
 public interface HttpService extends AutoCloseable {
 
-    HttpResponse process(HttpRequest request);
+    CompletableFuture<HttpResponse> process(HttpRequest request);
 
 }

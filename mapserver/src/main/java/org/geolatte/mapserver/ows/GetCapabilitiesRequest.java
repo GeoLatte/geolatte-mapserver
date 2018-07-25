@@ -1,4 +1,4 @@
-package org.geolatte.mapserver.request;
+package org.geolatte.mapserver.ows;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 19/07/2018.

@@ -20,7 +20,7 @@
 package org.geolatte.mapserver.protocols.wms_1_3_0;
 
 import org.geolatte.geom.crs.CrsId;
-import org.geolatte.mapserver.request.MapServerRequest;
+import org.geolatte.mapserver.ows.MapServerRequest;
 import org.geolatte.mapserver.protocols.OsmGetMapRequest;
 
 import java.awt.*;
