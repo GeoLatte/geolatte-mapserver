@@ -20,7 +20,7 @@ public class RxHttpFeatureSourceFactory implements FeatureSourceFactory {
     @Override
     public FeatureSource mkFeatureSource(FeatureSourceConfig config) {
         if(config instanceof RxHttpFeatureSource) {
-            throw new IllegalStateException(format("Unexpecte type of config: %s ", config.getClass().getCanonicalName()));
+            throw new IllegalStateException(format("Unexpected type of config: %s ", config.getClass().getCanonicalName()));
         }
         return new RxHttpFeatureSource((RxHttpFeatureSourceConfig) config);
     }

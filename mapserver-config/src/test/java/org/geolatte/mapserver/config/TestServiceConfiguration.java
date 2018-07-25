@@ -2,6 +2,7 @@ package org.geolatte.mapserver.config;
 
 import org.geolatte.mapserver.*;
 import org.geolatte.mapserver.features.FeatureSourceFactory;
+import org.geolatte.mapserver.tilemap.DynamicTileMapLayer;
 import org.geolatte.mapserver.tilemap.TileMetadata;
 import org.geolatte.mapserver.tilemap.TileMapLayer;
 import org.geolatte.mapserver.tilemap.TileSet;
@@ -16,7 +17,6 @@ import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static junit.framework.TestCase.assertTrue;
-import static org.geolatte.mapserver.LayerType.TILE_MAP;
 import static org.geolatte.mapserver.image.ImageFormat.JPEG;
 import static org.geolatte.mapserver.image.ImageFormat.PNG;
 import static org.junit.Assert.assertEquals;
@@ -95,11 +95,10 @@ public class TestServiceConfiguration {
     }
 
     @Test
-    public void testTileMapLayer(){
+    public void testConstantTileMapLayer(){
         Optional<Layer> layerOpt = registry.getLayer("myTilemap");
         assertTrue(layerOpt.isPresent());
         Layer layer = layerOpt.get();
-        assertEquals(TILE_MAP, layer.getType());
         testTileMapStructure((TileMapLayer) layer);
     }
 

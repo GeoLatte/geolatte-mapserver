@@ -6,7 +6,6 @@ import org.geolatte.mapserver.ServiceRegistry;
 import org.geolatte.mapserver.image.Image;
 import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.Layer;
-import org.geolatte.mapserver.LayerType;
 import org.geolatte.mapserver.request.GetMapRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,11 +37,6 @@ public class TileMapLayer implements Layer {
 
     public TileMap getTileMap(){
         return tileMap;
-    }
-
-    @Override
-    public LayerType getType() {
-        return LayerType.TILE_MAP;
     }
 
     @Override

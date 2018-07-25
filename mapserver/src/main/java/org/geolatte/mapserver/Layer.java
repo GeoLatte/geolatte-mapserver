@@ -12,8 +12,6 @@ public interface Layer {
 
     String getName();
 
-    LayerType getType();
-
     Image createMapImage(GetMapRequest request);
 
 }
