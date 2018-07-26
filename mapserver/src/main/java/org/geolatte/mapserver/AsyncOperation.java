@@ -1,5 +1,6 @@
 package org.geolatte.mapserver;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -9,6 +10,10 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface AsyncOperation {
 
+    CompletableFuture<Boolean> asFuture();
 
+    default boolean isDone(){
+        return asFuture().isDone();
+    }
 
 }

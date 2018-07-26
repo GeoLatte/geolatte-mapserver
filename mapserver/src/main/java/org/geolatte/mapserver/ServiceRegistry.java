@@ -13,6 +13,9 @@ import java.util.Optional;
  */
 public interface ServiceRegistry {
 
+    //TODO this method makes it way to easy to couple everywhere -- move ServiceRegistry into the constructor so a different
+    // ServiceRegistry can be used e.g. for testing or mocking.
+    @Deprecated
     static ServiceRegistry getInstance(){
         return BootServiceRegistry.INSTANCE;
     }

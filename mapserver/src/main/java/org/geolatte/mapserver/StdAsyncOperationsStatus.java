@@ -11,17 +11,12 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 class StdAsyncOperationsStatus implements AsyncOperationsStatus {
 
-    private AtomicReference<Timer> cleaner = new AtomicReference<>(mkTimer(6, TimeUnit.HOURS));
-
-
-    private ConcurrentMap<UUID, AsyncOperation> operations = new ConcurrentHashMap<>();
+    final private AtomicReference<Timer> cleaner = new AtomicReference<>(mkTimer(6, TimeUnit.HOURS));
+    final private ConcurrentMap<UUID, AsyncOperation> operations = new ConcurrentHashMap<>();
 
     @Override
     public void scheduleCleanupEvery(int n, TimeUnit unit) {
-
-        this.cleaner.updateAndGet(timer -> updateTimer(timer, n, unit)
-        );
-
+        this.cleaner.updateAndGet(timer -> updateTimer(timer, n, unit));
     }
 
     @Override
@@ -34,17 +29,18 @@ class StdAsyncOperationsStatus implements AsyncOperationsStatus {
         return Optional.ofNullable(operations.get(id));
     }
 
-    private static Timer updateTimer(Timer oldTimer, int n, TimeUnit unit) {
+    private Timer updateTimer(Timer oldTimer, int n, TimeUnit unit) {
         oldTimer.cancel();
         return mkTimer(n, unit);
     }
 
-    private static Timer mkTimer(int n, TimeUnit unit) {
+    private Timer mkTimer(int n, TimeUnit unit) {
+
         TimerTask cleanup = new TimerTask() {
 
             @Override
             public void run() {
-
+                operations.values().removeIf(AsyncOperation::isDone);
             }
         };
         Timer timer = new Timer(true);
