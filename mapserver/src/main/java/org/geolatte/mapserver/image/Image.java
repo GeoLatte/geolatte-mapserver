@@ -37,6 +37,7 @@ public interface Image {
 
 
 
+    @SuppressWarnings("unchecked")
     default public <T> T getInternalRepresentation(Class<T> rep) {
         return (T) getInternalRepresentation();
     }

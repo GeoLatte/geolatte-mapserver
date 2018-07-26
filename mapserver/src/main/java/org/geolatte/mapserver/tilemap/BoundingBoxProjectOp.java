@@ -4,6 +4,7 @@ package org.geolatte.mapserver.tilemap;
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.image.Image;
 import org.geolatte.mapserver.transform.CoordinateTransforms;
 import org.geolatte.mapserver.image.Imaging;
@@ -82,7 +83,8 @@ public class BoundingBoxProjectOp implements TileMapOperation<Image> {
                 (int) (width(srcBBoxInTargetSRS) / requestXUnitsPerPixel),
                 (int) (height(srcBBoxInTargetSRS) / requestYUnitsPerPixel))
         );
-        Image projectedImage = imaging.reprojectByWarping(srcImg, mupTransform, tileMap.getSRS(), requestedSRS, targetMupTransform, 0.333);
+        CrsId crs = tileMap.getCoordinateReferenceSystem().getCrsId();
+        Image projectedImage = imaging.reprojectByWarping(srcImg, mupTransform, crs, requestedSRS, targetMupTransform, 0.333);
         logger.debug("Image warping took " + chrono.stop() + " ms.");
 
         //crop to clipped bbox

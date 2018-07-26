@@ -95,8 +95,7 @@ class BasicImaging implements Imaging {
     private BufferedImage getIndexedColorsConverted(Image image) {
         BufferedImage bi = image.getInternalRepresentation(BufferedImage.class);
         if (IndexColorModel.class.isAssignableFrom(bi.getColorModel().getClass())) {
-            BufferedImage tmp = ((IndexColorModel) bi.getColorModel()).convertToIntDiscrete(bi.getData(), false);
-            bi = tmp;
+            bi = ((IndexColorModel) bi.getColorModel()).convertToIntDiscrete(bi.getData(), false);
         }
         return bi;
     }
@@ -125,7 +124,6 @@ class BasicImaging implements Imaging {
         graphics2D.scale(xScale, yScale);
         graphics2D.drawImage((BufferedImage) source.getInternalRepresentation(), 0, 0, null);
         graphics2D.dispose();
-        ;
         return new BasicImage(target, source.getMinX(), source.getMinY());
     }
 

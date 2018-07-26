@@ -17,7 +17,7 @@ import org.geolatte.mapserver.image.Imaging;
 public class DefaultBoundingBoxOpFactory implements BoundingBoxOpFactory {
     @Override
     public TileMapOperation<Image> create(GetMapRequest request, TileMap tileMap, Imaging imaging) {
-        if (tileMap.getSRS().equals(request.getCrs())) {
+        if (tileMap.getCoordinateReferenceSystem().getCrsId().equals(request.getCrs())) {
             return new BoundingBoxOp(tileMap, request.getBbox(), request.getDimension(), imaging);
         } else {
             throw new UnsupportedOperationException("Reprojecting images is not supported ");
