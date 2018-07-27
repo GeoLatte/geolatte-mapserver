@@ -1,9 +1,9 @@
 package org.geolatte.mapserver.rxhttp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.geolatte.geom.C2D;
 import org.geolatte.geom.Feature;
 import org.geolatte.geom.json.GeolatteGeomModule;
+import org.geolatte.maprenderer.map.PlanarFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
@@ -21,14 +21,14 @@ class GeoJsonDeserializer {
 
     //mutable state
     private String[] jsons;
-    private List<Feature<C2D, ?>> features = new ArrayList<>();
+    private List<PlanarFeature> features = new ArrayList<>();
 
     static {
         mapper = new ObjectMapper();
         mapper.registerModule(new GeolatteGeomModule());
     }
 
-    Observable<Feature<C2D, ?>> deserialize(String chunk) {
+    Observable<PlanarFeature> deserialize(String chunk) {
         splitChunk(chunk);
         deserializeChunks();
         return Observable.from(features);
@@ -44,7 +44,7 @@ class GeoJsonDeserializer {
     private void deserializeChunk(String json) {
         try {
             Feature<?, ?> feature = mapper.readValue(json, Feature.class);
-            features.add((Feature<C2D, ?>) feature);
+            features.add(PlanarFeature.from(feature));
         } catch (Exception e) {
             logger.warn("Failure to parse String to GeoJson", e);
         }

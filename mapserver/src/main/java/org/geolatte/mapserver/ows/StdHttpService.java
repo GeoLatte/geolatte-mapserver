@@ -2,9 +2,7 @@ package org.geolatte.mapserver.ows;
 
 import org.geolatte.mapserver.http.HttpRequest;
 import org.geolatte.mapserver.http.HttpResponse;
-import org.geolatte.mapserver.ServiceRegistry;
-import org.geolatte.mapserver.boot.BootServiceRegistry;
-import org.geolatte.mapserver.protocols.ProtocolAdapter;
+import org.geolatte.mapserver.ServiceLocator;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -20,15 +18,13 @@ public class StdHttpService implements HttpService {
     private final OwsRequestHandlerFactory handlerFactory;
     private final ExecutorService executorService;
 
-    public StdHttpService(ExecutorService executorService) {
-        this.executorService = executorService;
-        ServiceRegistry registry = BootServiceRegistry.INSTANCE;
-
+    public StdHttpService(ServiceLocator serviceLocator) {
+        this.executorService = serviceLocator.executorService();
         this.handlerFactory = new OwsRequestHandlerFactory();
     }
 
     public StdHttpService() {
-        this(Executors.newSingleThreadExecutor());
+        this(ServiceLocator.defaultInstance());
     }
 
     @Override

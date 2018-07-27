@@ -16,10 +16,14 @@ public class OwsRequestHandlerFactory implements RequestHandlerFactory<HttpReque
     private final ServiceMetadata serviceMetadata;
     private final ProtocolAdapter protocolAdapter;
 
+    public OwsRequestHandlerFactory(ServiceLocator serviceLocator) {
+        layerRegistry = serviceLocator.layerRegistry();
+        serviceMetadata = serviceLocator.serviceMetadata();
+        protocolAdapter = serviceLocator.protocolAdapter();
+    }
+
     public OwsRequestHandlerFactory() {
-        layerRegistry = ServiceRegistry.getInstance().layerRegistry();
-        serviceMetadata = ServiceRegistry.getInstance().serviceMetadata();
-        protocolAdapter = ServiceRegistry.getInstance().protocolAdapter();
+        this(ServiceLocator.defaultInstance());
     }
 
     @Override

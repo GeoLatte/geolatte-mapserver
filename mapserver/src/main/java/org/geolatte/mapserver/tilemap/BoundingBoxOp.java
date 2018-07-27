@@ -21,6 +21,7 @@ package org.geolatte.mapserver.tilemap;
 
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
+import org.geolatte.mapserver.ServiceLocator;
 import org.geolatte.mapserver.image.Image;
 import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.util.Chrono;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.geolatte.mapserver.util.EnvelopUtils.height;
 import static org.geolatte.mapserver.util.EnvelopUtils.width;
@@ -72,14 +74,18 @@ public class BoundingBoxOp implements TileMapOperation<Image> {
      * @param tileMap     the <code>TileMap</code> on which to operate
      * @param boundingBox the <code>BoundingBox</code> for the result
      * @param dimension   the image dimensions of the result
-     * @param imaging     the <code>Imaging</code> instance to use for the image-manipulation
+     *
      */
-    public BoundingBoxOp(TileMap tileMap, Envelope<C2D> boundingBox, Dimension dimension, Imaging imaging) {
+    public BoundingBoxOp(TileMap tileMap, Envelope<C2D> boundingBox, Dimension dimension, ServiceLocator locator) {
         this.tileMap = tileMap;
         this.dimension = dimension;
         this.requestedBbox = boundingBox;
-        this.imaging = imaging;
+        this.imaging = locator.imaging();
         this.tileSetClippedBbox = this.tileMap.clipToMaxBoundingBox(boundingBox);
+    }
+
+    public BoundingBoxOp(TileMap tileMap, Envelope<C2D> boundingBox, Dimension dimension) {
+        this(tileMap, boundingBox, dimension, ServiceLocator.defaultInstance());
     }
 
     /**
@@ -98,7 +104,7 @@ public class BoundingBoxOp implements TileMapOperation<Image> {
         getTiles();
         if (tiles.isEmpty()) return imaging.createEmptyImage(dimension, this.tileMap.getTileImageFormat());
         chrono.reset();
-        loadTileImages();
+        getTileImages();
         mosaic();
         scale();
         LOGGER.debug("Image processing took " + chrono.stop() + " ms.");
@@ -112,13 +118,18 @@ public class BoundingBoxOp implements TileMapOperation<Image> {
         LOGGER.debug("TileSet chosen has order = " + tileSet);
     }
 
-    private void getTiles() {
+    protected List<Tile> getTiles() {
         tiles = tileMap.getTilesFor(tileSet, tileSetClippedBbox);
+        return tiles;
     }
 
-    protected void loadTileImages() {
+    protected boolean getIsForceArgb(){
+        return this.tileMap.isForceArgb();
+    }
+
+    protected void getTileImages() {
         TileImageLoadOp loadOp = new TileImageLoadOp(this.tiles, this.imaging, tileMap.isForceArgb());
-        images = loadOp.execute();
+        setImages(loadOp.execute());
         LOGGER.debug("Image loading took " + chrono.stop() + " ms.");
     }
 
@@ -160,5 +171,8 @@ public class BoundingBoxOp implements TileMapOperation<Image> {
         return empty;
     }
 
+    protected void setImages(List<Image> images){
+        this.images = images;
+    }
 
 }

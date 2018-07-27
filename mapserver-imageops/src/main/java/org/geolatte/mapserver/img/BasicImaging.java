@@ -228,6 +228,15 @@ class BasicImaging implements Imaging {
     }
 
     @Override
+    public Image fromRenderedImage(RenderedImage image) {
+        if(image instanceof BufferedImage) {
+            return new BasicImage((BufferedImage) image, 0, 0);
+        } else {
+            throw new UnsupportedOperationException("Not supported conversion");
+        }
+    }
+
+    @Override
     public Image reprojectByWarping(Image srcImg, MapUnitToPixelTransform mupTransform, CrsId srs, CoordinateReferenceSystem<?> requestedSRS, MapUnitToPixelTransform targetMupTransform, double v) {
         throw new UnsupportedOperationException("Warping is not supported");
     }

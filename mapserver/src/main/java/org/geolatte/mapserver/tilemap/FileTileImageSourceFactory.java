@@ -32,10 +32,6 @@ public class FileTileImageSourceFactory implements TileImageSourceFactory {
     public TileImageSource create(TileSet set, TileCoordinate coordinate, String extension) {
         File tileSetDirectory = new File(set.href);
         File tileImageFile = pathToTile(tileSetDirectory, coordinate, extension);
-        if (!tileSetDirectory.exists()) {
-            //TODO return an empty TileImageSource and log a warning
-            throw new RuntimeException(String.format("Tile %s does not exist.", tileImageFile.getAbsolutePath()));
-        }
         return new FileTileImageSource(tileImageFile);
     }
 

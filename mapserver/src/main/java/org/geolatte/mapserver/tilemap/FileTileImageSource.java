@@ -19,10 +19,9 @@
 
 package org.geolatte.mapserver.tilemap;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+
+import static java.lang.String.format;
 
 /**
  * A <code>TileImageSource</code> that retrieves the <code>TileImage</code>
@@ -39,7 +38,27 @@ public class FileTileImageSource implements TileImageSource {
     /**
      * {@inheritDoc}
      */
-    public InputStream open() throws IOException {
-        return new FileInputStream(src);
+    public InputStream toInputStream() throws IOException {
+        return new BufferedInputStream(new FileInputStream(src));
+    }
+
+    @Override
+    public OutputStream toOutputStream() throws IOException {
+        ensureParentDirs();
+        return new BufferedOutputStream(new FileOutputStream(src));
+    }
+
+    private void ensureParentDirs() {
+        if(!src.getParentFile().exists()) {
+            createParentDirs();
+        }
+
+    }
+
+    private void createParentDirs() {
+        boolean success = src.getParentFile().mkdirs();
+        if(!success){
+            throw new RuntimeException(format("Failed to write parent directories for tile %s", src.getAbsolutePath()));
+        }
     }
 }

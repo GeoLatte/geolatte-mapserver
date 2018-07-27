@@ -4,10 +4,12 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigBeanFactory;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.maprenderer.map.Painter;
 import org.geolatte.mapserver.FeatureSourceFactoryRegistry;
 import org.geolatte.mapserver.Layer;
 import org.geolatte.mapserver.features.FeatureSource;
 import org.geolatte.mapserver.features.FeatureSourceConfig;
+import org.geolatte.mapserver.tilemap.RenderContext;
 import org.geolatte.mapserver.tilemap.RenderableTileMapLayer;
 import org.geolatte.mapserver.tilemap.TileMapBuilder;
 import org.geolatte.mapserver.tilemap.TileMapLayer;
@@ -31,6 +33,7 @@ class LayerBuilder {
     final private TileMapBuilder builder;
     final private FeatureSourceFactoryRegistry featureSourceFactoryRegistry;
     private FeatureSource featureSource;
+    private String painterRef;
 
     LayerBuilder(String name, FeatureSourceFactoryRegistry featureSourceFactoryRegistry, Config layerConfig){
         this.name = name;
@@ -51,10 +54,10 @@ class LayerBuilder {
 
         configureTileSets();
 
-        optionallyConfigureSource();
+        optionallyConfigureSourceAndPainter();
 
         if (featureSource != null) {
-            return new RenderableTileMapLayer(name, builder.build(), featureSource);
+            return new RenderableTileMapLayer(name, builder.build(), RenderContext.from(featureSource, painterRef));
         } else {
             return new TileMapLayer(name, builder.build());
         }
@@ -109,9 +112,10 @@ class LayerBuilder {
         builder.crs(CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(code));
     }
 
-    private void optionallyConfigureSource() {
+    private void optionallyConfigureSourceAndPainter() {
         if (layerConfig.hasPath("source")) {
             this.featureSource = mkFeatureSource(layerConfig.getConfig("source"));
+            this.painterRef = layerConfig.getString("painter");
         }
     }
 

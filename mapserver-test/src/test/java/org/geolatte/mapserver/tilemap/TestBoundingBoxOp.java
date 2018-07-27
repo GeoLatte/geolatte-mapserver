@@ -22,8 +22,8 @@ package org.geolatte.mapserver.tilemap;
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.mapserver.TMSTestSupport;
-import org.geolatte.mapserver.ServiceRegistry;
 import org.geolatte.mapserver.image.Image;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
@@ -36,9 +36,15 @@ import static org.junit.Assert.assertEquals;
 
 public class TestBoundingBoxOp {
 
-    private ServiceRegistry registry = ServiceRegistry.getInstance();
-    private TileMap tileMap = TMSTestSupport.makeOSMTileMap();
-    private TileMap orthoMap = TMSTestSupport.makeOrthoTileMap();
+
+    private TileMap tileMap;
+    private TileMap orthoMap;
+
+    @Before
+    public void setup(){
+        tileMap = TMSTestSupport.makeOSMTileMap();
+        orthoMap = TMSTestSupport.makeOrthoTileMap();
+    }
 
     //TODO -- these tests need to be finalized:
     //  - test against reference images
@@ -57,7 +63,7 @@ public class TestBoundingBoxOp {
     }
 
     private void executeAndWriteToFile(Envelope bbox, File f, TileMap map) throws IOException {
-        BoundingBoxOp boundingBoxOp = new BoundingBoxOp(map, bbox, new Dimension(512, 256), registry.imaging());
+        BoundingBoxOp boundingBoxOp = new BoundingBoxOp(map, bbox, new Dimension(512, 256));
         Image image = boundingBoxOp.execute();
         BufferedImage received =  image.getInternalRepresentation(BufferedImage.class);
         assertEquals(256, received.getHeight(), 0.0000005);

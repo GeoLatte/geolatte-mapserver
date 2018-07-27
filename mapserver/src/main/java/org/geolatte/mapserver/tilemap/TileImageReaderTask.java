@@ -37,6 +37,7 @@ public class TileImageReaderTask implements Callable<Image> {
     }
 
     public Image call() throws Exception {
-        return tile.getImage(imageTool, forceArgb);
+        //TODO -- clean this up (when refactoring to modern concurrency approach)
+        return tile.getImage(imageTool, forceArgb).get();
     }
 }

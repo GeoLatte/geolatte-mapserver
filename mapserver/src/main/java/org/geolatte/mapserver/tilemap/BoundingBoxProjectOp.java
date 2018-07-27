@@ -67,7 +67,7 @@ public class BoundingBoxProjectOp implements TileMapOperation<Image> {
     public Image execute() {
         Chrono chrono = new Chrono();
 
-        BoundingBoxOp bboxOp = new BoundingBoxOp(tileMap, sourceBBox, sourceDimension, imaging);
+        BoundingBoxOp bboxOp = new BoundingBoxOp(tileMap, sourceBBox, sourceDimension);
         Image srcImg = bboxOp.execute();
 
 

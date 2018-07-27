@@ -28,7 +28,7 @@ public class MockFeatureServer {
     }
 
     public void buildStub(Envelope<C2D> env, String returnBody) {
-        stubFor(get(urlEqualTo(format("/query?bbox=%s", bboxAsString(env))))
+        stubFor(get(anyUrl())
                 .withHeader("Accept", equalTo("application/json"))
                 .willReturn(aResponse()
                         .withStatus(200)
@@ -39,7 +39,7 @@ public class MockFeatureServer {
     }
 
     private String bboxAsString(Envelope<C2D> env) {
-        return format("%f,%f,%f,%f",
+        return format("%.2f,%.2f,%.2f,%.2f",
                 env.lowerLeft().getX(), env.lowerLeft().getY(),
                 env.upperRight().getX(), env.upperRight().getY());
     }

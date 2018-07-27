@@ -1,11 +1,9 @@
 package org.geolatte.mapserver.boot;
 
-import org.geolatte.mapserver.ServiceRegistry;
-import org.geolatte.mapserver.features.FeatureSource;
+import org.geolatte.mapserver.ServiceLocator;
 import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.protocols.ProtocolAdapter;
 import org.geolatte.mapserver.LayerRegistry;
-import org.geolatte.mapserver.rxhttp.RxHttpFeatureSource;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -14,9 +12,9 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by Karel Maesen, Geovise BVBA on 04/07/2018.
  */
-public class TestServiceRegistry {
+public class TestServiceLocator {
 
-    ServiceRegistry registry = ServiceRegistry.getInstance();
+    ServiceLocator registry = ServiceLocator.defaultInstance();
 
     @Test
     public void testIserviceRegistryImaging(){

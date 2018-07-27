@@ -53,7 +53,7 @@ public class TileMap {
     private final List<TileSet> tileSets;
 
     private TileImageSourceFactory tileImageSourceFactory;
-    private BoundingBoxOpFactory boundingBoxOpFactory = new DefaultBoundingBoxOpFactory();
+
     private boolean forceArgb;
 
     TileMap(String serviceURL, String title, CoordinateReferenceSystem<C2D> crs, Envelope<C2D> bbox,
@@ -154,13 +154,10 @@ public class TileMap {
             return ImageFormat.PNG;
     }
 
-
-
     private TileImageSourceFactory makeTileImageSourceFactory(String serviceUrl) {
-        try {
-            URL url = new URL(serviceUrl);
+        if (isUrl(serviceUrl)) {
             return new URLTileImageSourceFactory();
-        } catch (MalformedURLException e) {
+        } else {
             return new FileTileImageSourceFactory();
         }
     }
@@ -210,7 +207,7 @@ public class TileMap {
 
     private Tile makeTile(TileSet set, TileCoordinate tileCoordinate) {
         TileImageSource source = tileImageSourceFactory.create(set, tileCoordinate, tileMetadata.extension);
-        return new Tile(source, tileCoordinate, set.getTileCoordinateSpace());
+        return new Tile(source, tileCoordinate, set.getTileCoordinateSpace(), getTileImageFormat());
     }
 
 
@@ -244,5 +241,14 @@ public class TileMap {
 
     public TileSetCoordinateSpace getTileCoordinateSpace(int tileSet) {
         return getTileSets().get(tileSet).getTileCoordinateSpace();
+    }
+
+    private boolean isUrl(String maybeUrl){
+        try {
+            URL url = new URL(serviceUrl);
+            return true;
+        } catch (MalformedURLException e) {
+            return false;
+        }
     }
 }

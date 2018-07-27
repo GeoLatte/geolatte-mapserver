@@ -3,6 +3,7 @@ package org.geolatte.mapserver.features;
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Feature;
+import org.geolatte.maprenderer.map.PlanarFeature;
 import rx.Observable;
 
 import java.io.Closeable;
@@ -14,9 +15,9 @@ import java.io.Closeable;
  */
 public interface FeatureSource extends Closeable {
 
-    Observable<Feature<C2D,?>> query(Envelope<C2D> bbox, String query);
+    Observable<PlanarFeature> query(Envelope<C2D> bbox, String query);
 
-    default Observable<Feature<C2D,?>> query(Envelope<C2D> bbox) {
+    default Observable<PlanarFeature> query(Envelope<C2D> bbox) {
         return query( bbox, null);
     }
 }

@@ -7,8 +7,10 @@ import org.geolatte.mapserver.util.PixelRange;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 12/04/2018.
@@ -65,6 +67,8 @@ public interface Imaging {
     Image affineTransform(Image image, int tx, int ty, double sx, double sy);
 
     Image read(InputStream is, int minX, int minY, boolean forceArgb) throws IOException;
+
+    Image fromRenderedImage(RenderedImage image);
 
     Image reprojectByWarping(Image srcImg, MapUnitToPixelTransform mupTransform, CrsId srs, CoordinateReferenceSystem<?> requestedSRS, MapUnitToPixelTransform targetMupTransform, double v);
 

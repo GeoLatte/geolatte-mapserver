@@ -26,6 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 //TODO change this using a more modern concurrency idiom
+@Deprecated
 public class TileReadExecutor {
 
 

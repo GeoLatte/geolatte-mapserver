@@ -15,7 +15,7 @@ public class TestConfiguration {
     @Test
     public void testSuccessfullLayerRegistryConfiguration(){
 
-        LayerRegistry registry = ServiceRegistry.getInstance().layerRegistry();
+        LayerRegistry registry = ServiceLocator.defaultInstance().layerRegistry();
         Layer vkb = registry.getLayer("vkb").get();
         assertThat( vkb , instanceOf(RenderableTileMapLayer.class));
     }

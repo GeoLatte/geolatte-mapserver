@@ -76,6 +76,16 @@ public class ImageOpsTestSupport {
         }
         return out;
     }
+
+    //writing an image to file, and reading it back in doesn't result in exactly the same image. Therefore, first write
+    //to disk, read result, and then compare to the expected file.
+    public static Image imageAfterIO(Image result, ImageFormat fmt) throws IOException {
+        File out = writeImageToFile(result, fmt);
+        return readTileImage(out, 0, 0);
+    }
+
+
+
 }
 
 

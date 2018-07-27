@@ -21,6 +21,7 @@ package org.geolatte.mapserver.tilemap;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * A source for a <code>TileImage</code>.
@@ -35,6 +36,15 @@ public interface TileImageSource {
      * @return an <code>InputStream</code> that provides access to a </code>TileImage</code>
      * @throws IOException
      */
-    public abstract InputStream open() throws IOException;
+    public abstract InputStream toInputStream() throws IOException;
+
+    /**
+     * Open
+     * @return
+     * @throws IOException
+     */
+    default OutputStream toOutputStream() throws  IOException {
+        throw new UnsupportedOperationException();
+    }
 
 }

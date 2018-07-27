@@ -40,7 +40,7 @@ public class URLTileImageSource implements TileImageSource {
         return new URLTileImageSource(url);
     }
 
-    public InputStream open() throws IOException {
+    public InputStream toInputStream() throws IOException {
         connection = url.openConnection();
         inStream = connection.getInputStream();
         return inStream;

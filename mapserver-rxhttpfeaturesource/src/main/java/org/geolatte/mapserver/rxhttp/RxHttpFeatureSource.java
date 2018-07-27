@@ -5,6 +5,7 @@ import be.wegenenverkeer.rxhttp.RxHttpClient;
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Feature;
+import org.geolatte.maprenderer.map.PlanarFeature;
 import org.geolatte.mapserver.features.FeatureSource;
 import org.stringtemplate.v4.ST;
 import rx.Observable;
@@ -36,11 +37,12 @@ public class RxHttpFeatureSource implements FeatureSource {
     }
 
     @Override
-    public Observable<Feature<C2D, ?>> query(Envelope<C2D> bbox, String query) {
+    public Observable<PlanarFeature> query(Envelope<C2D> bbox, String query) {
         String queryUrl = render(bbox, query);
         ClientRequest request = client.requestBuilder()
                 .setUrlRelativetoBase(queryUrl)
-                .build();GeoJsonDeserializer deserializer = new GeoJsonDeserializer();
+                .build();
+       GeoJsonDeserializer deserializer = new GeoJsonDeserializer();
        return client.executeObservably(request, bytes -> new String(bytes, UTF8))
                .flatMap( deserializer::deserialize);
     }

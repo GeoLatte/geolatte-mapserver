@@ -10,14 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.geolatte.mapserver.img.ImageOpsTestSupport.assertImageEquals;
-import static org.geolatte.mapserver.img.ImageOpsTestSupport.readTileImage;
-import static org.geolatte.mapserver.img.ImageOpsTestSupport.writeImageToFile;
+import static org.geolatte.mapserver.img.ImageOpsTestSupport.*;
 import static org.junit.Assert.assertEquals;
 
 
@@ -50,7 +47,7 @@ public class BasicImagingTest {
     public void testCrop() throws IOException {
         PixelRange range = new PixelRange(50, 50, 100, 80);
         Image cropped = imaging.crop(img, range);
-        Image received = testImageAfterIO(cropped, ImageFormat.JPEG);
+        Image received = imageAfterIO(cropped, ImageFormat.JPEG);
         assertEquals(100, cropped.getWidth());
         assertEquals(80, cropped.getHeight());
         Image expected = readTileImage("test1-cropped.jpg", true);
@@ -62,7 +59,7 @@ public class BasicImagingTest {
         Image img1 = readTileImage("test1.png", false);
         Image img2 = readTileImage("test2.png", false);
         Image result = imaging.overlay(img1, img2);
-        Image received = testImageAfterIO(result, ImageFormat.PNG);
+        Image received = imageAfterIO(result, ImageFormat.PNG);
         Image expected = readTileImage("test1-test2-overlay.png", true);
         assertImageEquals(expected, received);
     }
@@ -75,7 +72,7 @@ public class BasicImagingTest {
         assertEquals(50, result.getMinY());
         assertEquals(256, result.getHeight());
         assertEquals(128, result.getWidth(), 0.00001);
-        Image received = testImageAfterIO(result, ImageFormat.PNG);
+        Image received = imageAfterIO(result, ImageFormat.PNG);
         Image expected = readTileImage("test3-transform-scale-translate.png", true);
         assertImageEquals(expected, received);
     }
@@ -92,7 +89,7 @@ public class BasicImagingTest {
         assertEquals(0, result.getMinY());
         assertEquals(512,result.getWidth());
         assertEquals(512, result.getHeight());
-        Image received = testImageAfterIO(result, ImageFormat.PNG);
+        Image received = imageAfterIO(result, ImageFormat.PNG);
         Image expected = readTileImage("mosaic-no-crop.png", true);
         assertImageEquals(expected, received);
     }
@@ -109,7 +106,7 @@ public class BasicImagingTest {
         assertEquals(128, result.getMinY());
         assertEquals(256,result.getWidth());
         assertEquals(256, result.getHeight());
-        Image received = testImageAfterIO(result, ImageFormat.PNG);
+        Image received = imageAfterIO(result, ImageFormat.PNG);
         Image expected = readTileImage("mosaic-crop.png", true);
         assertImageEquals(expected, received);
     }
@@ -118,19 +115,10 @@ public class BasicImagingTest {
         Dimension dim = img.getDimension();
         Dimension newDim = new Dimension((int)(dim.width * factor), (int)(dim.height * factor));
         Image result = imaging.scale(img, newDim);
-        Image received = testImageAfterIO(result, ImageFormat.JPEG);
+        Image received = imageAfterIO(result, ImageFormat.JPEG);
         assertEquals(newDim, result.getDimension());
         Image expected = readTileImage(expectedImageFile, true);
         assertImageEquals(expected, received);
     }
-
-    //writing an image to file, and reading it back in doesn't result in exactly the same image. Therefore, first write
-    //to disk, read result, and then compare to the expected file.
-    private Image testImageAfterIO(Image result, ImageFormat fmt) throws IOException {
-        File out = writeImageToFile(result, fmt);
-        return readTileImage(out, 0, 0);
-    }
-
-
 
 }

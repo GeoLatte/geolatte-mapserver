@@ -23,12 +23,16 @@ package org.geolatte.mapserver.tilemap;
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.mapserver.image.Image;
+import org.geolatte.mapserver.image.ImageFormat;
 import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.util.PixelRange;
 
 import java.awt.*;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Optional;
 import java.util.Set;
 
 public class Tile {
@@ -36,12 +40,14 @@ public class Tile {
     final private TileCoordinate coordinate;
     final private TileImageSource source;
     final private TileSetCoordinateSpace tileSetCoordinateSpace;
+    final private ImageFormat format;
 
 
-    public Tile(TileImageSource source, TileCoordinate coordinate, TileSetCoordinateSpace tileSetCoordinateSpace) {
+    public Tile(TileImageSource source, TileCoordinate coordinate, TileSetCoordinateSpace tileSetCoordinateSpace, ImageFormat format) {
         this.source = source;
         this.coordinate = coordinate;
         this.tileSetCoordinateSpace = tileSetCoordinateSpace;
+        this.format = format;
     }
 
     static PixelRange pixelBounds(java.util.List<Tile> tiles) {
@@ -65,29 +71,27 @@ public class Tile {
     }
 
     /**
-     * Returns the <code>TileImage</code> for this tile.
+     * Returns the <code>TileImage</code> for this tile, or None if there is no such image
      *
      * @param imaging the <code>Imaging</code> implementation to use for decoding the image
      * @return
      */
-    public Image getImage(Imaging imaging, boolean forceArgb) {
-        InputStream is = null;
+    public Optional<Image> getImage(Imaging imaging, boolean forceArgb) {
         PixelRange pb = getPixelBounds();
-        try {
-            is = source.open();
-            return imaging.read(is, pb.getMinX(), pb.getMinY(), forceArgb);
-        } catch (Throwable e) {
-            // no tile found, return an empty tile
-            // return img.empty(pb.getWidth(), pb.getHeight());
+        try(InputStream is = source.toInputStream()) {
+            return Optional.of(imaging.read(is, pb.getMinX(), pb.getMinY(), forceArgb));
+        } catch(FileNotFoundException fe) {
+            return Optional.empty();
+        } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    // nothing to do;
-                }
-            }
+        }
+    }
+
+    public void writeImage(Imaging imaging, Image image) {
+        try (OutputStream out = source.toOutputStream()) {
+            image.write(out, format);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -95,6 +99,9 @@ public class Tile {
         return tileSetCoordinateSpace.tilePixelRange(this.coordinate);
     }
 
+    public Dimension getDimension() {
+        return getPixelBounds().getDimension();
+    }
 
     Envelope<C2D> getBoundingBox() {
         return tileSetCoordinateSpace.boundingBox(this.coordinate);
@@ -121,4 +128,5 @@ public class Tile {
     public int hashCode() {
         return source != null ? source.hashCode() : 0;
     }
+
 }

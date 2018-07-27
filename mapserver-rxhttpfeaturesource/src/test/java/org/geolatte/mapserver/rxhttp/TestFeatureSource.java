@@ -7,6 +7,7 @@ import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Feature;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
+import org.geolatte.maprenderer.map.PlanarFeature;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,7 +58,7 @@ public class TestFeatureSource {
         Envelope<C2D> bbox = new Envelope<>(10, 10, 20, 20, CoordinateReferenceSystems.WEB_MERCATOR);
         mockServer.buildStub(bbox);
 
-        Observable<Feature<C2D, ?>> result = featureSource.query(bbox);
+        Observable<PlanarFeature> result = featureSource.query(bbox);
 
         TestSubscriber<Feature> sub = new TestSubscriber<>();
         result.subscribe(sub);
@@ -74,7 +75,7 @@ public class TestFeatureSource {
         Envelope<C2D> bbox = new Envelope<>(10, 10, 20, 20, CoordinateReferenceSystems.WEB_MERCATOR);
         mockServer.buildStub(bbox, "\n");
 
-        Observable<Feature<C2D, ?>> result = featureSource.query(bbox);
+        Observable<PlanarFeature> result = featureSource.query(bbox);
 
         TestSubscriber<Feature> sub = new TestSubscriber<>();
         result.subscribe(sub);
@@ -94,7 +95,7 @@ public class TestFeatureSource {
                 )
         );
 
-        Observable<Feature<C2D, ?>> result = featureSource.query(new Envelope<C2D>(10, 10, 20, 20, CoordinateReferenceSystems.WEB_MERCATOR));
+        Observable<PlanarFeature> result = featureSource.query(new Envelope<C2D>(10, 10, 20, 20, CoordinateReferenceSystems.WEB_MERCATOR));
 
         TestSubscriber<Feature> sub = new TestSubscriber<>();
         result.subscribe(sub);
