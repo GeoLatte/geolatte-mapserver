@@ -31,15 +31,11 @@ public class TestFeatureSource {
     final private int DEFAULT_TIME_OUT = 200;
     private RxHttpFeatureSource featureSource;
 
-    private WireMockServer wireMockServer;
-
-//TODO -- why doesn't this work???
-//    public WireMockRule wireMockRule = new WireMockRule(); // No-args constructor defaults to port 8080
+    private MockFeatureServer mockServer = new MockFeatureServer();
 
     @Before
     public void setUp(){
-        wireMockServer = new WireMockServer(wireMockConfig().port(8080)); //No-args constructor will start on port 8080, no HTTPS
-        wireMockServer.start();
+        mockServer.start();
 
         RxHttpFeatureSourceConfig config = new RxHttpFeatureSourceConfig(
         );
@@ -53,15 +49,15 @@ public class TestFeatureSource {
         if (featureSource != null) {
             featureSource.close();
         }
-        wireMockServer.stop();
+        mockServer.stop();
     }
 
     @Test
     public void testFeatureSource(){
-        buildStub(JSONBODY);
+        Envelope<C2D> bbox = new Envelope<>(10, 10, 20, 20, CoordinateReferenceSystems.WEB_MERCATOR);
+        mockServer.buildStub(bbox);
 
-
-        Observable<Feature<C2D, ?>> result = featureSource.query(new Envelope<C2D>(10, 10, 20, 20, CoordinateReferenceSystems.WEB_MERCATOR));
+        Observable<Feature<C2D, ?>> result = featureSource.query(bbox);
 
         TestSubscriber<Feature> sub = new TestSubscriber<>();
         result.subscribe(sub);
@@ -75,10 +71,10 @@ public class TestFeatureSource {
 
     @Test
     public void testEmptyResult(){
-        buildStub("\n");
+        Envelope<C2D> bbox = new Envelope<>(10, 10, 20, 20, CoordinateReferenceSystems.WEB_MERCATOR);
+        mockServer.buildStub(bbox, "\n");
 
-
-        Observable<Feature<C2D, ?>> result = featureSource.query(new Envelope<C2D>(10, 10, 20, 20, CoordinateReferenceSystems.WEB_MERCATOR));
+        Observable<Feature<C2D, ?>> result = featureSource.query(bbox);
 
         TestSubscriber<Feature> sub = new TestSubscriber<>();
         result.subscribe(sub);
@@ -108,22 +104,8 @@ public class TestFeatureSource {
 
     }
 
-    private void buildStub(String s) {
-        stubFor(get(urlEqualTo("/query?bbox=10.000000,10.000000,20.000000,20.000000"))
-                .withHeader("Accept", equalTo("application/json"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody(s)
-                )
-        );
-    }
 
 
-    private final String JSONBODY =
-            "{\"id\":\"10000301\",\"type\":\"Feature\",\"properties\":{\"nummer\":\"aab\"},\"geometry\":{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"bbox\":[97662,180039.31,97662,180039.31],\"geometries\":[{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"bbox\":[97662,180039.31,97662,180039.31],\"coordinates\":[97662,180039.31]}]}}\n" +
-            "{\"id\":\"10000351\",\"type\":\"Feature\",\"properties\":{\"nummer\":\"baa\"},\"geometry\":{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"bbox\":[106175.99,175881.46,106175.99,175881.46],\"geometries\":[{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"bbox\":[106175.99,175881.46,106175.99,175881.46],\"coordinates\":[106175.99,175881.46]}]}}\n" +
-            "{\"id\":\"10000401\",\"type\":\"Feature\",\"properties\":{\"nummer\":\"aba\"},\"geometry\":{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"bbox\":[106175.99,175881.46,106175.99,175881.46],\"geometries\":[{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"bbox\":[106175.99,175881.46,106175.99,175881.46],\"coordinates\":[106175.99,175881.46]}]}}";
 
 }
 
