@@ -1,4 +1,4 @@
-package org.geolatte.mapserver.ows;
+package org.geolatte.mapserver.http;
 
 import org.geolatte.mapserver.http.HttpRequest;
 import org.geolatte.mapserver.http.HttpResponse;

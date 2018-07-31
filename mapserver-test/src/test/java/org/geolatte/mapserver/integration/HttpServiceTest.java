@@ -1,7 +1,7 @@
 package org.geolatte.mapserver.integration;
 
-import org.geolatte.mapserver.ows.HttpService;
-import org.geolatte.mapserver.ows.StdHttpService;
+import org.geolatte.mapserver.http.HttpService;
+import org.geolatte.mapserver.ows.OwsHttpService;
 import org.geolatte.mapserver.http.BasicHttpRequest;
 import org.geolatte.mapserver.http.HttpRequest;
 import org.geolatte.mapserver.http.HttpResponse;
@@ -24,7 +24,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class HttpServiceTest {
 
-    private HttpService service = new StdHttpService();
+    private HttpService service = new OwsHttpService();
     private Map<String, List<String>> baseRequestParameters;
 
     @Test

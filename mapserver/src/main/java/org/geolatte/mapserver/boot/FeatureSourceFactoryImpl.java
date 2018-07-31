@@ -20,6 +20,7 @@ public class FeatureSourceFactoryImpl implements FeatureSourceFactoryRegistry {
         featureSourceFactories = loadAllFeatureSourceFactoryProviders();
     }
 
+    //TODO -- this duplication to BootServiceLocate#loaddAll -- refactor
     private Map<String, org.geolatte.mapserver.features.FeatureSourceFactory> loadAllFeatureSourceFactoryProviders() {
         Map<String, org.geolatte.mapserver.features.FeatureSourceFactory> result = new HashMap<>();
         ServiceLoader<FeatureSourceFactoryProvider> loader = ServiceLoader.load(FeatureSourceFactoryProvider.class);
