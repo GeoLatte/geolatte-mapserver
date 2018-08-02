@@ -9,6 +9,7 @@ import org.geolatte.mapserver.ServiceLocator;
 import org.geolatte.mapserver.boot.BootServiceLocator;
 import org.geolatte.mapserver.image.Image;
 import org.geolatte.mapserver.image.ImageFormat;
+import org.geolatte.mapserver.layers.RenderableTileMapLayer;
 import org.geolatte.mapserver.ows.GetMapRequest;
 import org.geolatte.mapserver.protocols.OsmGetMapRequest;
 import org.geolatte.mapserver.rxhttp.MockFeatureServer;

@@ -1,8 +1,12 @@
-package org.geolatte.mapserver.tilemap;
+package org.geolatte.mapserver.layers;
 
 import org.geolatte.mapserver.Layer;
 import org.geolatte.mapserver.image.Image;
 import org.geolatte.mapserver.ows.GetMapRequest;
+import org.geolatte.mapserver.tilemap.BoundingBoxOp;
+import org.geolatte.mapserver.tilemap.DynamicBoundingBoxOp;
+import org.geolatte.mapserver.tilemap.RenderContext;
+import org.geolatte.mapserver.tilemap.TileMap;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 25/07/2018.

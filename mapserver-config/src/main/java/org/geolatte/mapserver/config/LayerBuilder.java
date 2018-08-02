@@ -4,15 +4,14 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigBeanFactory;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.maprenderer.map.Painter;
 import org.geolatte.mapserver.FeatureSourceFactoryRegistry;
 import org.geolatte.mapserver.Layer;
 import org.geolatte.mapserver.features.FeatureSource;
 import org.geolatte.mapserver.features.FeatureSourceConfig;
 import org.geolatte.mapserver.tilemap.RenderContext;
-import org.geolatte.mapserver.tilemap.RenderableTileMapLayer;
+import org.geolatte.mapserver.layers.RenderableTileMapLayer;
 import org.geolatte.mapserver.tilemap.TileMapBuilder;
-import org.geolatte.mapserver.tilemap.TileMapLayer;
+import org.geolatte.mapserver.layers.TileMapLayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

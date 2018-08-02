@@ -1,8 +1,10 @@
-package org.geolatte.mapserver.tilemap;
+package org.geolatte.mapserver.layers;
 
 import org.geolatte.mapserver.Layer;
 import org.geolatte.mapserver.image.Image;
 import org.geolatte.mapserver.ows.GetMapRequest;
+import org.geolatte.mapserver.tilemap.BoundingBoxOp;
+import org.geolatte.mapserver.tilemap.TileMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +13,6 @@ import org.slf4j.LoggerFactory;
  */
 public class TileMapLayer implements Layer {
 
-    final private static Logger logger = LoggerFactory.getLogger(TileMapLayer.class);
     final private String name;
 
     final private TileMap tileMap;

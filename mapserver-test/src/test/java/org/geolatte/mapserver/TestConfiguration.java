@@ -1,6 +1,6 @@
 package org.geolatte.mapserver;
 
-import org.geolatte.mapserver.tilemap.RenderableTileMapLayer;
+import org.geolatte.mapserver.layers.RenderableTileMapLayer;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.instanceOf;

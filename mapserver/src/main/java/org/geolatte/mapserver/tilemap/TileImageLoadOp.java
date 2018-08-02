@@ -45,9 +45,7 @@ public class TileImageLoadOp implements TileMapOperation<java.util.List<Image>> 
         for (Future<Image> future : futures) {
             try {
                 results.add(future.get());
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e.getCause());
-            } catch (ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e.getCause());
             }
         }
