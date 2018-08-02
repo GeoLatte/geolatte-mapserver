@@ -8,6 +8,8 @@ import org.geolatte.mapserver.tilemap.TileMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * Created by Karel Maesen, Geovise BVBA on 13/04/2018.
  */
@@ -32,7 +34,7 @@ public class TileMapLayer implements Layer {
     }
 
     @Override
-    public Image createMapImage(GetMapRequest request) {
+    public CompletableFuture<Image> createMapImage(GetMapRequest request) {
         return makeBoundingBoxOp(request).execute();
     }
 

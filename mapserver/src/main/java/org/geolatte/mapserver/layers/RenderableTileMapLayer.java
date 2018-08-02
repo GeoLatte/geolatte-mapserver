@@ -5,8 +5,10 @@ import org.geolatte.mapserver.image.Image;
 import org.geolatte.mapserver.ows.GetMapRequest;
 import org.geolatte.mapserver.tilemap.BoundingBoxOp;
 import org.geolatte.mapserver.tilemap.DynamicBoundingBoxOp;
-import org.geolatte.mapserver.tilemap.RenderContext;
 import org.geolatte.mapserver.tilemap.TileMap;
+
+import java.util.concurrent.CompletableFuture;
+
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 25/07/2018.
@@ -29,7 +31,7 @@ public class RenderableTileMapLayer implements Layer {
     }
 
     @Override
-    public Image createMapImage(GetMapRequest request) {
+    public CompletableFuture<Image> createMapImage(GetMapRequest request) {
         return makeBoundingBoxOp(request).execute();
     }
 

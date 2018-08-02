@@ -16,10 +16,8 @@ import java.util.concurrent.ExecutorService;
 public class OwsHttpService implements HttpService {
 
     private final OwsRequestHandlerFactory handlerFactory;
-    private final ExecutorService executorService;
 
     public OwsHttpService(ServiceLocator serviceLocator) {
-        this.executorService = serviceLocator.executorService();
         this.handlerFactory = new OwsRequestHandlerFactory();
     }
 
@@ -29,7 +27,7 @@ public class OwsHttpService implements HttpService {
 
     @Override
     public CompletableFuture<HttpResponse> process(HttpRequest httpRequest) {
-        return CompletableFuture.supplyAsync( () -> handlerFactory.create(httpRequest).handle(), executorService);
+        return handlerFactory.create(httpRequest).handle();
     }
 
     @Override

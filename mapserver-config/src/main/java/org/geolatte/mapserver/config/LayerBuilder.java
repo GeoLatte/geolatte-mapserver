@@ -8,7 +8,7 @@ import org.geolatte.mapserver.FeatureSourceFactoryRegistry;
 import org.geolatte.mapserver.Layer;
 import org.geolatte.mapserver.features.FeatureSource;
 import org.geolatte.mapserver.features.FeatureSourceConfig;
-import org.geolatte.mapserver.tilemap.RenderContext;
+import org.geolatte.mapserver.layers.RenderContext;
 import org.geolatte.mapserver.layers.RenderableTileMapLayer;
 import org.geolatte.mapserver.tilemap.TileMapBuilder;
 import org.geolatte.mapserver.layers.TileMapLayer;

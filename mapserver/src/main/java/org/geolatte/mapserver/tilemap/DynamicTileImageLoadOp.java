@@ -11,6 +11,7 @@ import org.geolatte.mapserver.ServiceLocator;
 import org.geolatte.mapserver.features.FeatureSource;
 import org.geolatte.mapserver.image.Image;
 import org.geolatte.mapserver.image.Imaging;
+import org.geolatte.mapserver.layers.RenderContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
@@ -57,12 +58,12 @@ public class DynamicTileImageLoadOp implements TileMapOperation<List<Image>> {
     }
 
     @Override
-    public List<Image> execute() {
+    public CompletableFuture<List<Image>> execute() {
 
         List<CompletableFuture<Image>> futures = this.tiles.stream()
                 .map(this::getImage)
                 .collect(toList());
-        return sequence(futures).join();
+        return sequence(futures);
     }
 
     private CompletableFuture<Image> getImage(Tile tile) {

@@ -15,8 +15,10 @@ public class OwsRequestHandlerFactory implements RequestHandlerFactory<HttpReque
     private final LayerRegistry layerRegistry;
     private final ServiceMetadata serviceMetadata;
     private final ProtocolAdapter protocolAdapter;
+    private final ServiceLocator serviceLocator;
 
     public OwsRequestHandlerFactory(ServiceLocator serviceLocator) {
+        this.serviceLocator = serviceLocator;
         layerRegistry = serviceLocator.layerRegistry();
         serviceMetadata = serviceLocator.serviceMetadata();
         protocolAdapter = serviceLocator.protocolAdapter();
@@ -30,11 +32,11 @@ public class OwsRequestHandlerFactory implements RequestHandlerFactory<HttpReque
     public RequestHandler<HttpResponse> create(HttpRequest httpRequest) {
         MapServerRequest request = protocolAdapter.adapt(httpRequest);
         if (request instanceof GetMapRequest) {
-            return new GetMapRequestHandler((GetMapRequest) request, layerRegistry);
+            return new GetMapRequestHandler((GetMapRequest) request, serviceLocator);
         }
 
         if (request instanceof GetCapabilitiesRequest) {
-            return new GetCapabilitiesHandler((GetCapabilitiesRequest) request, serviceMetadata, protocolAdapter);
+            return new GetCapabilitiesHandler((GetCapabilitiesRequest) request, serviceLocator);
         }
 
         throw new IllegalArgumentException(format("Can't handle Request of type %s", request.getClass().getName()));

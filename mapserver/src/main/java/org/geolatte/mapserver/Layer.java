@@ -3,6 +3,8 @@ package org.geolatte.mapserver;
 import org.geolatte.mapserver.image.Image;
 import org.geolatte.mapserver.ows.GetMapRequest;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  *
  *
@@ -12,6 +14,6 @@ public interface Layer {
 
     String getName();
 
-    Image createMapImage(GetMapRequest request);
+    CompletableFuture<Image> createMapImage(GetMapRequest request);
 
 }
