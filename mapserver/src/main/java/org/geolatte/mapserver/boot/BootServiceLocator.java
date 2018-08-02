@@ -1,6 +1,7 @@
 package org.geolatte.mapserver.boot;
 
 import org.geolatte.mapserver.*;
+import org.geolatte.mapserver.features.FeatureSourceFactory;
 import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.protocols.ProtocolAdapter;
 import org.geolatte.mapserver.spi.*;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,16 +25,30 @@ public class BootServiceLocator implements ServiceLocator {
 
     final private static Logger logger = LoggerFactory.getLogger(BootServiceLocator.class);
 
-    final public static ServiceLocator INSTANCE = new BootServiceLocator();
+    final public static BootServiceLocator INSTANCE = new BootServiceLocator();
+
+    static  {
+        // we need ServiceLocator to build Layers. So we first build the INSTANCE, and then use it to
+        // set build the LayerRegistry and set it in the instance.
+        //
+        // It would be better to have a second phase bootstrapping for initializing the LayerRegistry
+        // (e.g. Hibernate has this) after the more general servcies are initialized.
+        FeatureSourceFactoryRegistry fsf = new StdFeatureSourceFactory(loadAllFeatureSourceFactories());
+        LayerRegistry registry = loadFirst(LayerRegistryProvider.class).layerRegistry(fsf, INSTANCE);
+        INSTANCE.setLayerRegistry(registry);
+    }
 
     final private Imaging imagingInstance;
     final private ProtocolAdapter protocolAdapter;
-    final private LayerRegistry layerRegistry;
     final private ServiceMetadata serviceMetadata;
     final private ExecutorService executorService;
     private final AggregatePainterFactory painterFactory;
 
-    private static <T> T loadFirst(Class<T> providerType){
+
+    private LayerRegistry layerRegistry;
+
+
+    static <T> T loadFirst(Class<T> providerType){
         List<T> all = loadAll(providerType);
 
         if (all.isEmpty()) {
@@ -61,17 +77,21 @@ public class BootServiceLocator implements ServiceLocator {
                 .collect(Collectors.toList());
     }
 
+    private static List<FeatureSourceFactory> loadAllFeatureSourceFactories() {
+        return loadAll(FeatureSourceFactoryProvider.class).stream()
+                .map( FeatureSourceFactoryProvider::featureSourceFactory)
+                .collect(Collectors.toList());
+    }
+
     private BootServiceLocator() {
         executorService = createExecutor();
         imagingInstance = loadFirst(ImagingProvider.class).imaging();
         protocolAdapter = loadFirst(ProtocolAdapterProvider.class).protocolAdapter();
-        // TODO -- we needed to split off the FSFRegistry from ServiceRegistry because
-        // the LayerRegistryProvider depends on this. Can we solve this differently? (See how Hibernate solves this)
-        FeatureSourceFactoryRegistry featureSourceFactoryRegistry = new FeatureSourceFactoryImpl();
-        serviceMetadata = loadFirst(ServiceMetadataProvider.class).serviceMetadata();
-        layerRegistry = loadFirst(LayerRegistryProvider.class).layerSourceRegistry(featureSourceFactoryRegistry);
         painterFactory = new AggregatePainterFactory(loadAllPainterFactories());
+        serviceMetadata = loadFirst(ServiceMetadataProvider.class).serviceMetadata();
     }
+
+
 
 
     public static ServiceLocator instance(){
@@ -90,7 +110,7 @@ public class BootServiceLocator implements ServiceLocator {
 
     @Override
     public LayerRegistry layerRegistry() {
-        return this.layerRegistry;
+        return layerRegistry;
     }
 
     @Override
@@ -111,6 +131,10 @@ public class BootServiceLocator implements ServiceLocator {
 
     private ExecutorService createExecutor() {
         return Executors.newFixedThreadPool(2*Runtime.getRuntime().availableProcessors());
+    }
+
+    private void setLayerRegistry(LayerRegistry r){
+        this.layerRegistry = r;
     }
 
 }

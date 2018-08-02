@@ -1,22 +1,13 @@
 package org.geolatte.mapserver.tilemap;
 
-import org.geolatte.geom.C2D;
-import org.geolatte.geom.Envelope;
-import org.geolatte.maprenderer.java2D.AWTMapGraphics;
-import org.geolatte.maprenderer.map.MapGraphics;
-import org.geolatte.maprenderer.map.Painter;
-import org.geolatte.maprenderer.map.PlanarFeature;
-import org.geolatte.mapserver.PainterFactory;
 import org.geolatte.mapserver.ServiceLocator;
-import org.geolatte.mapserver.features.FeatureSource;
 import org.geolatte.mapserver.image.Image;
 import org.geolatte.mapserver.image.Imaging;
-import org.geolatte.mapserver.layers.RenderContext;
+import org.geolatte.mapserver.render.RenderContext;
+import org.geolatte.mapserver.render.Renderer;
+import org.geolatte.mapserver.render.StdRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rx.Observable;
-import rx.Subscriber;
-import rx.observers.Subscribers;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +17,6 @@ import java.util.concurrent.ExecutorService;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.geolatte.mapserver.util.CompletableFutureUtil.sequence;
-import static org.geolatte.mapserver.util.EnvelopUtils.bufferRounded;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 27/07/2018.
@@ -36,21 +26,18 @@ public class DynamicTileImageLoadOp implements TileMapOperation<List<Image>> {
     final private static Logger logger = LoggerFactory.getLogger(DynamicTileImageLoadOp.class);
 
     final private List<Tile> tiles;
-    final private FeatureSource featureSource;
+
     final private boolean forceArgb;
     final private Imaging imaging;
     final private ExecutorService executorService;
-    final private PainterFactory painterFactory;
-    final private String painterRef;
+    private final Renderer renderer;
 
     DynamicTileImageLoadOp(List<Tile> tiles, boolean forceArgb, RenderContext renderContext, ServiceLocator locator) {
         this.tiles = tiles;
         this.forceArgb = forceArgb;
-        this.featureSource = renderContext.getFeatureSource();
         this.imaging = locator.imaging();
         this.executorService =  locator.executorService();
-        this.painterFactory =  locator.painterFactory();
-        this.painterRef =  renderContext.getPainterRef();
+        this.renderer = new StdRenderer(renderContext, locator);
     }
 
     DynamicTileImageLoadOp(List<Tile> tiles, boolean forceArgb, RenderContext renderContext) {
@@ -79,52 +66,23 @@ public class DynamicTileImageLoadOp implements TileMapOperation<List<Image>> {
                 .orElse(renderTile(tile));
     }
 
-    private CompletableFuture<Image> renderTile(Tile tile) {
+    private CompletableFuture<Image> renderTile(final Tile tile) {
 
-        MapGraphics graphics = new AWTMapGraphics(tile.getDimension(), tile.getBoundingBox());
-        Painter painter = painterFactory.mkPainter(painterRef, graphics);
-
-        CompletableFuture<Image> promise = new CompletableFuture<>();
-
-        if (!painter.willPaint()) {
-            return writeAndComplete(tile, graphics, promise);
-        }
-
-        Observable<PlanarFeature> features = featureSource.query(mkQueryBoundingBox(tile));
-
-        Subscriber<PlanarFeature> featureRenderer = Subscribers.create(
-                painter::paint,
-                promise::completeExceptionally,
-                () -> writeAndComplete(tile, graphics, promise)
-        );
-        features.subscribe(featureRenderer);
-        return promise;
-
+        return renderer.render(tile.getDimension(), tile.getBoundingBox())
+                .whenComplete( (img, exception ) -> {
+                    if (exception == null) logger.warn("Failure to render image");
+                    else cache(tile, img);
+                });
     }
 
-    private CompletableFuture<Image> writeAndComplete(Tile tile, MapGraphics graphics, CompletableFuture<Image> promise) {
-        Image img = imaging.fromRenderedImage(graphics.renderImage());
-        writeImageToTile(tile, img);
-        completePromise(img, promise);
-        return promise;
-    }
 
-    private void writeImageToTile(Tile tile, Image img) {
+    private void cache(Tile tile, Image img) {
         logger.debug(format("Writing image %s", tile.toString()));
         try {
             tile.writeImage(imaging, img);
         }catch(Throwable t){
             logger.error(format("Failure to write tile %s", tile.toString()), t);
         }
-    }
-
-    private void completePromise(Image image, CompletableFuture<Image> promise) {
-        promise.complete(image);
-    }
-
-    private Envelope<C2D> mkQueryBoundingBox(Tile tile) {
-        //todo make this configurable
-        return bufferRounded(tile.getBoundingBox(), 3);
     }
 
 }

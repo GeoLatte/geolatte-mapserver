@@ -3,7 +3,7 @@ package org.geolatte.mapserver.tilemap;
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.mapserver.image.Image;
-import org.geolatte.mapserver.layers.RenderContext;
+import org.geolatte.mapserver.render.RenderContext;
 
 import java.awt.*;
 import java.util.List;
