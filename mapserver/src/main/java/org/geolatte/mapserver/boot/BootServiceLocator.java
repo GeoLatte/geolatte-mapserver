@@ -61,7 +61,7 @@ public class BootServiceLocator implements ServiceLocator {
                 .collect(Collectors.toList());
     }
 
-    BootServiceLocator() {
+    private BootServiceLocator() {
         executorService = createExecutor();
         imagingInstance = loadFirst(ImagingProvider.class).imaging();
         protocolAdapter = loadFirst(ProtocolAdapterProvider.class).protocolAdapter();
@@ -98,11 +98,6 @@ public class BootServiceLocator implements ServiceLocator {
         return this.serviceMetadata;
     }
 
-    @Override
-    public AsyncOperationsStatus asyncOperationsStatus() {
-        return AsyncOperationsStatus.INSTANCE;
-    }
-
     //TODO -- make this configurable through a provider
     @Override
     public ExecutorService executorService() {
@@ -115,7 +110,6 @@ public class BootServiceLocator implements ServiceLocator {
     }
 
     private ExecutorService createExecutor() {
-        ExecutorService executorService;
         return Executors.newFixedThreadPool(2*Runtime.getRuntime().availableProcessors());
     }
 

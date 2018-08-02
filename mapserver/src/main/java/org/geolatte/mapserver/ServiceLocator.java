@@ -23,8 +23,6 @@ public interface ServiceLocator {
 
     ServiceMetadata serviceMetadata();
 
-    AsyncOperationsStatus asyncOperationsStatus();
-
     ExecutorService executorService();
 
     PainterFactory painterFactory();

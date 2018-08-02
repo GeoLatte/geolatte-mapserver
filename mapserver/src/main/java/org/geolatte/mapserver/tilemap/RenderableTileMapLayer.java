@@ -1,16 +1,13 @@
 package org.geolatte.mapserver.tilemap;
 
-import org.geolatte.mapserver.RenderableLayer;
-import org.geolatte.mapserver.AsyncOperation;
-import org.geolatte.mapserver.features.FeatureSource;
+import org.geolatte.mapserver.Layer;
 import org.geolatte.mapserver.image.Image;
 import org.geolatte.mapserver.ows.GetMapRequest;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 25/07/2018.
  */
-public class RenderableTileMapLayer implements  RenderableLayer {
+public class RenderableTileMapLayer implements Layer {
 
     final private TileMap tileMap;
     final private String name;
@@ -30,11 +27,6 @@ public class RenderableTileMapLayer implements  RenderableLayer {
     @Override
     public Image createMapImage(GetMapRequest request) {
         return makeBoundingBoxOp(request).execute();
-    }
-
-    @Override
-    public AsyncOperation renderLayer() {
-        throw new NotImplementedException();
     }
 
     private BoundingBoxOp makeBoundingBoxOp(GetMapRequest request) {
