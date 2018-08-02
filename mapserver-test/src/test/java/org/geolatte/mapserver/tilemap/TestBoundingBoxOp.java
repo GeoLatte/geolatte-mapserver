@@ -64,7 +64,7 @@ public class TestBoundingBoxOp {
 
     private void executeAndWriteToFile(Envelope bbox, File f, TileMap map) throws IOException {
         BoundingBoxOp boundingBoxOp = new BoundingBoxOp(map, bbox, new Dimension(512, 256));
-        Image image = boundingBoxOp.execute();
+        Image image = boundingBoxOp.execute().join();
         BufferedImage received =  image.getInternalRepresentation(BufferedImage.class);
         assertEquals(256, received.getHeight(), 0.0000005);
         assertEquals(512, received.getWidth(), 0.0000005);

@@ -1,4 +1,4 @@
-package org.geolatte.mapserver.tilemap;
+package org.geolatte.mapserver.layers;
 
 import org.geolatte.mapserver.ServiceLocator;
 import org.geolatte.mapserver.features.FeatureSource;

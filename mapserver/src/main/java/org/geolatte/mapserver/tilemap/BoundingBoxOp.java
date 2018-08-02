@@ -30,9 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.geolatte.mapserver.util.EnvelopUtils.height;
 import static org.geolatte.mapserver.util.EnvelopUtils.width;
 
@@ -63,10 +64,7 @@ public class BoundingBoxOp implements TileMapOperation<Image> {
     private Envelope<C2D> tileSetClippedBbox;
     private int tileSet;
     private java.util.List<Tile> tiles;
-    private java.util.List<Image> images = new ArrayList<>();
-    private Image result;
     private Chrono chrono;
-    private PixelRange imgBounds;
 
     /**
      * Constructs this operation
@@ -95,21 +93,23 @@ public class BoundingBoxOp implements TileMapOperation<Image> {
      * the specified image dimensions.
      */
     @Override
-    public Image execute() {
+    public CompletableFuture<Image> execute() {
         if (tileSetClippedBbox.isEmpty() || width(tileSetClippedBbox) < 1 || height(tileSetClippedBbox) < 1) {
-            return imaging.createEmptyImage(this.dimension, this.tileMap.getTileImageFormat());
+            return completedFuture(
+                    imaging.createEmptyImage(this.dimension, this.tileMap.getTileImageFormat())
+            );
         }
         chrono = new Chrono();
         chooseTileSet();
         getTiles();
-        if (tiles.isEmpty()) return imaging.createEmptyImage(dimension, this.tileMap.getTileImageFormat());
+        if (tiles.isEmpty()) return completedFuture(
+                imaging.createEmptyImage(dimension, this.tileMap.getTileImageFormat())
+        );
         chrono.reset();
-        getTileImages();
-        mosaic();
-        scale();
-        LOGGER.debug("Image processing took " + chrono.stop() + " ms.");
-        LOGGER.debug("Total execution is: " + chrono.total() + " ms.");
-        return result;
+        return getTileImages()
+                .thenApply(this::mosaic)
+                .thenApply(this::scale)
+                .whenComplete((r, t) -> LOGGER.debug("Execution took " + chrono.stop() + " ms."));
     }
 
     private void chooseTileSet() {
@@ -123,56 +123,50 @@ public class BoundingBoxOp implements TileMapOperation<Image> {
         return tiles;
     }
 
-    protected boolean getIsForceArgb(){
+    boolean getIsForceArgb(){
         return this.tileMap.isForceArgb();
     }
 
-    protected void getTileImages() {
+    protected CompletableFuture<List<Image>> getTileImages() {
         TileImageLoadOp loadOp = new TileImageLoadOp(this.tiles, this.imaging, tileMap.isForceArgb());
-        setImages(loadOp.execute());
-        LOGGER.debug("Image loading took " + chrono.stop() + " ms.");
+        return loadOp.execute();
     }
 
-    private void mosaic() {
-        imgBounds = tileMap.pixelBounds(tileSet, tileSetClippedBbox);
-        result = imaging.mosaic(images, imgBounds);
+    private Image mosaic(List<Image> images) {
+        PixelRange imgBounds = tileMap.pixelBounds(tileSet, tileSetClippedBbox);
+        return imaging.mosaic(images, imgBounds);
     }
 
 
-    private void scale() {
+    private Image scale(Image result) {
         if (!tileSetClippedBbox.equals(requestedBbox)) {
             //if the ows bbox is extends beyond the
             // bbox of the TileSet, then we must embed
             // the result in a larger, empty image
-            embedInEmptyImage();
+            return embedInEmptyImage(result);
         } else {
-            result = imaging.scale(result, dimension);
+            return imaging.scale(result, dimension);
         }
     }
 
-    private void embedInEmptyImage() {
-        Image empty = createEmptyBackgroundImage();
-        applyEmbeddingTransform();
-        result = imaging.overlay(empty, result);
+    private Image embedInEmptyImage(final Image result) {
+        Image empty = createEmptyBackgroundImage(result);
+        Image embedded = applyEmbeddingTransform( result );
+        return imaging.overlay(empty, embedded);
     }
 
-    private void applyEmbeddingTransform() {
+    private Image applyEmbeddingTransform(final Image result) {
         MapUnitToPixelTransform mupTransform = new MapUnitToPixelTransform(requestedBbox, new PixelRange(0, 0, (int) dimension.getWidth(), (int) dimension.getHeight()));
         PixelRange destRange = mupTransform.toPixelRange(tileSetClippedBbox);
         double sx = (double) destRange.getWidth() / (double) result.getWidth();
         int tx = destRange.getMinX() - (int)Math.floor(result.getMinX() * sx);
         double sy = (double) destRange.getHeight() / (double) result.getHeight();
         int ty = destRange.getMinY() - (int)Math.floor(result.getMinY() * sy);
-        result = imaging.affineTransform(result, tx, ty, sx, sy);
+        return imaging.affineTransform(result, tx, ty, sx, sy);
     }
 
-    private Image createEmptyBackgroundImage() {
-        Image empty = imaging.createEmptyImage(result, dimension);
-        return empty;
-    }
-
-    protected void setImages(List<Image> images){
-        this.images = images;
+    private Image createEmptyBackgroundImage(Image result) {
+        return imaging.createEmptyImage(result, dimension);
     }
 
 }

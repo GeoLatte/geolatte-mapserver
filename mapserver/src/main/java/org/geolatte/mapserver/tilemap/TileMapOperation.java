@@ -19,6 +19,10 @@
 
 package org.geolatte.mapserver.tilemap;
 
+import rx.Observable;
+
+import java.util.concurrent.CompletableFuture;
+
 /**
  * Represents an operation on a {@link TileMap}
  */
@@ -29,6 +33,6 @@ public interface TileMapOperation<R> {
      *
      * @return the result of this operation
      */
-    R execute();
+    CompletableFuture<R> execute();
 
 }

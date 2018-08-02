@@ -7,18 +7,18 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
+import static org.geolatte.mapserver.util.CompletableFutureUtil.sequence;
 
 /**
  * @author Karel Maesen, Geovise BVBA
  * creation-date: 7/1/11
  */
-public class TileImageLoadOp implements TileMapOperation<java.util.List<Image>> {
+public class TileImageLoadOp implements TileMapOperation<List<Image>> {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(TileImageLoadOp.class);
-
-    private final static TileReadExecutor READ_EXECUTOR = new TileReadExecutor();
 
     private final List<Tile> tiles;
     private final Imaging imaging;
@@ -31,26 +31,21 @@ public class TileImageLoadOp implements TileMapOperation<java.util.List<Image>> 
     }
 
     @Override
-    public java.util.List<Image> execute() {
+    public CompletableFuture<List<Image>> execute() {
         LOGGER.debug("Start loading " + tiles.size() + " tiles.");
-        List<Future<Image>> futures = new ArrayList<Future<Image>>();
+        List<CompletableFuture<Image>> futures = new ArrayList<>();
         java.util.List<Image> results = new ArrayList<>();
-
         for (Tile tile : tiles) {
-            TileImageReaderTask readerTask = new TileImageReaderTask(tile, imaging, forceArgb);
-            Future<Image> future = READ_EXECUTOR.submit(readerTask);
+
+            CompletableFuture<Image> future =
+                    CompletableFuture
+                            .supplyAsync(() -> tile.getImage(imaging, forceArgb))
+                            .thenApply(Optional::get); //TODO -- this Optional::get() is temporary and will need to disappear
             futures.add(future);
         }
 
-        for (Future<Image> future : futures) {
-            try {
-                results.add(future.get());
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e.getCause());
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e.getCause());
-            }
-        }
-        return results;
+        return sequence(futures);
+
     }
+
 }

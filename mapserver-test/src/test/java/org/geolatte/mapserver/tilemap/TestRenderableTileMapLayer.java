@@ -9,6 +9,7 @@ import org.geolatte.mapserver.ServiceLocator;
 import org.geolatte.mapserver.boot.BootServiceLocator;
 import org.geolatte.mapserver.image.Image;
 import org.geolatte.mapserver.image.ImageFormat;
+import org.geolatte.mapserver.layers.RenderableTileMapLayer;
 import org.geolatte.mapserver.ows.GetMapRequest;
 import org.geolatte.mapserver.protocols.OsmGetMapRequest;
 import org.geolatte.mapserver.rxhttp.MockFeatureServer;
@@ -18,6 +19,7 @@ import org.junit.Test;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 import static org.geolatte.mapserver.img.ImageOpsTestSupport.*;
 import static org.junit.Assert.assertThat;
@@ -50,9 +52,8 @@ public class TestRenderableTileMapLayer {
         Envelope<C2D> bbox = new Envelope<>(10, 10, 90, 90, CRS);
         mockServer.buildStub(new Envelope<>(7514065.0,-7514065.0,12523443.0,12523443.0, CRS));
 
-        Image img = layer.createMapImage(getMapRequest(bbox));
-
-        Image tmp =  imageAfterIO(img, ImageFormat.PNG);
+        CompletableFuture<Image> img = layer.createMapImage(getMapRequest(bbox));
+        Image tmp =  imageAfterIO(img.join(), ImageFormat.PNG);
         assertImageEquals(tmp, readTileImage("dynamic-render.png", true));
 
     }
