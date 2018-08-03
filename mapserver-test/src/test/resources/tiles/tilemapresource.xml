@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright 2009-2010  Geovise BVBA, QMINO BVBA
+  ~
+  ~ This file is part of GeoLatte Mapserver.
+  ~
+  ~ GeoLatte Mapserver is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Lesser General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ GeoLatte Mapserver is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with GeoLatte Mapserver.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<TileMap version="1.0.0" tilemapservice="src/test/resources/tiles/">
+    <!-- this is a TMS test dataset derived from OpenStreetMap data -->
+
+    <!-- Additional data: tms_type is google -->
+    <Title>osm</Title>
+    <Abstract></Abstract>
+    <SRS>EPSG:900913</SRS>
+    <BoundingBox minx="-20037508.340000" miny="-20037508.340000" maxx="20037508.340000" maxy="20037508.340000"/>
+    <Origin x="-20037508.340000" y="-20037508.340000"/>
+    <TileFormat width="256" height="256" mime-type="image/png" extension="png"/>
+    <TileSets>
+
+        <TileSet href="src/test/resources/tiles/osm/0"
+                 units-per-pixel="156543.03390000000945292413" order="0"/>
+        <TileSet href="src/test/resources/tiles/osm/1"
+                 units-per-pixel="78271.51695000000472646207" order="1"/>
+        <TileSet href="src/test/resources/tiles/osm/2"
+                 units-per-pixel="39135.75847500000236323103" order="2"/>
+        <TileSet href="src/test/resources/tiles/osm/3"
+                 units-per-pixel="19567.87923750000118161552" order="3"/>
+    </TileSets>
+</TileMap>
