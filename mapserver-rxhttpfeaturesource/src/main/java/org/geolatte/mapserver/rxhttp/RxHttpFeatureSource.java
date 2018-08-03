@@ -1,5 +1,6 @@
 package org.geolatte.mapserver.rxhttp;
 
+import java.awt.*;
 import java.nio.charset.Charset;
 import java.util.Locale;
 
@@ -14,10 +15,14 @@ import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.map.PlanarFeature;
 import org.geolatte.mapserver.features.FeatureDeserializer;
 import org.geolatte.mapserver.features.FeatureSource;
+import org.geolatte.mapserver.render.BboxFactors;
 import org.geolatte.mapserver.transform.Transform;
 import org.geolatte.mapserver.transform.TransformFactory;
 import org.stringtemplate.v4.ST;
 import rx.Observable;
+
+import static org.geolatte.mapserver.render.BboxFactors.upp;
+import static org.geolatte.mapserver.util.EnvelopUtils.bufferRounded;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 19/07/2018.
@@ -31,6 +36,7 @@ public class RxHttpFeatureSource implements FeatureSource {
 	final private RxHttpClient client;
 	final private FeatureDeserializerFactory featureDeserializerFactory;
 	final private CrsId sourceCrsId;
+  final private boolean convertFeaturesToRequestedCrs;
 	final private TransformFactory transformFactory;
 
 	public RxHttpFeatureSource(
@@ -42,7 +48,9 @@ public class RxHttpFeatureSource implements FeatureSource {
 		this.gzip = config.getGzip() == null ? true : config.getGzip();
 		this.featureDeserializerFactory = deserFactory;
 		this.sourceCrsId = CrsId.parse( config.getCrs() );
-		this.transformFactory = transformFactory;
+		this.convertFeaturesToRequestedCrs = config.convertFeaturesToRequestedCrs;
+
+    this.transformFactory = transformFactory;
 		this.client = new RxHttpClient.Builder()
 				.setAccept( "application/json" )
 				.setBaseUrl( host )
@@ -50,10 +58,20 @@ public class RxHttpFeatureSource implements FeatureSource {
 	}
 
 	@Override
-	public Observable<PlanarFeature> query(Envelope<C2D> bbox, String query) {
-		CrsId targetCrsId = bbox.getCoordinateReferenceSystem().getCrsId();
-		Transform<Position, C2D> transform = buildTransform( targetCrsId );
-		String queryUrl = render( transform, bbox, query );
+	public Observable<PlanarFeature> query(Envelope<C2D> tileBoundingBox, String query, BboxFactors dynamicFactors, Dimension size, double graphicsRes) {
+		Transform<C2D, C2D> transform = buildTransform( tileBoundingBox );
+
+    Envelope<C2D> env = transform == null ? tileBoundingBox : transform.reverse( tileBoundingBox );
+
+    C2D ll = env.lowerLeft();
+    C2D ur = env.upperRight();
+    double sx = size.width / (ur.getX() - ll.getX());
+    double sy = size.height / (ur.getY() - ll.getY());
+    double res = Math.max(1 / sx, 1 / sy);
+
+    Envelope<C2D> bbox = bufferRounded(env, dynamicFactors.getFactor(upp(res)));
+
+		String queryUrl = render( bbox, query );
 		ClientRequestBuilder builder = client.requestBuilder().setUrlRelativetoBase( queryUrl );
 		if ( this.gzip ) {
 			builder = builder.addHeader( "Accept-Encoding", "gzip" );
@@ -68,7 +86,7 @@ public class RxHttpFeatureSource implements FeatureSource {
 				.flatMapIterable( chunkSplitter::split )
 				.flatMapIterable( deserializer::deserialize );
 
-		if ( transform != null ) {
+		if ( convertFeaturesToRequestedCrs && (transform != null) ) {
 			Observable<Feature> transformed = featureObservable.map( f -> (Feature) (transform.forwardFeature( f )) );
 			return transformed.map( PlanarFeature::from );
 		} else {
@@ -79,10 +97,11 @@ public class RxHttpFeatureSource implements FeatureSource {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Transform<Position, C2D> buildTransform(CrsId targetCrsId) {
-		Transform<Position, C2D> transform = null;
+	private Transform<C2D, C2D> buildTransform(Envelope<C2D> bbox) {
+    CrsId targetCrsId = bbox.getCoordinateReferenceSystem().getCrsId();
+		Transform<C2D, C2D> transform = null;
 		if ( !targetCrsId.equals( sourceCrsId ) ) {
-			transform = (Transform<Position, C2D>) this.transformFactory.getTransform( sourceCrsId, targetCrsId );
+			transform = (Transform<C2D, C2D>) this.transformFactory.getTransform( sourceCrsId, targetCrsId );
 
 		}
 		return transform;
@@ -99,9 +118,8 @@ public class RxHttpFeatureSource implements FeatureSource {
 		return this.sourceCrsId;
 	}
 
-	private String render(Transform<Position, C2D> transform, Envelope<C2D> bbox, String query) {
-		Envelope env = transform == null ? bbox : transform.reverse( bbox );
-		ST st = fillInTemplateParams( env, query );
+	private String render(Envelope<C2D> bbox, String query) {
+		ST st = fillInTemplateParams( bbox, query );
 		return st.render();
 	}
 

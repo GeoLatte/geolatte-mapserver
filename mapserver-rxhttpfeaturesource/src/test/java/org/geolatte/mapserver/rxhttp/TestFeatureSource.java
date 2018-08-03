@@ -8,6 +8,7 @@ import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.maprenderer.map.PlanarFeature;
+import org.geolatte.mapserver.render.BboxFactors;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +19,7 @@ import org.geolatte.mapserver.transform.Transform;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
+import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -35,6 +37,9 @@ public class TestFeatureSource {
     private RxHttpFeatureSource featureSource;
 
     private MockFeatureServer mockServer = new MockFeatureServer();
+
+    private BboxFactors bboxFactors = new BboxFactors(1);
+    private Dimension size = new Dimension(250,250);
 
     @Before
     public void setUp(){
@@ -61,7 +66,7 @@ public class TestFeatureSource {
         Envelope<C2D> bbox = new Envelope<>(556600, 6446270,667920, 6621290, CoordinateReferenceSystems.WEB_MERCATOR);
         mockServer.buildStub(bbox);
 
-        Observable<PlanarFeature> result = featureSource.query(bbox);
+        Observable<PlanarFeature> result = query(bbox);
 
         TestSubscriber<Feature> sub = new TestSubscriber<>();
         result.subscribe(sub);
@@ -83,7 +88,7 @@ public class TestFeatureSource {
         Envelope<C2D> bbox = new Envelope<>(556600, 6446270,667920, 6621290, CoordinateReferenceSystems.WEB_MERCATOR);
         mockServer.buildStub(bbox, "\n");
 
-        Observable<PlanarFeature> result = featureSource.query(bbox);
+        Observable<PlanarFeature> result = query(bbox);
 
         TestSubscriber<Feature> sub = new TestSubscriber<>();
         result.subscribe(sub);
@@ -103,7 +108,7 @@ public class TestFeatureSource {
                 )
         );
 
-        Observable<PlanarFeature> result = featureSource.query(new Envelope<C2D>(10, 10, 20, 20, CoordinateReferenceSystems.WEB_MERCATOR));
+        Observable<PlanarFeature> result = query(new Envelope<C2D>(10, 10, 20, 20, CoordinateReferenceSystems.WEB_MERCATOR));
 
         TestSubscriber<Feature> sub = new TestSubscriber<>();
         result.subscribe(sub);
@@ -114,7 +119,9 @@ public class TestFeatureSource {
     }
 
 
-
+    private Observable<PlanarFeature> query(Envelope<C2D> bbox) {
+      return featureSource.query(bbox, bboxFactors, size, 1);
+    }
 
 }
 

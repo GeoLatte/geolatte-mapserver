@@ -2,10 +2,11 @@ package org.geolatte.mapserver.features;
 
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
-import org.geolatte.geom.Feature;
 import org.geolatte.maprenderer.map.PlanarFeature;
+import org.geolatte.mapserver.render.BboxFactors;
 import rx.Observable;
 
+import java.awt.*;
 import java.io.Closeable;
 
 /**
@@ -15,9 +16,9 @@ import java.io.Closeable;
  */
 public interface FeatureSource extends Closeable {
 
-    Observable<PlanarFeature> query(Envelope<C2D> bbox, String query);
+    Observable<PlanarFeature> query(Envelope<C2D> bbox, String query, BboxFactors dynamicFactors, Dimension size, double resolution);
 
-    default Observable<PlanarFeature> query(Envelope<C2D> bbox) {
-        return query( bbox, null);
+    default Observable<PlanarFeature> query(Envelope<C2D> bbox, BboxFactors dynamicFactors, Dimension size, double resolution) {
+        return query( bbox, null, dynamicFactors, size, resolution);
     }
 }

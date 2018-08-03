@@ -69,7 +69,7 @@ public class StdRenderer implements Renderer {
 
         instrumentCreateMapOp(graphics.getMapUnitsPerPixel(), promise);
 
-        Observable<PlanarFeature> features = featureSource.query(queryBoundingBox(tileBoundingBox, graphics.getMapUnitsPerPixel()));
+        Observable<PlanarFeature> features = featureSource.query(tileBoundingBox, this.dynamicFactors, graphics.getDimension(), graphics.getMapUnitsPerPixel());
         Observable<PlanarFeature> share = features.share();
 
         share.subscribe(createRenderingSubscriber(graphics, painter, promise));
@@ -102,12 +102,5 @@ public class StdRenderer implements Renderer {
                 mapImageTimer.stop();
             }
         });
-    }
-
-    private Envelope<C2D> queryBoundingBox(Envelope<C2D> tileBoundingBox, double resolution) {
-        return bufferRounded(
-                tileBoundingBox,
-                this.dynamicFactors.getFactor(upp(resolution)));
-
     }
 }
