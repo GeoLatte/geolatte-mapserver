@@ -25,24 +25,29 @@ import static org.geolatte.mapserver.util.EnvelopUtils.bufferRounded;
  */
 public class StdRenderer implements Renderer {
 
+    private final static double STANDARD_FACTOR = 3;
+
     final private FeatureSource featureSource;
     final private PainterFactory painterFactory;
     final private String painterRef;
     final private Imaging imaging;
+    final private double factor;
 
-    public StdRenderer(FeatureSource featureSource, String painterRef, ServiceLocator serviceLocator) {
+
+    public StdRenderer(FeatureSource featureSource, String painterRef, double factor, ServiceLocator serviceLocator) {
         this.featureSource = featureSource;
         this.painterRef = painterRef;
         this.imaging = serviceLocator.imaging();
         this.painterFactory = serviceLocator.painterFactory();
+        this.factor = factor;
     }
 
     public StdRenderer(RenderContext renderContext, ServiceLocator locator) {
-        this(renderContext.getFeatureSource(), renderContext.getPainterRef(), locator);
+        this(renderContext.getFeatureSource(), renderContext.getPainterRef(), STANDARD_FACTOR, locator);
     }
 
     public StdRenderer(RenderContext renderContext){
-        this(renderContext.getFeatureSource(), renderContext.getPainterRef(), ServiceLocator.defaultInstance());
+        this(renderContext.getFeatureSource(), renderContext.getPainterRef(), STANDARD_FACTOR, ServiceLocator.defaultInstance());
     }
 
     @Override
@@ -70,6 +75,6 @@ public class StdRenderer implements Renderer {
     }
 
     private Envelope<C2D> queryBoundingBox(Envelope<C2D> tileBoundingBox) {
-        return bufferRounded(tileBoundingBox, 3);
+        return bufferRounded(tileBoundingBox, this.factor);
     }
 }

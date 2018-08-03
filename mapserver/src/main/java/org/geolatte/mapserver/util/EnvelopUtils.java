@@ -20,9 +20,11 @@ public class EnvelopUtils {
 
     public static Envelope<C2D> bufferRounded(Envelope<C2D> env, double factor) {
 
-        if (factor <= 1) {
-            throw new IllegalArgumentException("Factor needs to be > 1");
+        if (factor < 1) {
+            throw new IllegalArgumentException("Factor needs to be >= 1");
         }
+
+        factor -= 1;
 
         double halfWidth = factor*width(env) / 2;
         double halfHeight = factor*height(env) /2;
