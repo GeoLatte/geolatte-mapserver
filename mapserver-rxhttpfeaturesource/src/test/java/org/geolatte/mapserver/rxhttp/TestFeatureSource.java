@@ -38,8 +38,7 @@ public class TestFeatureSource {
     public void setUp(){
         mockServer.start();
 
-        RxHttpFeatureSourceConfig config = new RxHttpFeatureSourceConfig(
-        );
+        RxHttpFeatureSourceConfig config = new RxHttpFeatureSourceConfig();
         config.setHost("http://localhost:8080");
         config.setTemplate("/query?bbox=<bbox>");
         featureSource = new RxHttpFeatureSource(config);
