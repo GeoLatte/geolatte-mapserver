@@ -1,7 +1,12 @@
 package org.geolatte.mapserver.config;
 
 import org.geolatte.mapserver.*;
-import org.geolatte.mapserver.features.FeatureSourceFactory;
+import org.geolatte.mapserver.boot.StdFeatureSourceFactory;
+import org.geolatte.mapserver.image.Imaging;
+import org.geolatte.mapserver.layers.DynamicLayer;
+import org.geolatte.mapserver.layers.RenderableTileMapLayer;
+import org.geolatte.mapserver.protocols.ProtocolAdapter;
+import org.geolatte.mapserver.render.Renderer;
 import org.geolatte.mapserver.tilemap.TileMetadata;
 import org.geolatte.mapserver.layers.TileMapLayer;
 import org.geolatte.mapserver.tilemap.TileSet;
@@ -11,13 +16,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 
 import static java.util.Arrays.asList;
 import static junit.framework.TestCase.assertTrue;
 import static org.geolatte.mapserver.image.ImageFormat.JPEG;
 import static org.geolatte.mapserver.image.ImageFormat.PNG;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -35,12 +45,9 @@ public class TestServiceConfiguration {
     private ServiceMetadata.ServiceIdentification expectedSI;
     private List<ServiceMetadata.Operation> expectedOperations;
 
-    private final FeatureSourceFactoryRegistry fsfregistry = new FeatureSourceFactoryRegistry() {
-        @Override
-        public Optional<FeatureSourceFactory> featureSourceFactoryForType(String canonicalName) {
-            return Optional.empty();
-        }
-    };
+    private ServiceLocator dummyLocator = mkServiceLocator();
+
+    private final FeatureSourceFactoryRegistry fsfregistry = new StdFeatureSourceFactory(Arrays.asList(new FeatureSourceFactoryDouble()));
 
     @Before
     public void setup() {
@@ -59,7 +66,8 @@ public class TestServiceConfiguration {
 
         ConfigServicProvider provider = new ConfigServicProvider("test-mapserver");
         serviceMetadata = provider.serviceMetadata();
-        registry = provider.layerSourceRegistry(fsfregistry);
+        registry = provider.layerRegistry(fsfregistry, dummyLocator);
+
     }
 
     @Test
@@ -94,12 +102,33 @@ public class TestServiceConfiguration {
     }
 
     @Test
-    public void testConstantTileMapLayer(){
+    public void testTileMapLayer(){
         Optional<Layer> layerOpt = registry.getLayer("myTilemap");
         assertTrue(layerOpt.isPresent());
         Layer layer = layerOpt.get();
         testTileMapStructure((TileMapLayer) layer);
     }
+
+    @Test
+    public void testRenderableTileMapLayer(){
+        Optional<Layer> layerOpt = registry.getLayer("vkbtm");
+        assertTrue(layerOpt.isPresent());
+        Layer layer = layerOpt.get();
+        assertThat( layer, instanceOf(RenderableTileMapLayer.class));
+    }
+
+    @Test
+    public void testDynamicLayer(){
+        Optional<Layer> layerOpt = registry.getLayer("vkb");
+        assertTrue(layerOpt.isPresent());
+        Layer layer = layerOpt.get();
+        assertThat( layer, instanceOf(DynamicLayer.class));
+        Renderer renderer = ((DynamicLayer)layer).getRenderer();
+        assertThat(renderer, notNullValue());
+
+    }
+
+
 
     private void testTileMapStructure(TileMapLayer layer){
         assertEquals("myTilemap", layer.getName());
@@ -119,6 +148,42 @@ public class TestServiceConfiguration {
 
         }
     }
+
+    private ServiceLocator mkServiceLocator() {
+        return new ServiceLocator() {
+
+            @Override
+            public Imaging imaging() {
+                return null;
+            }
+
+            @Override
+            public ProtocolAdapter protocolAdapter() {
+                return null;
+            }
+
+            @Override
+            public LayerRegistry layerRegistry() {
+                return null;
+            }
+
+            @Override
+            public ServiceMetadata serviceMetadata() {
+                return null;
+            }
+
+            @Override
+            public ExecutorService executorService() {
+                return null;
+            }
+
+            @Override
+            public PainterFactory painterFactory() {
+                return null;
+            }
+        };
+    }
+
 
 
 }

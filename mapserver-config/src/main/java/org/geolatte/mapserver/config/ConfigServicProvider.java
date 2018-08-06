@@ -4,6 +4,7 @@ import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.geolatte.mapserver.FeatureSourceFactoryRegistry;
 import org.geolatte.mapserver.LayerRegistry;
+import org.geolatte.mapserver.ServiceLocator;
 import org.geolatte.mapserver.ServiceMetadata;
 import org.geolatte.mapserver.image.ImageFormat;
 import org.geolatte.mapserver.spi.LayerRegistryProvider;
@@ -37,10 +38,10 @@ public class ConfigServicProvider implements ServiceMetadataProvider, LayerRegis
     }
 
     @Override
-    public LayerRegistry layerSourceRegistry(FeatureSourceFactoryRegistry featureSourceFactoryRegistry) {
+    public LayerRegistry layerRegistry(FeatureSourceFactoryRegistry featureSourceFactoryRegistry, ServiceLocator locator) {
         Config cf = mainConfig.getConfig(PREFIX);
         Config layersCf = cf.getConfig("layers");
-        return new LayerRegistryBuilder(featureSourceFactoryRegistry, layersCf).build();
+        return new LayerRegistryBuilder(featureSourceFactoryRegistry, layersCf, locator).build();
     }
 
 

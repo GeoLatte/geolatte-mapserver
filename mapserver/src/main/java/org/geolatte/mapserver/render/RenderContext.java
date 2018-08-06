@@ -1,4 +1,4 @@
-package org.geolatte.mapserver.layers;
+package org.geolatte.mapserver.render;
 
 import org.geolatte.mapserver.ServiceLocator;
 import org.geolatte.mapserver.features.FeatureSource;
@@ -11,13 +11,16 @@ public class RenderContext {
     final private FeatureSource featureSource;
     final private String painterRef;
 
-    public RenderContext(FeatureSource featureSource, String painterRef, ServiceLocator serviceLocator) {
+    private RenderContext(FeatureSource featureSource, String painterRef) {
         this.featureSource = featureSource;
         this.painterRef = painterRef;
     }
 
     public static RenderContext from(FeatureSource featureSource, String painterRef) {
-        return new RenderContext(featureSource, painterRef, ServiceLocator.defaultInstance());
+        if (featureSource == null || painterRef == null) {
+            throw new IllegalArgumentException("Can't accept null arguments");
+        }
+        return new RenderContext(featureSource, painterRef);
     }
 
     public String getPainterRef() {
