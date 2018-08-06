@@ -28,15 +28,20 @@ OGC Web services")
  
  5. The `OwsHttpService` turns this image into a `HttpResponse`.
 
-Currently Mapserver supports two types of `Layer`s. The first, `TileMapLayer`, is backed by a pre-rendered 
+## Layers
+
+Currently Mapserver supports three types of `Layer`. The first, `TileMapLayer`, is backed by a pre-rendered 
 [TileMap](https://wiki.osgeo.org/wiki/Tile_Map_Service_Specification). When handling map requests,
 the best fitting tilemap level is selected and the requested image bbox is created by mosaicing, 
 cropping and stretching the image as required.  
 
-The second type is the `RenderableTileMapLayer`. It
-has the same behavior as the first, but will generate tiles dynamically. To render the tiles, the `RenderableTileMapLayer` uses the [Geolatte MapRenderer](https://github.com/GeoLatte/geolatte-maprenderer)
-as the rendering backend, `FeatureSource` as a source of geographic objects (features), and a `Painter`
-that specifies how the feature should be rendered on the rendering backend.
+The second type is the `DynamicLayer` which will render the requested map directly using the 
+[Geolatte MapRenderer](https://github.com/GeoLatte/geolatte-maprenderer) as the rendering backend, `FeatureSource` as a
+ source of geographic objects (features), and a `Painter` that specifies how the feature should be rendered 
+ on the rendering backend. 
+ 
+ The third type, `RenderableTileMapLayer` combines the behavior of the two. It uses a `TileMap` like the first, but will 
+ generate tiles dynamically using the same resources as the `DynamicLayer`. 
 
 ### Service Provider Interfaces
 
@@ -55,7 +60,7 @@ services. These are:
  
   - `LayerRegistryProvider`: to provide the `LayerRegistry` for the Mapserver
   
-  - `FeatureSourceFactoryProvider`: to provide
+  - `FeatureSourceFactoryProvider`: to provide factories for `FeatureSource`s.
    
   - `ServiceMetadataProvider` provides general service metadata (required by the `GetCapabilitiesRequest`)
  

@@ -12,3 +12,4 @@ public interface FeatureSourceFactory {
     Class<? extends FeatureSourceConfig> configClass();
 
 }
+
