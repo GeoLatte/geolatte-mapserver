@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import rx.Observable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,11 +18,12 @@ import java.util.List;
 class GeoJsonDeserializer {
 
     final private static Logger logger = LoggerFactory.getLogger(GeoJsonDeserializer.class);
-    final static private ObjectMapper mapper;
+    final private static ObjectMapper mapper;
 
     //mutable state
     private String[] jsons;
-    private List<PlanarFeature> features = new ArrayList<>();
+    private String partialJson = "";
+    private List<PlanarFeature> features;
 
     static {
         mapper = new ObjectMapper();
@@ -29,6 +31,7 @@ class GeoJsonDeserializer {
     }
 
     Observable<PlanarFeature> deserialize(String chunk) {
+        features = new ArrayList<>();
         splitChunk(chunk);
         deserializeChunks();
         return Observable.from(features);
@@ -52,6 +55,19 @@ class GeoJsonDeserializer {
     }
 
     private void splitChunk(String chunk) {
-        jsons = chunk.split("\n");
+        String chunkWithPartial = partialJson + chunk;
+
+        String[] parts = chunkWithPartial.split("\n");
+
+        if (chunk.endsWith("\n")) {
+            // every part in the chunk is a complete json
+            partialJson = "";
+            jsons = parts;
+        } else {
+            // the last part is not a complete json, we keep it for the next chunk
+            partialJson = parts[parts.length - 1];
+            // all other parts are complete jsons
+            jsons = Arrays.copyOfRange(parts, 0, parts.length - 1);
+        }
     }
 }

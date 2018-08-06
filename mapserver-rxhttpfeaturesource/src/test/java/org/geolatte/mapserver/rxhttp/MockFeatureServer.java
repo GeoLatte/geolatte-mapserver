@@ -33,6 +33,7 @@ public class MockFeatureServer {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
+                        .withChunkedDribbleDelay(5, 10)
                         .withBody(returnBody)
                 )
         );
@@ -51,6 +52,6 @@ public class MockFeatureServer {
     private final String JSONBODY =
             "{\"id\":\"10000301\",\"type\":\"Feature\",\"properties\":{\"nummer\":\"aab\"},\"geometry\":{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"bbox\":[97662,180039.31,97662,180039.31],\"geometries\":[{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"bbox\":[97662,180039.31,97662,180039.31],\"coordinates\":[97662,180039.31]}]}}\n" +
                     "{\"id\":\"10000351\",\"type\":\"Feature\",\"properties\":{\"nummer\":\"baa\"},\"geometry\":{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"bbox\":[106175.99,175881.46,106175.99,175881.46],\"geometries\":[{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"bbox\":[106175.99,175881.46,106175.99,175881.46],\"coordinates\":[106175.99,175881.46]}]}}\n" +
-                    "{\"id\":\"10000401\",\"type\":\"Feature\",\"properties\":{\"nummer\":\"aba\"},\"geometry\":{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"bbox\":[106175.99,175881.46,106175.99,175881.46],\"geometries\":[{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"bbox\":[106175.99,175881.46,106175.99,175881.46],\"coordinates\":[106175.99,175881.46]}]}}";
+                    "{\"id\":\"10000401\",\"type\":\"Feature\",\"properties\":{\"nummer\":\"aba\"},\"geometry\":{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"bbox\":[106175.99,175881.46,106175.99,175881.46],\"geometries\":[{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"bbox\":[106175.99,175881.46,106175.99,175881.46],\"coordinates\":[106175.99,175881.46]}]}}\n";
 
 }
