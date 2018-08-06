@@ -4,16 +4,13 @@ import be.wegenenverkeer.rxhttp.ClientRequest;
 import be.wegenenverkeer.rxhttp.RxHttpClient;
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
-import org.geolatte.geom.Feature;
 import org.geolatte.maprenderer.map.PlanarFeature;
 import org.geolatte.mapserver.features.FeatureSource;
 import org.stringtemplate.v4.ST;
 import rx.Observable;
 
 import java.nio.charset.Charset;
-import java.util.Optional;
-
-import static java.lang.String.format;
+import java.util.Locale;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 19/07/2018.
@@ -42,9 +39,9 @@ public class RxHttpFeatureSource implements FeatureSource {
         ClientRequest request = client.requestBuilder()
                 .setUrlRelativetoBase(queryUrl)
                 .build();
-       GeoJsonDeserializer deserializer = new GeoJsonDeserializer();
-       return client.executeObservably(request, bytes -> new String(bytes, UTF8))
-               .flatMap( deserializer::deserialize);
+        GeoJsonDeserializer deserializer = new GeoJsonDeserializer();
+        return client.executeObservably(request, bytes -> new String(bytes, UTF8))
+                .flatMap(deserializer::deserialize);
     }
 
     private String render(Envelope<C2D> bbox, String query) {
@@ -64,12 +61,12 @@ public class RxHttpFeatureSource implements FeatureSource {
     private String asString(Envelope<C2D> bbox) {
         C2D ll = bbox.lowerLeft();
         C2D ur = bbox.upperRight();
-        return format("%f,%f,%f,%f", ll.getX(), ll.getY(), ur.getX(), ur.getY());
+        return String.format(Locale.ROOT, "%f,%f,%f,%f", ll.getX(), ll.getY(), ur.getX(), ur.getY());
     }
 
     @Override
     public void close() {
-        if(client != null) {
+        if (client != null) {
             client.close();
         }
     }
