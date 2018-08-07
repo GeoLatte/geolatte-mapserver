@@ -5,6 +5,7 @@ import be.wegenenverkeer.rxhttp.RxHttpClient;
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.maprenderer.map.PlanarFeature;
+import org.geolatte.mapserver.features.FeatureDeserializer;
 import org.geolatte.mapserver.features.FeatureSource;
 import org.stringtemplate.v4.ST;
 import rx.Observable;
@@ -21,9 +22,9 @@ public class RxHttpFeatureSource implements FeatureSource {
     final private static Charset UTF8 = Charset.forName("UTF-8");
     final private String template;
     final private RxHttpClient client;
+    final private FeatureDeserializer featureDeserializer;
 
-
-    public RxHttpFeatureSource(RxHttpFeatureSourceConfig config) {
+    public RxHttpFeatureSource(RxHttpFeatureSourceConfig config, FeatureDeserializer featureDeserializer) {
         this.template = config.getTemplate();
         String host = config.getHost();
 
@@ -31,6 +32,8 @@ public class RxHttpFeatureSource implements FeatureSource {
                 .setAccept("application/json")
                 .setBaseUrl(host)
                 .build();
+
+        this.featureDeserializer = featureDeserializer;
     }
 
     @Override
@@ -39,9 +42,13 @@ public class RxHttpFeatureSource implements FeatureSource {
         ClientRequest request = client.requestBuilder()
                 .setUrlRelativetoBase(queryUrl)
                 .build();
-        GeoJsonDeserializer deserializer = new GeoJsonDeserializer();
-        return client.executeObservably(request, bytes -> new String(bytes, UTF8))
-                .flatMap(deserializer::deserialize);
+
+        ChunkSplitter chunkSplitter = new ChunkSplitter();
+
+        return client
+                .executeObservably(request, bytes -> new String(bytes, UTF8))
+                .flatMapIterable(chunkSplitter::split)
+                .flatMapIterable(featureDeserializer::deserialize);
     }
 
     private String render(Envelope<C2D> bbox, String query) {

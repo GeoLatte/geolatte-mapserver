@@ -2,6 +2,7 @@ package org.geolatte.mapserver.config;
 
 import org.geolatte.mapserver.*;
 import org.geolatte.mapserver.boot.StdFeatureSourceFactory;
+import org.geolatte.mapserver.features.FeatureDeserializer;
 import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.layers.DynamicLayer;
 import org.geolatte.mapserver.layers.RenderableTileMapLayer;
@@ -169,6 +170,11 @@ public class TestServiceConfiguration {
 
             @Override
             public ServiceMetadata serviceMetadata() {
+                return null;
+            }
+
+            @Override
+            public FeatureDeserializer featureDeserializer() {
                 return null;
             }
 

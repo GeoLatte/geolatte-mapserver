@@ -1,6 +1,6 @@
 package org.geolatte.mapserver.rxhttp;
 
-import com.typesafe.config.Config;
+import org.geolatte.mapserver.features.FeatureDeserializer;
 import org.geolatte.mapserver.features.FeatureSource;
 import org.geolatte.mapserver.features.FeatureSourceConfig;
 import org.geolatte.mapserver.features.FeatureSourceFactory;
@@ -18,11 +18,11 @@ public class RxHttpFeatureSourceFactory implements FeatureSourceFactory {
     }
 
     @Override
-    public FeatureSource mkFeatureSource(FeatureSourceConfig config) {
+    public FeatureSource mkFeatureSource(FeatureSourceConfig config, FeatureDeserializer featureDeserializer) {
         if(config instanceof RxHttpFeatureSource) {
             throw new IllegalStateException(format("Unexpected type of config: %s ", config.getClass().getCanonicalName()));
         }
-        return new RxHttpFeatureSource((RxHttpFeatureSourceConfig) config);
+        return new RxHttpFeatureSource((RxHttpFeatureSourceConfig) config, featureDeserializer);
     }
 
     @Override
