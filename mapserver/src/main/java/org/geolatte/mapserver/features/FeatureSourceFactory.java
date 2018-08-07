@@ -7,7 +7,7 @@ public interface FeatureSourceFactory {
 
     Class<? extends FeatureSource> resultClass();
 
-    FeatureSource mkFeatureSource(FeatureSourceConfig config);
+    FeatureSource mkFeatureSource(FeatureSourceConfig config, FeatureDeserializer featureDeserializer);
 
     Class<? extends FeatureSourceConfig> configClass();
 

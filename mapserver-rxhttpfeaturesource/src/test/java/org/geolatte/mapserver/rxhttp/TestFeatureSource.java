@@ -36,7 +36,7 @@ public class TestFeatureSource {
         RxHttpFeatureSourceConfig config = new RxHttpFeatureSourceConfig();
         config.setHost("http://localhost:8080");
         config.setTemplate("/query?bbox=<bbox>");
-        featureSource = new RxHttpFeatureSource(config);
+        featureSource = new RxHttpFeatureSource(config, new GeoJsonFeatureDeserializer());
     }
 
     @After

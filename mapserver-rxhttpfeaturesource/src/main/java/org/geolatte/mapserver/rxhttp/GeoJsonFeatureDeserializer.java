@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.Feature;
 import org.geolatte.geom.json.GeolatteGeomModule;
 import org.geolatte.maprenderer.map.PlanarFeature;
+import org.geolatte.mapserver.features.FeatureDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,9 +13,9 @@ import java.util.Collections;
 /**
  * Created by Karel Maesen, Geovise BVBA on 20/07/2018.
  */
-class GeoJsonDeserializer {
+class GeoJsonFeatureDeserializer implements FeatureDeserializer {
 
-    final private static Logger logger = LoggerFactory.getLogger(GeoJsonDeserializer.class);
+    final private static Logger logger = LoggerFactory.getLogger(GeoJsonFeatureDeserializer.class);
     final private static ObjectMapper mapper;
 
     static {
@@ -22,6 +23,7 @@ class GeoJsonDeserializer {
         mapper.registerModule(new GeolatteGeomModule());
     }
 
+    @Override
     public Iterable<PlanarFeature> deserialize(String jsonString) {
         try {
             Feature<?, ?> feature = mapper.readValue(jsonString, Feature.class);
