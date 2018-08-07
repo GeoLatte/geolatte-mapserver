@@ -1,6 +1,7 @@
 package org.geolatte.mapserver;
 
 import org.geolatte.mapserver.boot.BootServiceLocator;
+import org.geolatte.mapserver.features.FeatureDeserializer;
 import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.protocols.ProtocolAdapter;
 

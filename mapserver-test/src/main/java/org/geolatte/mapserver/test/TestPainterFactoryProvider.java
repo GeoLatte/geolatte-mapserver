@@ -62,13 +62,18 @@ class TestPainter implements Painter {
                 if (geom instanceof Point) {
                     drawPoint((Point<C2D>)geom);
                 } else {
-                    ShapeAdapter sa = new ShapeAdapter(mapGraphics.getTransform());
-                    Shape[] shapes = sa.toShape(geom);
-                    asList(shapes).forEach(mapGraphics::draw);
+                    drawGeom(geom);
                 }
             });
+        } else {
+            drawGeom(geometry);
         }
+    }
 
+    private void drawGeom(Geometry<C2D> geom) {
+        ShapeAdapter sa = new ShapeAdapter(mapGraphics.getTransform());
+        Shape[] shapes = sa.toShape(geom);
+        asList(shapes).forEach(mapGraphics::draw);
     }
 
     private void drawPoint(Point<C2D> geometry) {
