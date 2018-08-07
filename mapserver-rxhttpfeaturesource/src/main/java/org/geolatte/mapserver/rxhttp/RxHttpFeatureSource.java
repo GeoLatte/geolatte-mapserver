@@ -22,18 +22,17 @@ public class RxHttpFeatureSource implements FeatureSource {
     final private static Charset UTF8 = Charset.forName("UTF-8");
     final private String template;
     final private RxHttpClient client;
-    final private FeatureDeserializer featureDeserializer;
+    final private FeatureDeserializerFactory featureDeserializerFactory;
 
-    public RxHttpFeatureSource(RxHttpFeatureSourceConfig config, FeatureDeserializer featureDeserializer) {
+    public RxHttpFeatureSource(RxHttpFeatureSourceConfig config, FeatureDeserializerFactory deserFactory) {
         this.template = config.getTemplate();
         String host = config.getHost();
+        this.featureDeserializerFactory = deserFactory;
 
         this.client = new RxHttpClient.Builder()
                 .setAccept("application/json")
                 .setBaseUrl(host)
                 .build();
-
-        this.featureDeserializer = featureDeserializer;
     }
 
     @Override
@@ -44,11 +43,11 @@ public class RxHttpFeatureSource implements FeatureSource {
                 .build();
 
         ChunkSplitter chunkSplitter = new ChunkSplitter();
-
+        final FeatureDeserializer deserializer = featureDeserializerFactory.featureDeserializer();
         return client
                 .executeObservably(request, bytes -> new String(bytes, UTF8))
                 .flatMapIterable(chunkSplitter::split)
-                .flatMapIterable(featureDeserializer::deserialize);
+                .flatMapIterable(deserializer::deserialize);
     }
 
     private String render(Envelope<C2D> bbox, String query) {

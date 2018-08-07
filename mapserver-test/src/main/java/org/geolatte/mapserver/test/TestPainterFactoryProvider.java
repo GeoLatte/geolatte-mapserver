@@ -67,7 +67,7 @@ class TestPainter implements Painter {
             });
         } else {
             drawGeom(geometry);
-        }   
+        }
     }
 
     private void drawGeom(Geometry<C2D> geom) {

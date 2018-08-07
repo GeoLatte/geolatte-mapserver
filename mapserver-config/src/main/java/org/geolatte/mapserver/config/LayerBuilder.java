@@ -40,7 +40,7 @@ public abstract class LayerBuilder {
                 .featureSourceFactoryForType(featureSourceClass)
                 .map(f -> {
                     FeatureSourceConfig fsc = ConfigBeanFactory.create(sourceConfig, f.configClass());
-                    return f.mkFeatureSource(fsc, serviceLocator.featureDeserializer());
+                    return f.mkFeatureSource(fsc);
                 });
 
         //Let's make configuration lenient and just log that we can't seem to

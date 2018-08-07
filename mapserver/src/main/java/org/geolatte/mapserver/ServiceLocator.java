@@ -24,8 +24,6 @@ public interface ServiceLocator {
 
     ServiceMetadata serviceMetadata();
 
-    FeatureDeserializer featureDeserializer();
-
     ExecutorService executorService();
 
     PainterFactory painterFactory();

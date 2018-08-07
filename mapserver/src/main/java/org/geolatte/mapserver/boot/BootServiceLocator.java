@@ -41,7 +41,6 @@ public class BootServiceLocator implements ServiceLocator {
     final private Imaging imagingInstance;
     final private ProtocolAdapter protocolAdapter;
     final private ServiceMetadata serviceMetadata;
-    final private FeatureDeserializer featureDeserializer;
     final private ExecutorService executorService;
     private final AggregatePainterFactory painterFactory;
 
@@ -90,7 +89,6 @@ public class BootServiceLocator implements ServiceLocator {
         protocolAdapter = loadFirst(ProtocolAdapterProvider.class).protocolAdapter();
         painterFactory = new AggregatePainterFactory(loadAllPainterFactories());
         serviceMetadata = loadFirst(ServiceMetadataProvider.class).serviceMetadata();
-        featureDeserializer = loadFirst(FeatureDeserializerProvider.class).featureDeserializer();
     }
 
 
@@ -118,11 +116,6 @@ public class BootServiceLocator implements ServiceLocator {
     @Override
     public ServiceMetadata serviceMetadata() {
         return this.serviceMetadata;
-    }
-
-    @Override
-    public FeatureDeserializer featureDeserializer() {
-        return this.featureDeserializer;
     }
 
     //TODO -- make this configurable through a provider

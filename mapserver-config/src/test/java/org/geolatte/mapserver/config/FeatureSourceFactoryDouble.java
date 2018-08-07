@@ -1,6 +1,5 @@
 package org.geolatte.mapserver.config;
 
-import org.geolatte.mapserver.features.FeatureDeserializer;
 import org.geolatte.mapserver.features.FeatureSource;
 import org.geolatte.mapserver.features.FeatureSourceConfig;
 import org.geolatte.mapserver.features.FeatureSourceFactory;
@@ -17,7 +16,7 @@ public class FeatureSourceFactoryDouble implements FeatureSourceFactory, Feature
     }
 
     @Override
-    public FeatureSource mkFeatureSource(FeatureSourceConfig config, FeatureDeserializer featureDeserializer) {
+    public FeatureSource mkFeatureSource(FeatureSourceConfig config) {
         return new FeatureSourceDouble();
     }
 

@@ -174,11 +174,6 @@ public class TestServiceConfiguration {
             }
 
             @Override
-            public FeatureDeserializer featureDeserializer() {
-                return null;
-            }
-
-            @Override
             public ExecutorService executorService() {
                 return null;
             }
