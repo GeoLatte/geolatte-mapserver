@@ -22,8 +22,11 @@ public class RxHttpFeatureSource implements FeatureSource {
     final private String template;
     final private RxHttpClient client;
 
+    private GeoJsonDeserializer deserializer;
 
     public RxHttpFeatureSource(RxHttpFeatureSourceConfig config) {
+        this.deserializer = new GeoJsonDeserializer();
+
         this.template = config.getTemplate();
         String host = config.getHost();
 
@@ -39,9 +42,13 @@ public class RxHttpFeatureSource implements FeatureSource {
         ClientRequest request = client.requestBuilder()
                 .setUrlRelativetoBase(queryUrl)
                 .build();
-        GeoJsonDeserializer deserializer = new GeoJsonDeserializer();
-        return client.executeObservably(request, bytes -> new String(bytes, UTF8))
-                .flatMap(deserializer::deserialize);
+
+        ChunkSplitter chunkSplitter = new ChunkSplitter();
+
+        return client
+                .executeObservably(request, bytes -> new String(bytes, UTF8))
+                .flatMapIterable(chunkSplitter::split)
+                .flatMapIterable(deserializer::deserialize);
     }
 
     private String render(Envelope<C2D> bbox, String query) {
