@@ -1,6 +1,5 @@
 package org.geolatte.mapserver.rxhttp;
 
-import org.geolatte.mapserver.features.FeatureDeserializer;
 import org.geolatte.mapserver.features.FeatureSource;
 import org.geolatte.mapserver.features.FeatureSourceConfig;
 import org.geolatte.mapserver.features.FeatureSourceFactory;
@@ -22,28 +21,35 @@ public class RxHttpFeatureSourceFactory implements FeatureSourceFactory {
     }
 
     @Override
-    public FeatureSource mkFeatureSource(FeatureSourceConfig config) {
-        if(config instanceof RxHttpFeatureSource) {
+    public RxHttpFeatureSource mkFeatureSource(FeatureSourceConfig config) {
+        if (config instanceof RxHttpFeatureSource) {
             throw new IllegalStateException(format("Unexpected type of config: %s ", config.getClass().getCanonicalName()));
         }
         RxHttpFeatureSourceConfig featureSourceConfig = (RxHttpFeatureSourceConfig) config;
-        FeatureDeserializerFactory factory =  instantiate(featureSourceConfig.getFeatureDeserializerFactory());
+        FeatureDeserializerFactory factory = instantiate(featureSourceConfig.getFeatureDeserializerFactory());
         return new RxHttpFeatureSource(featureSourceConfig, factory);
     }
 
     private FeatureDeserializerFactory instantiate(String factoryClassName) {
-        if(factoryClassName == null) {
-            logger.info("RxHttpFeatureSource is using the standard GeoJsonFeatureDeserializer factory");
-            return new GeoJsonFeatureDeserializerFactory();
-        } else {
-            try {
-                logger.info(format("RxHttpFeatureSource is configured with %s as FeatureDeserializerFactory", factoryClassName));
-                return (FeatureDeserializerFactory) Class.forName(factoryClassName).newInstance();
-            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | ClassCastException e) {
-                logger.error(format("Failed to instantiate instance of %s as FeatureDeserializerFactory", factoryClassName), e);
-                throw new IllegalStateException(e);
-            }
+        if (factoryClassName == null) {
+            return instantiateStandardDeserFactory(factoryClassName);
         }
+        return instantiateConfiguredClassName(factoryClassName);
+    }
+
+    private FeatureDeserializerFactory instantiateConfiguredClassName(String factoryClassName) {
+        try {
+            logger.info(format("RxHttpFeatureSource is configured with %s as FeatureDeserializerFactory", factoryClassName));
+            return (FeatureDeserializerFactory) Class.forName(factoryClassName).newInstance();
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | ClassCastException e) {
+            logger.error(format("Failed to instantiate instance of %s as FeatureDeserializerFactory", factoryClassName), e);
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private FeatureDeserializerFactory instantiateStandardDeserFactory(String factoryClassName) {
+        logger.info(format("RxHttpFeatureSource uses the standard FeatureDeserializerFactory %s", factoryClassName));
+        return new GeoJsonFeatureDeserializerFactory();
     }
 
     @Override

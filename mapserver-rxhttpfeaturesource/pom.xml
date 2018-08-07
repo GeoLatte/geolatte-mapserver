@@ -40,6 +40,13 @@
             <artifactId>rxhttpclient-java</artifactId>
         </dependency>
 
+        <!-- required for @Optional annotation, so that -->
+        <dependency>
+            <groupId>com.typesafe</groupId>
+            <artifactId>config</artifactId>
+        </dependency>
+
+
         <dependency>
             <groupId>com.typesafe</groupId>
             <artifactId>config</artifactId>
@@ -68,6 +75,7 @@
             <artifactId>wiremock</artifactId>
             <scope>test</scope>
         </dependency>
+
 
     </dependencies>
 

@@ -50,6 +50,11 @@ public class RxHttpFeatureSource implements FeatureSource {
                 .flatMapIterable(deserializer::deserialize);
     }
 
+    // for testing
+    protected FeatureDeserializerFactory getFeatureDeserializerFactory(){
+        return this.featureDeserializerFactory;
+    }
+
     private String render(Envelope<C2D> bbox, String query) {
         ST st = fillInTemplateParams(bbox, query);
         return st.render();

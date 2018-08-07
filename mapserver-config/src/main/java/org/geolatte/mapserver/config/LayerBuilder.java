@@ -2,6 +2,7 @@ package org.geolatte.mapserver.config;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigBeanFactory;
+import com.typesafe.config.ConfigMergeable;
 import org.geolatte.mapserver.FeatureSourceFactoryRegistry;
 import org.geolatte.mapserver.Layer;
 import org.geolatte.mapserver.ServiceLocator;
