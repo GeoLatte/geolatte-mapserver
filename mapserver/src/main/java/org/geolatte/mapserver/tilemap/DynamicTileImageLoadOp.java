@@ -70,8 +70,11 @@ public class DynamicTileImageLoadOp implements TileMapOperation<List<Image>> {
 
         return renderer.render(tile.getDimension(), tile.getBoundingBox())
                 .whenComplete( (img, exception ) -> {
-                    if (exception == null) logger.warn("Failure to render image");
-                    else cache(tile, img);
+                    if (exception == null) {
+                        cache(tile, img);
+                    } else {
+                        logger.warn("Failure to render image", exception);
+                    }
                 });
     }
 
