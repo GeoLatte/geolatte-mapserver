@@ -1,5 +1,6 @@
 package org.geolatte.mapserver.rxhttp;
 
+import com.typesafe.config.Optional;
 import org.geolatte.mapserver.features.FeatureSourceConfig;
 
 import java.util.Objects;
@@ -10,6 +11,9 @@ import java.util.Objects;
 public class RxHttpFeatureSourceConfig implements FeatureSourceConfig {
 
     private String template;
+
+    @Optional
+    private String featureDeserializerFactory;
 
     public String getHost() {
         return host;
@@ -27,6 +31,14 @@ public class RxHttpFeatureSourceConfig implements FeatureSourceConfig {
 
     public void setTemplate(String template) {
         this.template = template;
+    }
+
+    public String getFeatureDeserializerFactory( ) {
+        return featureDeserializerFactory;
+    }
+
+    public void setFeatureDeserializerFactory(String featureDeserializerFactory) {
+        this.featureDeserializerFactory = featureDeserializerFactory;
     }
 
     @Override

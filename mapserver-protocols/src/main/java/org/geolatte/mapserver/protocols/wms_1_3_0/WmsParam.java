@@ -33,7 +33,7 @@ public enum WmsParam {
     TRANSPARENT,
     WIDTH,
     HEIGHT,
-    CRS,
+    CRS("SRS"),
     SERVICE,
     BBOX,
     LAYERS,
