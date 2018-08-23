@@ -4,7 +4,6 @@ import com.typesafe.config.Config;
 import org.geolatte.mapserver.FeatureSourceFactoryRegistry;
 import org.geolatte.mapserver.ServiceLocator;
 import org.geolatte.mapserver.features.FeatureSource;
-import org.geolatte.mapserver.features.FeatureSourceFactory;
 import org.geolatte.mapserver.layers.DynamicLayer;
 import org.geolatte.mapserver.render.RenderContext;
 
@@ -26,9 +25,10 @@ public class DynamicLayerBuilder extends LayerBuilder {
     public DynamicLayer build() {
         FeatureSource fs = mkFeatureSource(config.getConfig("source"));
         String painter = config.getString("painter");
+        Double factor = config.hasPath("bboxFactor") ? config.getDouble("bboxFactor") : null;
 
         RenderContext renderContext = RenderContext.from(fs, painter);
-        return new DynamicLayer(name, renderContext, this.serviceLocator);
+        return new DynamicLayer(name, renderContext, this.serviceLocator, factor);
     }
 
 }

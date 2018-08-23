@@ -28,7 +28,7 @@ public class TestStdRenderer {
     @Before
     public void before() {
         FeatureSource fs = new FeatureSourceGenerate();
-        renderer = new StdRenderer(fs, "testPainter",  1, ServiceLocator.defaultInstance());
+        renderer = new StdRenderer(fs, "testPainter",  1.0, ServiceLocator.defaultInstance());
         dimension = new Dimension(256, 256);
         bbox = new Envelope(0, 0, 1000, 1000, WEB_MERCATOR);
     }
