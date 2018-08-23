@@ -34,12 +34,16 @@ public class StdRenderer implements Renderer {
     final private double factor;
 
 
-    public StdRenderer(FeatureSource featureSource, String painterRef, double factor, ServiceLocator serviceLocator) {
+    public StdRenderer(FeatureSource featureSource, String painterRef, Double factor, ServiceLocator serviceLocator) {
         this.featureSource = featureSource;
         this.painterRef = painterRef;
         this.imaging = serviceLocator.imaging();
         this.painterFactory = serviceLocator.painterFactory();
-        this.factor = factor;
+        this.factor = factor != null ? factor : STANDARD_FACTOR;
+    }
+
+    public StdRenderer(RenderContext renderContext, ServiceLocator locator, Double factor) {
+        this(renderContext.getFeatureSource(), renderContext.getPainterRef(), factor, locator);
     }
 
     public StdRenderer(RenderContext renderContext, ServiceLocator locator) {
