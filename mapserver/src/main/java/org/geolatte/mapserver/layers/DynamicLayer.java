@@ -1,22 +1,14 @@
 package org.geolatte.mapserver.layers;
 
-import org.geolatte.maprenderer.map.Painter;
-import org.geolatte.maprenderer.map.PlanarFeature;
 import org.geolatte.mapserver.Layer;
 import org.geolatte.mapserver.ServiceLocator;
-import org.geolatte.mapserver.features.FeatureSource;
-import org.geolatte.mapserver.features.FeatureSourceFactory;
 import org.geolatte.mapserver.image.Image;
 import org.geolatte.mapserver.ows.GetMapRequest;
 import org.geolatte.mapserver.render.RenderContext;
 import org.geolatte.mapserver.render.Renderer;
 import org.geolatte.mapserver.render.StdRenderer;
-import rx.Observable;
 
-import java.awt.*;
 import java.util.concurrent.CompletableFuture;
-
-import static org.geolatte.mapserver.util.EnvelopUtils.bufferRounded;
 
 /**
  * Dynamic Renderable layer
@@ -29,9 +21,9 @@ public class DynamicLayer implements Layer {
     final private Renderer renderer;
 
 
-    public DynamicLayer(String name, RenderContext renderContext, ServiceLocator locator) {
+    public DynamicLayer(String name, RenderContext renderContext, ServiceLocator locator, Double factor) {
         this.name = name;
-        this.renderer = new StdRenderer(renderContext, locator);
+        this.renderer = new StdRenderer(renderContext, locator, factor);
     }
 
     @Override
