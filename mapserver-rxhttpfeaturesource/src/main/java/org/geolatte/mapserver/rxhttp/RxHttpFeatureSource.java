@@ -29,7 +29,7 @@ public class RxHttpFeatureSource implements FeatureSource {
     public RxHttpFeatureSource(RxHttpFeatureSourceConfig config, FeatureDeserializerFactory deserFactory) {
         this.template = config.getTemplate();
         String host = config.getHost();
-        this.gzip = config.getGzip() != null && config.getGzip();
+        this.gzip = config.getGzip() == null ? true : config.getGzip();
         this.featureDeserializerFactory = deserFactory;
 
         this.client = new RxHttpClient.Builder()
