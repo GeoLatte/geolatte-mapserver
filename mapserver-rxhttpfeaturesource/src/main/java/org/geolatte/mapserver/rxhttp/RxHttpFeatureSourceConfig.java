@@ -13,6 +13,9 @@ public class RxHttpFeatureSourceConfig implements FeatureSourceConfig {
     private String template;
 
     @Optional
+    private Boolean gzip;
+
+    @Optional
     private String featureDeserializerFactory;
 
     public String getHost() {
@@ -39,6 +42,14 @@ public class RxHttpFeatureSourceConfig implements FeatureSourceConfig {
 
     public void setFeatureDeserializerFactory(String featureDeserializerFactory) {
         this.featureDeserializerFactory = featureDeserializerFactory;
+    }
+
+    public Boolean getGzip() {
+        return gzip;
+    }
+
+    public void setGzip(Boolean gzip) {
+        this.gzip = gzip;
     }
 
     @Override
