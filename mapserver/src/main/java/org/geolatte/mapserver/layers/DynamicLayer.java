@@ -8,6 +8,7 @@ import org.geolatte.mapserver.render.RenderContext;
 import org.geolatte.mapserver.render.Renderer;
 import org.geolatte.mapserver.render.StdRenderer;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -21,9 +22,9 @@ public class DynamicLayer implements Layer {
     final private Renderer renderer;
 
 
-    public DynamicLayer(String name, RenderContext renderContext, ServiceLocator locator, Double factor) {
+    public DynamicLayer(String name, RenderContext renderContext, ServiceLocator locator, Double factor, Map<Double, Double> dynamicFactors) {
         this.name = name;
-        this.renderer = new StdRenderer(renderContext, locator, factor);
+        this.renderer = new StdRenderer(renderContext, locator, factor, dynamicFactors);
     }
 
     @Override

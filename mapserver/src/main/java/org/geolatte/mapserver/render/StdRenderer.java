@@ -16,6 +16,7 @@ import rx.Subscriber;
 import rx.observers.Subscribers;
 
 import java.awt.*;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import static org.geolatte.mapserver.util.EnvelopUtils.bufferRounded;
@@ -32,26 +33,27 @@ public class StdRenderer implements Renderer {
     final private String painterRef;
     final private Imaging imaging;
     final private double factor;
+    private Map<Double, Double> dynamicFactors;
 
-
-    public StdRenderer(FeatureSource featureSource, String painterRef, Double factor, ServiceLocator serviceLocator) {
+    public StdRenderer(FeatureSource featureSource, String painterRef, Double factor, Map<Double, Double> dynamicFactors, ServiceLocator serviceLocator) {
         this.featureSource = featureSource;
         this.painterRef = painterRef;
         this.imaging = serviceLocator.imaging();
         this.painterFactory = serviceLocator.painterFactory();
         this.factor = factor != null ? factor : STANDARD_FACTOR;
+        this.dynamicFactors = dynamicFactors;
     }
 
-    public StdRenderer(RenderContext renderContext, ServiceLocator locator, Double factor) {
-        this(renderContext.getFeatureSource(), renderContext.getPainterRef(), factor, locator);
+    public StdRenderer(RenderContext renderContext, ServiceLocator locator, Double factor, Map<Double, Double> dynamicFactors) {
+        this(renderContext.getFeatureSource(), renderContext.getPainterRef(), factor, dynamicFactors, locator);
     }
 
     public StdRenderer(RenderContext renderContext, ServiceLocator locator) {
-        this(renderContext.getFeatureSource(), renderContext.getPainterRef(), STANDARD_FACTOR, locator);
+        this(renderContext.getFeatureSource(), renderContext.getPainterRef(), STANDARD_FACTOR, null, locator);
     }
 
     public StdRenderer(RenderContext renderContext){
-        this(renderContext.getFeatureSource(), renderContext.getPainterRef(), STANDARD_FACTOR, ServiceLocator.defaultInstance());
+        this(renderContext.getFeatureSource(), renderContext.getPainterRef(), STANDARD_FACTOR, null, ServiceLocator.defaultInstance());
     }
 
     @Override
@@ -66,7 +68,7 @@ public class StdRenderer implements Renderer {
             return promise;
         }
 
-        Observable<PlanarFeature> features = featureSource.query(queryBoundingBox(tileBoundingBox));
+        Observable<PlanarFeature> features = featureSource.query(queryBoundingBox(tileBoundingBox, graphics.getMapUnitsPerPixel()));
 
         Subscriber<PlanarFeature> featureRenderer = Subscribers.create(
                 painter::paint,
@@ -78,7 +80,11 @@ public class StdRenderer implements Renderer {
         return promise;
     }
 
-    private Envelope<C2D> queryBoundingBox(Envelope<C2D> tileBoundingBox) {
-        return bufferRounded(tileBoundingBox, this.factor);
+    private Envelope<C2D> queryBoundingBox(Envelope<C2D> tileBoundingBox, double resolution) {
+        if (this.dynamicFactors != null) {
+            return bufferRounded(tileBoundingBox, this.dynamicFactors.getOrDefault(resolution, this.factor));
+        } else {
+            return bufferRounded(tileBoundingBox, this.factor);
+        }
     }
 }
