@@ -12,7 +12,8 @@ public class CompletableFutureUtil {
 
     public static <T> CompletableFuture<List<T>> sequence(List<CompletableFuture<T>> futures) {
         return CompletableFuture.allOf(
-                futures.toArray(new CompletableFuture<?>[futures.size()])
+                futures.toArray(new CompletableFuture<?>[0])
         ).thenApply(v -> futures.stream().map(CompletableFuture<T>::join).collect(toList()));
     }
+
 }
