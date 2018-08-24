@@ -20,6 +20,7 @@ public class ServiceMetadata {
 
     final static public String GET_CAPABILITIES_OP = "GetCapabilities";
     final static public String GET_MAP_OP = "GetMap";
+    final static public String GET_LEGEND_GRAPHIC = "GetLegendGraphic";
 
     private final ServiceIdentification serviceIdentification;
     private final ServiceProvider serviceProvider;

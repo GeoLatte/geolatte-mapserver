@@ -39,6 +39,10 @@ public class OwsRequestHandlerFactory implements RequestHandlerFactory<HttpReque
             return new GetCapabilitiesHandler((GetCapabilitiesRequest) request, serviceLocator);
         }
 
+        if (request instanceof GetLegendGraphicRequest) {
+            return new GetLegendGraphicRequestHandler((GetLegendGraphicRequest) request, serviceLocator);
+        }
+
         throw new IllegalArgumentException(format("Can't handle Request of type %s", request.getClass().getName()));
     }
 
