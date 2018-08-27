@@ -1,6 +1,7 @@
 package org.geolatte.mapserver.rxhttp;
 
 import be.wegenenverkeer.rxhttp.ClientRequest;
+import be.wegenenverkeer.rxhttp.ClientRequestBuilder;
 import be.wegenenverkeer.rxhttp.RxHttpClient;
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
@@ -21,12 +22,14 @@ public class RxHttpFeatureSource implements FeatureSource {
 
     final private static Charset UTF8 = Charset.forName("UTF-8");
     final private String template;
+    final private boolean gzip;
     final private RxHttpClient client;
     final private FeatureDeserializerFactory featureDeserializerFactory;
 
     public RxHttpFeatureSource(RxHttpFeatureSourceConfig config, FeatureDeserializerFactory deserFactory) {
         this.template = config.getTemplate();
         String host = config.getHost();
+        this.gzip = config.getGzip() == null ? true : config.getGzip();
         this.featureDeserializerFactory = deserFactory;
 
         this.client = new RxHttpClient.Builder()
@@ -38,9 +41,11 @@ public class RxHttpFeatureSource implements FeatureSource {
     @Override
     public Observable<PlanarFeature> query(Envelope<C2D> bbox, String query) {
         String queryUrl = render(bbox, query);
-        ClientRequest request = client.requestBuilder()
-                .setUrlRelativetoBase(queryUrl)
-                .build();
+        ClientRequestBuilder builder = client.requestBuilder().setUrlRelativetoBase(queryUrl);
+        if (this.gzip) {
+            builder = builder.addHeader("Accept-Encoding", "gzip");
+        }
+        ClientRequest request = builder.build();
 
         ChunkSplitter chunkSplitter = new ChunkSplitter();
         final FeatureDeserializer deserializer = featureDeserializerFactory.featureDeserializer();

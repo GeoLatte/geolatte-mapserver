@@ -41,7 +41,8 @@ public enum WmsParam {
     BGCOLOR,
     SLD,
     STYLES,
-    UPDATESEQUENCE;
+    UPDATESEQUENCE,
+    LAYER;
 
 
     private String[] names = new String[]{};
