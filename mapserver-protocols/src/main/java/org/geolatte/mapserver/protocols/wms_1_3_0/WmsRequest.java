@@ -61,6 +61,9 @@ public abstract class WmsRequest {
                 "capabilities".equalsIgnoreCase(requestParamValue)) {
             return true;
         }
+        if (ServiceMetadata.GET_LEGEND_GRAPHIC.equalsIgnoreCase(requestParamValue)) {
+            return true;
+        }
         return false;
     }
 
@@ -80,6 +83,11 @@ public abstract class WmsRequest {
                 "capabilities".equalsIgnoreCase(requestParamValue)) {
             return new WmsGetCapabilitiesRequest();
         }
+
+        if (ServiceMetadata.GET_LEGEND_GRAPHIC.equalsIgnoreCase(requestParamValue)) {
+          return new WmsGetLegendGraphicRequest();
+        }
+
         throw new IllegalArgumentException("Can't find the ows parameter, or ows not supported."); //OK, so which?
     }
 

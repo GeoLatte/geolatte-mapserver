@@ -4,14 +4,13 @@ import org.geolatte.mapserver.Layer;
 import org.geolatte.mapserver.LayerRegistry;
 import org.geolatte.mapserver.RequestHandler;
 import org.geolatte.mapserver.ServiceLocator;
-import org.geolatte.mapserver.http.BasicHttpResponse;
 import org.geolatte.mapserver.http.HttpResponse;
-import org.geolatte.mapserver.image.Image;
-import org.geolatte.mapserver.image.ImageFormat;
 
-import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+
+import static org.geolatte.mapserver.http.HttpResponseHelper.futureNotFoundResponse;
+import static org.geolatte.mapserver.http.HttpResponseHelper.imageToResponse;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 19/07/2018.
@@ -30,37 +29,14 @@ public class GetMapRequestHandler implements RequestHandler<HttpResponse> {
     @Override
     public CompletableFuture<HttpResponse> handle() {
         Optional<Layer> layerSource = layerRegistry.getLayer(request.getLayerName());
-        if (!layerSource.isPresent()) {
-            return CompletableFuture.completedFuture(buildNotFoundResponse());
-        }
-        //TODO handle failure case if any
-        return buildOkResponse(request, layerSource.get());
+        return layerSource.map(ls -> mkResponse(request, ls))
+                .orElse( futureNotFoundResponse() );
     }
 
-    private CompletableFuture<HttpResponse> buildOkResponse(GetMapRequest request, Layer layerSource) {
+    private CompletableFuture<HttpResponse> mkResponse(GetMapRequest request, Layer layerSource) {
         return layerSource.createMapImage(request)
-                .thenApply(img ->  formatResponse(img, request.getImageFormat()));
+                .thenApply(img -> imageToResponse(img, request.getImageFormat()));
     }
 
-    private HttpResponse buildNotFoundResponse() {
-        BasicHttpResponse.Builder builder = BasicHttpResponse.builder();
-        builder.NotFound();
-        return builder.build();
-    }
 
-    private HttpResponse formatResponse(Image img, ImageFormat fmt) {
-        return BasicHttpResponse.builder()
-                .ok()
-                .setHeader("Content-type", fmt.getMimeType())
-                .body(toBytes(img, fmt))
-                .build();
-    }
-
-    private byte[] toBytes(Image img, ImageFormat fmt) {
-        try {
-            return img.toByteArray(fmt);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
