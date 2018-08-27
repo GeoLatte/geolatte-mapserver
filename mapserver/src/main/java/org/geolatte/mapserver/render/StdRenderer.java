@@ -17,6 +17,7 @@ import rx.observers.Subscribers;
 
 import java.awt.*;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
 
 import static org.geolatte.mapserver.util.EnvelopUtils.bufferRounded;
@@ -33,9 +34,9 @@ public class StdRenderer implements Renderer {
     final private String painterRef;
     final private Imaging imaging;
     final private double factor;
-    private Map<Double, Double> dynamicFactors;
+    private TreeMap<Double, Double> dynamicFactors;
 
-    public StdRenderer(FeatureSource featureSource, String painterRef, Double factor, Map<Double, Double> dynamicFactors, ServiceLocator serviceLocator) {
+    public StdRenderer(FeatureSource featureSource, String painterRef, Double factor, TreeMap<Double, Double> dynamicFactors, ServiceLocator serviceLocator) {
         this.featureSource = featureSource;
         this.painterRef = painterRef;
         this.imaging = serviceLocator.imaging();
@@ -44,7 +45,7 @@ public class StdRenderer implements Renderer {
         this.dynamicFactors = dynamicFactors;
     }
 
-    public StdRenderer(RenderContext renderContext, ServiceLocator locator, Double factor, Map<Double, Double> dynamicFactors) {
+    public StdRenderer(RenderContext renderContext, ServiceLocator locator, Double factor, TreeMap<Double, Double> dynamicFactors) {
         this(renderContext.getFeatureSource(), renderContext.getPainterRef(), factor, dynamicFactors, locator);
     }
 
@@ -82,7 +83,10 @@ public class StdRenderer implements Renderer {
 
     private Envelope<C2D> queryBoundingBox(Envelope<C2D> tileBoundingBox, double resolution) {
         if (this.dynamicFactors != null) {
-            return bufferRounded(tileBoundingBox, this.dynamicFactors.getOrDefault(resolution, this.factor));
+            return bufferRounded(
+                    tileBoundingBox,
+                    this.dynamicFactors.ceilingKey(resolution) != null ? this.dynamicFactors.ceilingEntry(resolution).getValue() : this.factor
+            );
         } else {
             return bufferRounded(tileBoundingBox, this.factor);
         }

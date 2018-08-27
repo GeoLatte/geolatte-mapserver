@@ -8,8 +8,7 @@ import org.geolatte.mapserver.features.FeatureSource;
 import org.geolatte.mapserver.layers.DynamicLayer;
 import org.geolatte.mapserver.render.RenderContext;
 
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.TreeMap;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 03/08/2018.
@@ -30,17 +29,16 @@ public class DynamicLayerBuilder extends LayerBuilder {
         FeatureSource fs = mkFeatureSource(config.getConfig("source"));
         String painter = config.getString("painter");
         Double factor = config.hasPath("bboxFactor") ? config.getDouble("bboxFactor") : null;
-        Map<Double, Double> dynamicFactors = config.hasPath("bboxFactors") ? toDynamicFactors(config.getObject("bboxFactors")) : null;
+        TreeMap<Double, Double> dynamicFactors = config.hasPath("bboxFactors") ? toDynamicFactors(config.getObject("bboxFactors")) : null;
 
         RenderContext renderContext = RenderContext.from(fs, painter);
         return new DynamicLayer(name, renderContext, this.serviceLocator, factor, dynamicFactors);
     }
 
-    private Map<Double, Double> toDynamicFactors(ConfigObject values) {
-        return values.entrySet().stream().collect(Collectors.toMap(
-                entry -> Double.valueOf(entry.getKey()),
-                entry -> ((Number) entry.getValue().unwrapped()).doubleValue()
-        ));
+    private TreeMap<Double, Double> toDynamicFactors(ConfigObject values) {
+        return values.entrySet().stream().collect(TreeMap::new,
+                (map, entry) -> map.put(Double.valueOf(entry.getKey()),  ((Number) entry.getValue().unwrapped()).doubleValue()),
+                (m, c) -> new RuntimeException("No duplicate keys in bboxFactors allowed"));
     }
 
 }
