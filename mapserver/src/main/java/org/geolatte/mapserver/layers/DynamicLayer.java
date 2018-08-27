@@ -8,7 +8,6 @@ import org.geolatte.mapserver.render.RenderContext;
 import org.geolatte.mapserver.render.Renderer;
 import org.geolatte.mapserver.render.StdRenderer;
 
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
 
