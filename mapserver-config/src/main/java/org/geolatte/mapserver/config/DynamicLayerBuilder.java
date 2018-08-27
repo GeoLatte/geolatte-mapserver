@@ -1,14 +1,15 @@
 package org.geolatte.mapserver.config;
 
 import com.typesafe.config.Config;
-import com.typesafe.config.ConfigObject;
 import org.geolatte.mapserver.FeatureSourceFactoryRegistry;
 import org.geolatte.mapserver.ServiceLocator;
 import org.geolatte.mapserver.features.FeatureSource;
 import org.geolatte.mapserver.layers.DynamicLayer;
+import org.geolatte.mapserver.render.BboxFactors;
 import org.geolatte.mapserver.render.RenderContext;
 
-import java.util.TreeMap;
+import static org.geolatte.mapserver.render.BboxFactors.factor;
+import static org.geolatte.mapserver.render.BboxFactors.upp;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 03/08/2018.
@@ -28,17 +29,29 @@ public class DynamicLayerBuilder extends LayerBuilder {
     public DynamicLayer build() {
         FeatureSource fs = mkFeatureSource(config.getConfig("source"));
         String painter = config.getString("painter");
-        Double factor = config.hasPath("bboxFactor") ? config.getDouble("bboxFactor") : null;
-        TreeMap<Double, Double> dynamicFactors = config.hasPath("bboxFactors") ? toDynamicFactors(config.getObject("bboxFactors")) : null;
-
-        RenderContext renderContext = RenderContext.from(fs, painter);
-        return new DynamicLayer(name, renderContext, this.serviceLocator, factor, dynamicFactors);
+        BboxFactors factors =  mkBboxFactors();
+        RenderContext renderContext = RenderContext.from(fs, painter, factors);
+        return new DynamicLayer(name, renderContext, this.serviceLocator);
     }
 
-    private TreeMap<Double, Double> toDynamicFactors(ConfigObject values) {
-        return values.entrySet().stream().collect(TreeMap::new,
-                (map, entry) -> map.put(Double.valueOf(entry.getKey()),  ((Number) entry.getValue().unwrapped()).doubleValue()),
-                (m, c) -> new RuntimeException("No duplicate keys in bboxFactors allowed"));
+    private BboxFactors mkBboxFactors() {
+        Double factor = config.hasPath("bboxFactor") ? config.getDouble("bboxFactor") : null;
+        BboxFactors factors =  factor == null? new BboxFactors() : new BboxFactors(factor);
+        if (config.hasPath("bboxFactors")) {
+            addFactorBreaks(factors);
+        }
+        return factors;
+    }
+
+    private void addFactorBreaks(BboxFactors factors) {
+        config.getObject("bboxFactors")
+                .entrySet()
+                .stream()
+                .forEach( entry ->
+                        factors.put(
+                                upp(Double.valueOf(entry.getKey())),
+                                factor(((Number) entry.getValue().unwrapped()).doubleValue()))
+                );
     }
 
 }

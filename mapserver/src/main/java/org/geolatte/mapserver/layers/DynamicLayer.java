@@ -22,9 +22,9 @@ public class DynamicLayer implements Layer {
     final private Renderer renderer;
 
 
-    public DynamicLayer(String name, RenderContext renderContext, ServiceLocator locator, Double factor, TreeMap<Double, Double> dynamicFactors) {
+    public DynamicLayer(String name, RenderContext renderContext, ServiceLocator locator) {
         this.name = name;
-        this.renderer = new StdRenderer(renderContext, locator, factor, dynamicFactors);
+        this.renderer = new StdRenderer(renderContext, locator);
     }
 
     @Override
