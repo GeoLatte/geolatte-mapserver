@@ -1,6 +1,5 @@
 package org.geolatte.mapserver.render;
 
-import org.geolatte.mapserver.ServiceLocator;
 import org.geolatte.mapserver.features.FeatureSource;
 
 /**
@@ -10,17 +9,25 @@ public class RenderContext {
 
     final private FeatureSource featureSource;
     final private String painterRef;
+    final private BboxFactors bboxFactors;
 
-    private RenderContext(FeatureSource featureSource, String painterRef) {
+    private RenderContext(FeatureSource featureSource, String painterRef, BboxFactors bboxFactors) {
         this.featureSource = featureSource;
         this.painterRef = painterRef;
+        this.bboxFactors = bboxFactors;
     }
 
-    public static RenderContext from(FeatureSource featureSource, String painterRef) {
+    public static RenderContext from(FeatureSource featureSource, String painterRef,
+                                     BboxFactors bboxFactors) {
+
         if (featureSource == null || painterRef == null) {
             throw new IllegalArgumentException("Can't accept null arguments");
         }
-        return new RenderContext(featureSource, painterRef);
+        return new RenderContext(featureSource, painterRef, bboxFactors);
+    }
+
+    public static RenderContext from(FeatureSource featureSource, String painterRef) {
+        return from(featureSource, painterRef, new BboxFactors());
     }
 
     public String getPainterRef() {
@@ -32,4 +39,7 @@ public class RenderContext {
     }
 
 
+    public BboxFactors getBboxFactors() {
+        return bboxFactors;
+    }
 }
