@@ -6,13 +6,17 @@ import org.geolatte.maprenderer.java2D.AWTMapGraphics;
 import org.geolatte.maprenderer.map.MapGraphics;
 import org.geolatte.maprenderer.map.Painter;
 import org.geolatte.maprenderer.map.PlanarFeature;
+import org.geolatte.mapserver.Instrumentation;
 import org.geolatte.mapserver.PainterFactory;
 import org.geolatte.mapserver.ServiceLocator;
+import org.geolatte.mapserver.instrumentation.Timer;
 import org.geolatte.mapserver.features.FeatureSource;
 import org.geolatte.mapserver.image.Image;
 import org.geolatte.mapserver.image.Imaging;
+import org.geolatte.mapserver.instrumentation.StopOnceTimerWrapper;
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Actions;
 import rx.observers.Subscribers;
 
 import java.awt.*;
@@ -30,6 +34,7 @@ public class StdRenderer implements Renderer {
     final private PainterFactory painterFactory;
     final private String painterRef;
     final private Imaging imaging;
+    final private Instrumentation instrumentation;
     private BboxFactors dynamicFactors;
 
     public StdRenderer(FeatureSource featureSource, String painterRef, BboxFactors dynamicFactors, ServiceLocator serviceLocator) {
@@ -37,6 +42,7 @@ public class StdRenderer implements Renderer {
         this.painterRef = painterRef;
         this.imaging = serviceLocator.imaging();
         this.painterFactory = serviceLocator.painterFactory();
+        this.instrumentation = serviceLocator.instrumentation();
         this.dynamicFactors = dynamicFactors;
     }
 
@@ -61,6 +67,15 @@ public class StdRenderer implements Renderer {
             return promise;
         }
 
+        Timer mapImageTimer = instrumentation.getCreateMapImageTimer(graphics.getMapUnitsPerPixel());
+        promise.whenComplete((image, throwable) -> {
+            if (image != null) {
+                mapImageTimer.stop();
+            }
+        });
+
+        StopOnceTimerWrapper featuresTimer = new StopOnceTimerWrapper(instrumentation.getLoadFeaturesTimer(graphics.getMapUnitsPerPixel()));
+
         Observable<PlanarFeature> features = featureSource.query(queryBoundingBox(tileBoundingBox, graphics.getMapUnitsPerPixel()));
 
         Subscriber<PlanarFeature> featureRenderer = Subscribers.create(
@@ -69,7 +84,16 @@ public class StdRenderer implements Renderer {
                 () -> promise.complete(imaging.fromRenderedImage(graphics.renderImage()))
         );
 
-        features.subscribe(featureRenderer);
+        Subscriber<PlanarFeature> featuresTimerSubscriber = Subscribers.create(
+                (feature) -> featuresTimer.stopOnce(), //stop timer when the first feature arrives
+                Actions.empty(),
+                featuresTimer::stopOnce //stop here as well because timer will not have been stopped in onNext when there were no features
+        );
+
+        Observable<PlanarFeature> share = features.share();
+        share.subscribe(featureRenderer);
+        share.take(1).subscribe(featuresTimerSubscriber);
+
         return promise;
     }
 
