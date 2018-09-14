@@ -2,10 +2,10 @@ package org.geolatte.mapserver.config;
 
 import org.geolatte.mapserver.*;
 import org.geolatte.mapserver.boot.StdFeatureSourceFactory;
-import org.geolatte.mapserver.features.FeatureDeserializer;
 import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.layers.DynamicLayer;
 import org.geolatte.mapserver.layers.RenderableTileMapLayer;
+import org.geolatte.mapserver.Instrumentation;
 import org.geolatte.mapserver.protocols.ProtocolAdapter;
 import org.geolatte.mapserver.render.Renderer;
 import org.geolatte.mapserver.tilemap.TileMetadata;
@@ -180,6 +180,11 @@ public class TestServiceConfiguration {
 
             @Override
             public PainterFactory painterFactory() {
+                return null;
+            }
+
+            @Override
+            public Instrumentation instrumentation() {
                 return null;
             }
         };

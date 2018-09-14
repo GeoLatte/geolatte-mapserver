@@ -1,9 +1,9 @@
 package org.geolatte.mapserver.boot;
 
 import org.geolatte.mapserver.*;
-import org.geolatte.mapserver.features.FeatureDeserializer;
 import org.geolatte.mapserver.features.FeatureSourceFactory;
 import org.geolatte.mapserver.image.Imaging;
+import org.geolatte.mapserver.Instrumentation;
 import org.geolatte.mapserver.protocols.ProtocolAdapter;
 import org.geolatte.mapserver.spi.*;
 import org.slf4j.Logger;
@@ -38,11 +38,12 @@ public class BootServiceLocator implements ServiceLocator {
         INSTANCE.setLayerRegistry(registry);
     }
 
-    final private Imaging imagingInstance;
-    final private ProtocolAdapter protocolAdapter;
-    final private ServiceMetadata serviceMetadata;
-    final private ExecutorService executorService;
+    private final Imaging imagingInstance;
+    private final ProtocolAdapter protocolAdapter;
+    private final ServiceMetadata serviceMetadata;
+    private final ExecutorService executorService;
     private final AggregatePainterFactory painterFactory;
+    private final Instrumentation instrumentation;
 
 
     private LayerRegistry layerRegistry;
@@ -89,6 +90,7 @@ public class BootServiceLocator implements ServiceLocator {
         protocolAdapter = loadFirst(ProtocolAdapterProvider.class).protocolAdapter();
         painterFactory = new AggregatePainterFactory(loadAllPainterFactories());
         serviceMetadata = loadFirst(ServiceMetadataProvider.class).serviceMetadata();
+        instrumentation = loadFirst(InstrumentationProvider.class).instrumentation();
     }
 
 
@@ -127,6 +129,11 @@ public class BootServiceLocator implements ServiceLocator {
     @Override
     public PainterFactory painterFactory() {
         return painterFactory;
+    }
+
+    @Override
+    public Instrumentation instrumentation() {
+        return instrumentation;
     }
 
     private ExecutorService createExecutor() {
