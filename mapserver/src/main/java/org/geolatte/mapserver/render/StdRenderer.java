@@ -67,34 +67,41 @@ public class StdRenderer implements Renderer {
             return promise;
         }
 
-        Timer mapImageTimer = instrumentation.getCreateMapImageTimer(graphics.getMapUnitsPerPixel());
+        instrumentCreateMapOp(graphics.getMapUnitsPerPixel(), promise);
+
+        Observable<PlanarFeature> features = featureSource.query(queryBoundingBox(tileBoundingBox, graphics.getMapUnitsPerPixel()));
+        Observable<PlanarFeature> share = features.share();
+
+        share.subscribe(createRenderingSubscriber(graphics, painter, promise));
+        share.take(1).subscribe(createInstrumentationSubscriber(graphics));
+
+        return promise;
+    }
+
+    private Subscriber<PlanarFeature> createRenderingSubscriber(MapGraphics graphics, Painter painter, CompletableFuture<Image> promise) {
+        return Subscribers.create(
+                    painter::paint,
+                    promise::completeExceptionally,
+                    () -> promise.complete(imaging.fromRenderedImage(graphics.renderImage()))
+            );
+    }
+
+    private Subscriber<PlanarFeature> createInstrumentationSubscriber(MapGraphics graphics) {
+        StopOnceTimerWrapper featuresTimer = new StopOnceTimerWrapper(instrumentation.getLoadFeaturesTimer(graphics.getMapUnitsPerPixel()));
+        return Subscribers.create(
+                (feature) -> featuresTimer.stopOnce(), //stop timer when the first feature arrives
+                Actions.empty(),
+                featuresTimer::stopOnce //stop here as well because timer will not have been stopped in onNext when there were no features
+        );
+    }
+
+    private void instrumentCreateMapOp(double upp, CompletableFuture<Image> promise) {
+        Timer mapImageTimer = instrumentation.getCreateMapImageTimer(upp);
         promise.whenComplete((image, throwable) -> {
             if (image != null) {
                 mapImageTimer.stop();
             }
         });
-
-        StopOnceTimerWrapper featuresTimer = new StopOnceTimerWrapper(instrumentation.getLoadFeaturesTimer(graphics.getMapUnitsPerPixel()));
-
-        Observable<PlanarFeature> features = featureSource.query(queryBoundingBox(tileBoundingBox, graphics.getMapUnitsPerPixel()));
-
-        Subscriber<PlanarFeature> featureRenderer = Subscribers.create(
-                painter::paint,
-                promise::completeExceptionally,
-                () -> promise.complete(imaging.fromRenderedImage(graphics.renderImage()))
-        );
-
-        Subscriber<PlanarFeature> featuresTimerSubscriber = Subscribers.create(
-                (feature) -> featuresTimer.stopOnce(), //stop timer when the first feature arrives
-                Actions.empty(),
-                featuresTimer::stopOnce //stop here as well because timer will not have been stopped in onNext when there were no features
-        );
-
-        Observable<PlanarFeature> share = features.share();
-        share.subscribe(featureRenderer);
-        share.take(1).subscribe(featuresTimerSubscriber);
-
-        return promise;
     }
 
     private Envelope<C2D> queryBoundingBox(Envelope<C2D> tileBoundingBox, double resolution) {
