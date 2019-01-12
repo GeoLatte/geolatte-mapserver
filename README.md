@@ -82,7 +82,7 @@ This repository contains default implementations for most of these SPI interface
 using [Lightbend's Config](https://github.com/lightbend/config)
 
 Users of the library are required to provide their own `PainterFactory` implementations (although
-later we plan to incorporate an [SLD](http://www.opengeospatial.org/standards/sld)-based implemntation
+later we plan to incorporate an [SLD](http://www.opengeospatial.org/standards/sld)-based implementation
 in this project)
 
 ## Integrating Mapserver into your application 
