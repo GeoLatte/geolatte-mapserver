@@ -10,6 +10,7 @@ import rx.Observable;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 03/08/2018.
@@ -20,7 +21,7 @@ public class FeatureSourceGenerate implements FeatureSource {
     @Override
     public Observable<PlanarFeature> query(Envelope<C2D> bbox, String query) {
 
-        GeometryGenerator<C2D, Point<C2D>> point = Generators.point(bbox, 52);
+        GeometryGenerator<C2D, Point<C2D>> point = Generators.point(bbox,  new Random( 52));
 
         return Observable.range(0, 10)
                 .map(i -> point.generate())
