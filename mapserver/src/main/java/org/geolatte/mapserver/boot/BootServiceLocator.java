@@ -4,6 +4,7 @@ import org.geolatte.mapserver.*;
 import org.geolatte.mapserver.features.FeatureSourceFactory;
 import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.Instrumentation;
+import org.geolatte.mapserver.instrumentation.NoOpInstrumentationProvider;
 import org.geolatte.mapserver.protocols.ProtocolAdapter;
 import org.geolatte.mapserver.spi.*;
 import org.slf4j.Logger;
@@ -55,11 +56,28 @@ public class BootServiceLocator implements ServiceLocator {
         if (all.isEmpty()) {
             throw new IllegalStateException(format("Failure to load essential service: %s", providerType.getCanonicalName()));
         }
+        return returnFirst( providerType, all );
+
+    }
+
+    private static <T> T returnFirst(Class<T> providerType, List<T> all) {
+        T service = all.get(0);
+        logger.info(format("Using %s for service %s", service.getClass().getCanonicalName(), providerType.getCanonicalName()));
+        return service;
+    }
+
+    static <T> T loadFirstOrUse(Class<T> providerType, T defaultInstance){
+        List<T> all = loadAll(providerType);
+
+        if (all.isEmpty()) {
+            return defaultInstance;
+        }
         T service = all.get(0);
         logger.info(format("Using %s for service %s", service.getClass().getCanonicalName(), providerType.getCanonicalName()));
         return service;
 
     }
+
 
     private static <T> List<T> loadAll(Class<T> providerType) {
         ServiceLoader<T> loader = ServiceLoader.load(providerType);
@@ -90,7 +108,7 @@ public class BootServiceLocator implements ServiceLocator {
         protocolAdapter = loadFirst(ProtocolAdapterProvider.class).protocolAdapter();
         painterFactory = new AggregatePainterFactory(loadAllPainterFactories());
         serviceMetadata = loadFirst(ServiceMetadataProvider.class).serviceMetadata();
-        instrumentation = loadFirst(InstrumentationProvider.class).instrumentation();
+        instrumentation = loadFirstOrUse( InstrumentationProvider.class, new NoOpInstrumentationProvider() ).instrumentation();
     }
 
 
