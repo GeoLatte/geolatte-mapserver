@@ -23,8 +23,9 @@ package org.geolatte.mapserver.coordinatetransforms;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.mapserver.transform.CoordinateTransforms;
+import org.geolatte.mapserver.transform.Transform;
 
 /**
  * Transforms bounding boxes to Lat/Lon
@@ -32,20 +33,21 @@ import org.geolatte.mapserver.transform.CoordinateTransforms;
  * @author Karel Maesen, Geovise BVBA
  */
 public class GeolatteCoordinateTransforms implements CoordinateTransforms {
+    @Override
+    public Transform getTransformOp(CrsId source, CrsId target) {
+        return new GLTransform();
+    }
+}
 
+class GLTransform implements Transform{
 
     @Override
-    public <Q extends Position, P extends Position> Geometry<P> transform(Geometry<Q> src, CoordinateReferenceSystem<P> targetCrs) {
+    public <P extends Position> Geometry<?> forward(Geometry<P> src) {
         return null;
     }
 
     @Override
-    public <Q extends Position, P extends Position> Envelope<P> transform(Envelope<Q> src, CoordinateReferenceSystem<P> targetCrs) {
+    public <P extends Position> Envelope<?> reverse(Envelope<P> src) {
         return null;
-    }
-
-    @Override
-    public void transform(double[] src, double[] trgt, CoordinateReferenceSystem<?> srcCrs, CoordinateReferenceSystem<?> trgtCrs) {
-
     }
 }
