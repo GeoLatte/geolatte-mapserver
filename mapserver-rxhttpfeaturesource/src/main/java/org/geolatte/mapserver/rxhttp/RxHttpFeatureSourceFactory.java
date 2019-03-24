@@ -1,5 +1,6 @@
 package org.geolatte.mapserver.rxhttp;
 
+import org.geolatte.mapserver.ServiceLocator;
 import org.geolatte.mapserver.features.FeatureSource;
 import org.geolatte.mapserver.features.FeatureSourceConfig;
 import org.geolatte.mapserver.features.FeatureSourceFactory;
@@ -14,10 +15,16 @@ import static java.lang.String.format;
 public class RxHttpFeatureSourceFactory implements FeatureSourceFactory {
 
     private static Logger logger = LoggerFactory.getLogger(RxHttpFeatureSourceFactory.class);
+    private ServiceLocator serviceLocator;
 
     @Override
     public Class<? extends FeatureSource> resultClass() {
         return RxHttpFeatureSource.class;
+    }
+
+    @Override
+    public void setServiceLocator(ServiceLocator serviceLocator) {
+        this.serviceLocator = serviceLocator;
     }
 
     @Override
@@ -27,7 +34,8 @@ public class RxHttpFeatureSourceFactory implements FeatureSourceFactory {
         }
         RxHttpFeatureSourceConfig featureSourceConfig = (RxHttpFeatureSourceConfig) config;
         FeatureDeserializerFactory factory = instantiate(featureSourceConfig.getFeatureDeserializerFactory());
-        return new RxHttpFeatureSource(featureSourceConfig, factory);
+        //assume the source doesn't do the coordinate transforms for us, so we need to do the transforms client-side
+        return new RxHttpFeatureSource(featureSourceConfig, factory, serviceLocator.coordinateTransforms());
     }
 
     private FeatureDeserializerFactory instantiate(String factoryClassName) {

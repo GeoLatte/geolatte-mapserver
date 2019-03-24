@@ -35,8 +35,8 @@ public class BootServiceLocator implements ServiceLocator {
         // set build the LayerRegistry and set it in the instance.
         //
         // It would be better to have a second phase bootstrapping for initializing the LayerRegistry
-        // (e.g. Hibernate has this) after the more general servcies are initialized.
-        FeatureSourceFactoryRegistry fsf = new StdFeatureSourceFactory(loadAllFeatureSourceFactories());
+        // (e.g. Hibernate has this) after the more general services are initialized.
+        FeatureSourceFactoryRegistry fsf = new StdFeatureSourceFactory(loadAllFeatureSourceFactories(), INSTANCE);
         LayerRegistry registry = loadFirst(LayerRegistryProvider.class).layerRegistry(fsf, INSTANCE);
         INSTANCE.setLayerRegistry(registry);
     }

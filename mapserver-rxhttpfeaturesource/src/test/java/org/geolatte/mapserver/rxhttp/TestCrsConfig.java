@@ -14,16 +14,8 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by Karel Maesen, Geovise BVBA on 2019-03-24.
  */
-public class TestCrsConfig {
-
-	private RxHttpFeatureSourceFactory featureSourceFactory;
-
-	@Before
-	public void before(){
-		featureSourceFactory= new RxHttpFeatureSourceFactory();
-	}
-
-
+public class TestCrsConfig  extends AbstractFeatureSourceTest {
+	
 	@Test
 	public void testConfiguredCrs(){
 		Config config = ConfigFactory.load( "crs.conf").getConfig( "source");

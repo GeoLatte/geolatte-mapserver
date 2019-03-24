@@ -5,10 +5,14 @@ import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Feature;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.map.PlanarFeature;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import org.geolatte.mapserver.transform.CoordinateTransforms;
+import org.geolatte.mapserver.transform.Transform;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
@@ -37,7 +41,7 @@ public class TestFeatureSource {
         config.setHost("http://localhost:8080");
         config.setTemplate("/query?bbox=<bbox>");
         config.setCrs("EPSG:31370");
-        featureSource = new RxHttpFeatureSource(config, new GeoJsonFeatureDeserializerFactory());
+        featureSource = new RxHttpFeatureSource(config, new GeoJsonFeatureDeserializerFactory(), new CoordinateTransformsDouble() );
     }
 
     @After
@@ -105,4 +109,11 @@ public class TestFeatureSource {
 
 }
 
+class CoordinateTransformsDouble implements CoordinateTransforms {
 
+    @Override
+    public Transform getTransformOp(
+            CrsId source, CrsId target) {
+        return null;
+    }
+}
