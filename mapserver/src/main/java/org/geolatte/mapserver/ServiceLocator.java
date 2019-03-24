@@ -3,6 +3,7 @@ package org.geolatte.mapserver;
 import org.geolatte.mapserver.boot.BootServiceLocator;
 import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.protocols.ProtocolAdapter;
+import org.geolatte.mapserver.transform.CoordinateTransforms;
 
 import java.util.concurrent.ExecutorService;
 
@@ -26,6 +27,8 @@ public interface ServiceLocator {
     ExecutorService executorService();
 
     PainterFactory painterFactory();
+
+    public CoordinateTransforms coordinateTransforms();
 
     Instrumentation instrumentation();
 

@@ -11,6 +11,8 @@ import org.geolatte.mapserver.render.Renderer;
 import org.geolatte.mapserver.tilemap.TileMetadata;
 import org.geolatte.mapserver.layers.TileMapLayer;
 import org.geolatte.mapserver.tilemap.TileSet;
+import org.geolatte.mapserver.transform.CoordinateTransforms;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -180,6 +182,11 @@ public class TestServiceConfiguration {
 
             @Override
             public PainterFactory painterFactory() {
+                return null;
+            }
+
+            @Override
+            public CoordinateTransforms coordinateTransforms() {
                 return null;
             }
 

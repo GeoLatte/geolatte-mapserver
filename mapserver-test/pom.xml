@@ -32,6 +32,13 @@
 
         <dependency>
             <groupId>org.geolatte</groupId>
+            <artifactId>mapserver-coordinatetransforms</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.geolatte</groupId>
             <artifactId>mapserver-config</artifactId>
             <version>${project.version}</version>
         </dependency>

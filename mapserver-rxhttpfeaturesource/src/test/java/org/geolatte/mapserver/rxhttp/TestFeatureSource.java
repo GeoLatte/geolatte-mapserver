@@ -36,6 +36,7 @@ public class TestFeatureSource {
         RxHttpFeatureSourceConfig config = new RxHttpFeatureSourceConfig();
         config.setHost("http://localhost:8080");
         config.setTemplate("/query?bbox=<bbox>");
+        config.setCrs("EPSG:31370");
         featureSource = new RxHttpFeatureSource(config, new GeoJsonFeatureDeserializerFactory());
     }
 
