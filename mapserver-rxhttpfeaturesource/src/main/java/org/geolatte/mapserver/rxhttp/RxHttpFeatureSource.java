@@ -5,6 +5,7 @@ import be.wegenenverkeer.rxhttp.ClientRequestBuilder;
 import be.wegenenverkeer.rxhttp.RxHttpClient;
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.map.PlanarFeature;
 import org.geolatte.mapserver.features.FeatureDeserializer;
 import org.geolatte.mapserver.features.FeatureSource;
@@ -25,13 +26,14 @@ public class RxHttpFeatureSource implements FeatureSource {
     final private boolean gzip;
     final private RxHttpClient client;
     final private FeatureDeserializerFactory featureDeserializerFactory;
+    final private CrsId sourceCrs;
 
     public RxHttpFeatureSource(RxHttpFeatureSourceConfig config, FeatureDeserializerFactory deserFactory) {
         this.template = config.getTemplate();
         String host = config.getHost();
         this.gzip = config.getGzip() == null ? true : config.getGzip();
         this.featureDeserializerFactory = deserFactory;
-
+        this.sourceCrs = CrsId.parse( config.getCrs());
         this.client = new RxHttpClient.Builder()
                 .setAccept("application/json")
                 .setBaseUrl(host)
@@ -58,6 +60,11 @@ public class RxHttpFeatureSource implements FeatureSource {
     // for testing
     protected FeatureDeserializerFactory getFeatureDeserializerFactory(){
         return this.featureDeserializerFactory;
+    }
+
+    //for testing
+    protected CrsId getSourceCrs(){
+        return this.sourceCrs;
     }
 
     private String render(Envelope<C2D> bbox, String query) {

@@ -10,6 +10,7 @@ import java.util.Objects;
  */
 public class RxHttpFeatureSourceConfig implements FeatureSourceConfig {
 
+    private static String DEFAULT_CRS = "EPSG:4326";
     private String template;
 
     @Optional
@@ -50,6 +51,17 @@ public class RxHttpFeatureSourceConfig implements FeatureSourceConfig {
 
     public void setGzip(Boolean gzip) {
         this.gzip = gzip;
+    }
+
+    @Optional
+    public String crs = DEFAULT_CRS;
+
+    public String getCrs(){
+        return crs;
+    }
+
+    public void setCrs(String crs) {
+        this.crs = crs;
     }
 
     @Override
