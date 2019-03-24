@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.geolatte.mapserver.transform.CoordinateTransforms;
-import org.geolatte.mapserver.transform.Transform;
+import org.geolatte.mapserver.transform.TransformOperation;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
@@ -66,6 +66,12 @@ public class TestFeatureSource {
         assertNotNull(result);
         assertEquals(3, sub.getValueCount());
 
+        //check if response is in Web Mercator
+//        assertEquals(
+//                CoordinateReferenceSystems.WEB_MERCATOR,
+//                sub.getOnNextEvents().get( 0 ).getGeometry().getCoordinateReferenceSystem()
+//        );
+
 
     }
 
@@ -112,7 +118,7 @@ public class TestFeatureSource {
 class CoordinateTransformsDouble implements CoordinateTransforms {
 
     @Override
-    public Transform getTransformOp(
+    public TransformOperation getTransformOp(
             CrsId source, CrsId target) {
         return null;
     }
