@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.geolatte.mapserver.transform.CoordinateTransforms;
-import org.geolatte.mapserver.transform.TransformOperation;
+import org.geolatte.mapserver.transform.Transform;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
@@ -118,7 +118,7 @@ public class TestFeatureSource {
 class CoordinateTransformsDouble implements CoordinateTransforms {
 
     @Override
-    public TransformOperation getTransformOp(
+    public Transform getTransform(
             CrsId source, CrsId target) {
         return null;
     }
