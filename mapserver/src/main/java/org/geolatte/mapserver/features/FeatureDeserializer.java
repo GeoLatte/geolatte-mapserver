@@ -1,9 +1,9 @@
 package org.geolatte.mapserver.features;
 
-import org.geolatte.maprenderer.map.PlanarFeature;
+import org.geolatte.geom.Feature;
 
 public interface FeatureDeserializer {
 
-    Iterable<PlanarFeature> deserialize(String jsonString);
+    Iterable<Feature> deserialize(String jsonString);
 
 }

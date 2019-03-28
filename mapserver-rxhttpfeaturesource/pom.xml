@@ -59,6 +59,13 @@
 
         <!-- Test dependenciesi -->
         <dependency>
+            <groupId>org.geolatte</groupId>
+            <artifactId>mapserver-coordinatetransforms</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>

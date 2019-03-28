@@ -5,7 +5,6 @@ import com.typesafe.config.ConfigBeanFactory;
 import com.typesafe.config.ConfigFactory;
 import org.geolatte.geom.crs.CrsId;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -21,7 +20,7 @@ public class TestCrsConfig  extends AbstractFeatureSourceTest {
 		Config config = ConfigFactory.load( "crs.conf").getConfig( "source");
 		RxHttpFeatureSourceConfig rxConfig = ConfigBeanFactory.create( config, RxHttpFeatureSourceConfig.class);
 		RxHttpFeatureSource featureSource = featureSourceFactory.mkFeatureSource(rxConfig);
-		assertThat(featureSource.getSourceCrs(), equalTo( CrsId.valueOf(31370)));
+		assertThat( featureSource.getSourceCrsId(), equalTo( CrsId.valueOf( 31370)));
 	}
 
 
@@ -30,7 +29,7 @@ public class TestCrsConfig  extends AbstractFeatureSourceTest {
 		Config config = ConfigFactory.load( "default-configured.conf").getConfig( "source");
 		RxHttpFeatureSourceConfig rxConfig = ConfigBeanFactory.create( config, RxHttpFeatureSourceConfig.class);
 		RxHttpFeatureSource featureSource = featureSourceFactory.mkFeatureSource(rxConfig);
-		assertThat(featureSource.getSourceCrs(), equalTo( CrsId.valueOf(4326)));
+		assertThat( featureSource.getSourceCrsId(), equalTo( CrsId.valueOf( 4326)));
 	}
 
 

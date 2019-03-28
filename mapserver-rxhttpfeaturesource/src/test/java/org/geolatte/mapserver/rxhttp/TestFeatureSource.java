@@ -12,6 +12,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.geolatte.mapserver.coordinatetransforms.GeolatteTransformFactory;
 import org.geolatte.mapserver.transform.TransformFactory;
 import org.geolatte.mapserver.transform.Transform;
 import rx.Observable;
@@ -20,6 +21,7 @@ import rx.observers.TestSubscriber;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.geolatte.geom.builder.DSL.c;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -42,7 +44,7 @@ public class TestFeatureSource {
         config.setHost("http://localhost:8080");
         config.setTemplate("/query?bbox=<bbox>");
         config.setCrs("EPSG:31370");
-        featureSource = new RxHttpFeatureSource(config, new GeoJsonFeatureDeserializerFactory(), new TransformFactoryDouble() );
+        featureSource = new RxHttpFeatureSource(config, new GeoJsonFeatureDeserializerFactory(), new GeolatteTransformFactory() );
     }
 
     @After
@@ -55,7 +57,8 @@ public class TestFeatureSource {
 
     @Test
     public void testFeatureSource(){
-        Envelope<C2D> bbox = new Envelope<>(10, 10, 20, 20, CoordinateReferenceSystems.WEB_MERCATOR);
+
+        Envelope<C2D> bbox = new Envelope<>(556600, 6446270,667920, 6621290, CoordinateReferenceSystems.WEB_MERCATOR);
         mockServer.buildStub(bbox);
 
         Observable<PlanarFeature> result = featureSource.query(bbox);
@@ -67,18 +70,17 @@ public class TestFeatureSource {
         assertNotNull(result);
         assertEquals(3, sub.getValueCount());
 
-        //check if response is in Web Mercator
-//        assertEquals(
-//                CoordinateReferenceSystems.WEB_MERCATOR,
-//                sub.getOnNextEvents().get( 0 ).getGeometry().getCoordinateReferenceSystem()
-//        );
+        assertEquals(
+                CoordinateReferenceSystems.WEB_MERCATOR,
+                sub.getOnNextEvents().get( 0 ).getGeometry().getCoordinateReferenceSystem()
+        );
 
 
     }
 
     @Test
     public void testEmptyResult(){
-        Envelope<C2D> bbox = new Envelope<>(10, 10, 20, 20, CoordinateReferenceSystems.WEB_MERCATOR);
+        Envelope<C2D> bbox = new Envelope<>(556600, 6446270,667920, 6621290, CoordinateReferenceSystems.WEB_MERCATOR);
         mockServer.buildStub(bbox, "\n");
 
         Observable<PlanarFeature> result = featureSource.query(bbox);
@@ -116,12 +118,3 @@ public class TestFeatureSource {
 
 }
 
-class TransformFactoryDouble implements TransformFactory {
-
-    @Override
-    public <P extends Position, Q extends Position> Transform<P, Q> getTransform(
-            CoordinateReferenceSystem<P> source, CoordinateReferenceSystem<Q> target) {
-        return null;
-    }
-
-}
