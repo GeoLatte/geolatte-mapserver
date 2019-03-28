@@ -8,7 +8,7 @@ import org.geolatte.geom.crs.CrsRegistry;
 /**
  * Created by Karel Maesen, Geovise BVBA on 12/04/2018.
  */
-public interface CoordinateTransforms {
+public interface TransformFactory {
 
     <P extends Position, Q extends Position> Transform<P,Q> getTransform(
             CoordinateReferenceSystem<P> source,

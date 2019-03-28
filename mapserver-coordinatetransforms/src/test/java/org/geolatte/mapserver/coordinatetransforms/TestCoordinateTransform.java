@@ -32,7 +32,7 @@ public class TestCoordinateTransform {
 
 	static private GeometryEquality eq = new ApproximateGeometryEquality( 0.05 );
 
-	GeolatteCoordinateTransforms transforms = new GeolatteCoordinateTransforms();
+	GeolatteTransformFactory transforms = new GeolatteTransformFactory();
 	Transform<G2D, C2D> transformOp = transforms.getTransform( WGS84, WEB_MERCATOR );
 
 	@Test

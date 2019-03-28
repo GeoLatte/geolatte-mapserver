@@ -4,14 +4,15 @@ import be.wegenenverkeer.rxhttp.HttpClientError;
 import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Feature;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
-import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.map.PlanarFeature;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.geolatte.mapserver.transform.CoordinateTransforms;
+import org.geolatte.mapserver.transform.TransformFactory;
 import org.geolatte.mapserver.transform.Transform;
 import rx.Observable;
 import rx.observers.TestSubscriber;
@@ -41,7 +42,7 @@ public class TestFeatureSource {
         config.setHost("http://localhost:8080");
         config.setTemplate("/query?bbox=<bbox>");
         config.setCrs("EPSG:31370");
-        featureSource = new RxHttpFeatureSource(config, new GeoJsonFeatureDeserializerFactory(), new CoordinateTransformsDouble() );
+        featureSource = new RxHttpFeatureSource(config, new GeoJsonFeatureDeserializerFactory(), new TransformFactoryDouble() );
     }
 
     @After
@@ -115,11 +116,12 @@ public class TestFeatureSource {
 
 }
 
-class CoordinateTransformsDouble implements CoordinateTransforms {
+class TransformFactoryDouble implements TransformFactory {
 
     @Override
-    public Transform getTransform(
-            CrsId source, CrsId target) {
+    public <P extends Position, Q extends Position> Transform<P, Q> getTransform(
+            CoordinateReferenceSystem<P> source, CoordinateReferenceSystem<Q> target) {
         return null;
     }
+
 }

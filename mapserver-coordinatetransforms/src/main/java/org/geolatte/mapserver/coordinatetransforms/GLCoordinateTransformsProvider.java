@@ -1,7 +1,7 @@
 package org.geolatte.mapserver.coordinatetransforms;
 
 import org.geolatte.mapserver.spi.CoordinateTransformsProvider;
-import org.geolatte.mapserver.transform.CoordinateTransforms;
+import org.geolatte.mapserver.transform.TransformFactory;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 2019-03-24.
@@ -9,7 +9,7 @@ import org.geolatte.mapserver.transform.CoordinateTransforms;
 public class GLCoordinateTransformsProvider implements CoordinateTransformsProvider {
 
 	@Override
-	public CoordinateTransforms coordinateTranforms() {
-		return new GeolatteCoordinateTransforms();
+	public TransformFactory coordinateTranforms() {
+		return new GeolatteTransformFactory();
 	}
 }

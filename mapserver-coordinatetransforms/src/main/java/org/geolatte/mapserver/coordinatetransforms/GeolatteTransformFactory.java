@@ -28,7 +28,7 @@ import org.geolatte.geom.crs.trans.EnvelopeTransform;
 import org.geolatte.geom.crs.trans.TransformOperation;
 import org.geolatte.geom.crs.trans.TransformOperations;
 import org.geolatte.geom.crs.trans.TransformVisitor;
-import org.geolatte.mapserver.transform.CoordinateTransforms;
+import org.geolatte.mapserver.transform.TransformFactory;
 import org.geolatte.mapserver.transform.Transform;
 
 /**
@@ -36,7 +36,7 @@ import org.geolatte.mapserver.transform.Transform;
  *
  * @author Karel Maesen, Geovise BVBA
  */
-public class GeolatteCoordinateTransforms implements CoordinateTransforms {
+public class GeolatteTransformFactory implements TransformFactory {
 
 	public <P extends Position, Q extends Position> Transform<P,Q> getTransform(
 			CoordinateReferenceSystem<P> source,
@@ -51,8 +51,6 @@ class GLTransformOp<P extends Position, Q extends Position> implements Transform
 
 
     final private TransformOperation<P,Q> operation;
-    final private CoordinateReferenceSystem<P> sourceCrs;
-    final private CoordinateReferenceSystem<Q> targetCrs;
     final private TransformVisitor<P, Q> visitor;
 	final private EnvelopeTransform<P,Q> envTransform;
 
@@ -60,8 +58,6 @@ class GLTransformOp<P extends Position, Q extends Position> implements Transform
 		this.operation = TransformOperations.from( sourceCrs, targetCrs );
 		visitor = new TransformVisitor<>( operation );
 		envTransform = new EnvelopeTransform<>(operation);
-        this.sourceCrs =sourceCrs;
-        this.targetCrs = targetCrs;
     }
 
 

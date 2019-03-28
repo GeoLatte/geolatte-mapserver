@@ -9,7 +9,7 @@ import org.geolatte.mapserver.ServiceLocator;
 import org.geolatte.mapserver.ServiceMetadata;
 import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.protocols.ProtocolAdapter;
-import org.geolatte.mapserver.transform.CoordinateTransforms;
+import org.geolatte.mapserver.transform.TransformFactory;
 
 import org.junit.Before;
 
@@ -62,7 +62,7 @@ class ServiceLocatorDouble implements ServiceLocator {
 	}
 
 	@Override
-	public CoordinateTransforms coordinateTransforms() {
+	public TransformFactory coordinateTransforms() {
 		return null;
 	}
 

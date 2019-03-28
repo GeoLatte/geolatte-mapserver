@@ -9,7 +9,7 @@ import org.geolatte.geom.crs.CrsId;
 import org.geolatte.maprenderer.map.PlanarFeature;
 import org.geolatte.mapserver.features.FeatureDeserializer;
 import org.geolatte.mapserver.features.FeatureSource;
-import org.geolatte.mapserver.transform.CoordinateTransforms;
+import org.geolatte.mapserver.transform.TransformFactory;
 import org.stringtemplate.v4.ST;
 import rx.Observable;
 
@@ -28,15 +28,15 @@ public class RxHttpFeatureSource implements FeatureSource {
     final private RxHttpClient client;
     final private FeatureDeserializerFactory featureDeserializerFactory;
     final private CrsId sourceCrs;
-    final private CoordinateTransforms coordinateTransforms;
+    final private TransformFactory transformFactory;
 
-    public RxHttpFeatureSource(RxHttpFeatureSourceConfig config, FeatureDeserializerFactory deserFactory, CoordinateTransforms coordinateTransforms) {
+    public RxHttpFeatureSource(RxHttpFeatureSourceConfig config, FeatureDeserializerFactory deserFactory, TransformFactory transformFactory) {
         this.template = config.getTemplate();
         String host = config.getHost();
         this.gzip = config.getGzip() == null ? true : config.getGzip();
         this.featureDeserializerFactory = deserFactory;
         this.sourceCrs = CrsId.parse( config.getCrs());
-        this.coordinateTransforms = coordinateTransforms;
+        this.transformFactory = transformFactory;
         this.client = new RxHttpClient.Builder()
                 .setAccept("application/json")
                 .setBaseUrl(host)

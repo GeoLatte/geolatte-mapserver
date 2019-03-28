@@ -7,7 +7,7 @@ import org.geolatte.mapserver.Instrumentation;
 import org.geolatte.mapserver.instrumentation.NoOpInstrumentationProvider;
 import org.geolatte.mapserver.protocols.ProtocolAdapter;
 import org.geolatte.mapserver.spi.*;
-import org.geolatte.mapserver.transform.CoordinateTransforms;
+import org.geolatte.mapserver.transform.TransformFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class BootServiceLocator implements ServiceLocator {
     private final ExecutorService executorService;
     private final AggregatePainterFactory painterFactory;
     private final Instrumentation instrumentation;
-    private final CoordinateTransforms coordinateTransforms;
+    private final TransformFactory transformFactory;
 
 
     private LayerRegistry layerRegistry;
@@ -111,7 +111,7 @@ public class BootServiceLocator implements ServiceLocator {
         protocolAdapter = loadFirst(ProtocolAdapterProvider.class).protocolAdapter();
         painterFactory = new AggregatePainterFactory(loadAllPainterFactories());
         serviceMetadata = loadFirst(ServiceMetadataProvider.class).serviceMetadata();
-        coordinateTransforms = loadFirst(CoordinateTransformsProvider.class).coordinateTranforms();
+        transformFactory = loadFirst( CoordinateTransformsProvider.class).coordinateTranforms();
         instrumentation = loadFirstOrUse( InstrumentationProvider.class, new NoOpInstrumentationProvider() ).instrumentation();
     }
 
@@ -154,8 +154,8 @@ public class BootServiceLocator implements ServiceLocator {
     }
 
     @Override
-    public CoordinateTransforms coordinateTransforms() {
-        return this.coordinateTransforms;
+    public TransformFactory coordinateTransforms() {
+        return this.transformFactory;
     }
     @Override
     public Instrumentation instrumentation() {
