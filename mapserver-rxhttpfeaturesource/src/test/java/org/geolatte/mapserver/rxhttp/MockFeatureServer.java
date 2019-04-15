@@ -30,6 +30,7 @@ public class MockFeatureServer {
     public void buildStub(Envelope<C2D> env, String returnBody) {
         stubFor(get(anyUrl())
                 .withHeader("Accept", equalTo("application/json"))
+                .withQueryParam("bbox", matching("195258.8121.*"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")

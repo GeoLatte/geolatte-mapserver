@@ -1,5 +1,6 @@
 package org.geolatte.mapserver.config;
 
+import org.geolatte.mapserver.ServiceLocator;
 import org.geolatte.mapserver.features.FeatureSource;
 import org.geolatte.mapserver.features.FeatureSourceConfig;
 import org.geolatte.mapserver.features.FeatureSourceFactory;
@@ -13,6 +14,11 @@ public class FeatureSourceFactoryDouble implements FeatureSourceFactory, Feature
     @Override
     public Class<? extends FeatureSource> resultClass() {
         return FeatureSourceDouble.class;
+    }
+
+    @Override
+    public void setServiceLocator(ServiceLocator serviceLocator) {
+        //do nothing
     }
 
     @Override

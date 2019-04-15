@@ -30,8 +30,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <geolatte-version>1.4.0-SNAPSHOT</geolatte-version>
-        <jackson-version>2.9.0</jackson-version>
+        <jackson-version>2.9.8</jackson-version>
+        <geolatte-version>1.5.0-SNAPSHOT</geolatte-version>
         <!--<reactive-streams-version>1.0.2</reactive-streams-version>-->
         <rxjava-version>1.2.4</rxjava-version>
         <rxhttp-version>0.6</rxhttp-version>

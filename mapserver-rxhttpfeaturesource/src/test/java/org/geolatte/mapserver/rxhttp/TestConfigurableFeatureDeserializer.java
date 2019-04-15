@@ -13,14 +13,8 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by Karel Maesen, Geovise BVBA on 07/08/2018.
  */
-public class TestConfigurableFeatureDeserializer {
+public class TestConfigurableFeatureDeserializer extends AbstractFeatureSourceTest {
 
-    private RxHttpFeatureSourceFactory featureSourceFactory;
-
-    @Before
-    public void before(){
-        featureSourceFactory= new RxHttpFeatureSourceFactory();
-    }
 
     @Test
     public void testConfiguredFDFactoryIsInstantiated(){

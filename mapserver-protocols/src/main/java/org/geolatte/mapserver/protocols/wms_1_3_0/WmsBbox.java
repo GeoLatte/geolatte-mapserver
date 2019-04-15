@@ -7,6 +7,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.GeographicCoordinateReferenceSystem;
 
 import java.util.Objects;
 
@@ -62,6 +63,7 @@ public class WmsBbox {
         return Objects.hash(minX, minY, maxX, maxY);
     }
 
+    @SuppressWarnings( "unchecked" )
     Envelope<C2D> toEnvelope(String srs) {
         CrsId crsId = CrsId.parse(srs);
         if(! crsId.getAuthority().equalsIgnoreCase("EPSG") ) {
@@ -71,8 +73,7 @@ public class WmsBbox {
         if (C2D.class.isAssignableFrom(crs.getPositionClass())) {
             return new Envelope<>(minX, minY, maxX, maxY, (CoordinateReferenceSystem<C2D>)crs);
         }  else {
-            return new Envelope<>(minX, minY, maxX, maxY, CoordinateReferenceSystems.WEB_MERCATOR);
+            return new Envelope<>(minX, minY, maxX, maxY, CoordinateReferenceSystems.asProjected(crs));
         }
-
     }
 }

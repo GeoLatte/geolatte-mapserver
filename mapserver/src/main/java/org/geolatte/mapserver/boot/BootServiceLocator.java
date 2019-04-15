@@ -4,8 +4,11 @@ import org.geolatte.mapserver.*;
 import org.geolatte.mapserver.features.FeatureSourceFactory;
 import org.geolatte.mapserver.image.Imaging;
 import org.geolatte.mapserver.Instrumentation;
+import org.geolatte.mapserver.instrumentation.NoOpInstrumentationProvider;
 import org.geolatte.mapserver.protocols.ProtocolAdapter;
 import org.geolatte.mapserver.spi.*;
+import org.geolatte.mapserver.transform.TransformFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +35,8 @@ public class BootServiceLocator implements ServiceLocator {
         // set build the LayerRegistry and set it in the instance.
         //
         // It would be better to have a second phase bootstrapping for initializing the LayerRegistry
-        // (e.g. Hibernate has this) after the more general servcies are initialized.
-        FeatureSourceFactoryRegistry fsf = new StdFeatureSourceFactory(loadAllFeatureSourceFactories());
+        // (e.g. Hibernate has this) after the more general services are initialized.
+        FeatureSourceFactoryRegistry fsf = new StdFeatureSourceFactory(loadAllFeatureSourceFactories(), INSTANCE);
         LayerRegistry registry = loadFirst(LayerRegistryProvider.class).layerRegistry(fsf, INSTANCE);
         INSTANCE.setLayerRegistry(registry);
     }
@@ -44,6 +47,7 @@ public class BootServiceLocator implements ServiceLocator {
     private final ExecutorService executorService;
     private final AggregatePainterFactory painterFactory;
     private final Instrumentation instrumentation;
+    private final TransformFactory transformFactory;
 
 
     private LayerRegistry layerRegistry;
@@ -55,11 +59,28 @@ public class BootServiceLocator implements ServiceLocator {
         if (all.isEmpty()) {
             throw new IllegalStateException(format("Failure to load essential service: %s", providerType.getCanonicalName()));
         }
+        return returnFirst( providerType, all );
+
+    }
+
+    private static <T> T returnFirst(Class<T> providerType, List<T> all) {
+        T service = all.get(0);
+        logger.info(format("Using %s for service %s", service.getClass().getCanonicalName(), providerType.getCanonicalName()));
+        return service;
+    }
+
+    static <T> T loadFirstOrUse(Class<T> providerType, T defaultInstance){
+        List<T> all = loadAll(providerType);
+
+        if (all.isEmpty()) {
+            return defaultInstance;
+        }
         T service = all.get(0);
         logger.info(format("Using %s for service %s", service.getClass().getCanonicalName(), providerType.getCanonicalName()));
         return service;
 
     }
+
 
     private static <T> List<T> loadAll(Class<T> providerType) {
         ServiceLoader<T> loader = ServiceLoader.load(providerType);
@@ -90,7 +111,8 @@ public class BootServiceLocator implements ServiceLocator {
         protocolAdapter = loadFirst(ProtocolAdapterProvider.class).protocolAdapter();
         painterFactory = new AggregatePainterFactory(loadAllPainterFactories());
         serviceMetadata = loadFirst(ServiceMetadataProvider.class).serviceMetadata();
-        instrumentation = loadFirst(InstrumentationProvider.class).instrumentation();
+        transformFactory = loadFirst( CoordinateTransformsProvider.class).coordinateTranforms();
+        instrumentation = loadFirstOrUse( InstrumentationProvider.class, new NoOpInstrumentationProvider() ).instrumentation();
     }
 
 
@@ -131,6 +153,10 @@ public class BootServiceLocator implements ServiceLocator {
         return painterFactory;
     }
 
+    @Override
+    public TransformFactory coordinateTransforms() {
+        return this.transformFactory;
+    }
     @Override
     public Instrumentation instrumentation() {
         return instrumentation;

@@ -24,10 +24,10 @@ class GeoJsonFeatureDeserializer implements FeatureDeserializer {
     }
 
     @Override
-    public Iterable<PlanarFeature> deserialize(String jsonString) {
+    public Iterable<Feature> deserialize(String jsonString) {
         try {
             Feature<?, ?> feature = mapper.readValue(jsonString, Feature.class);
-            return Collections.singletonList(PlanarFeature.from(feature));
+            return Collections.singletonList(feature);
         } catch (Exception e) {
             logger.warn("Failure to parse String to GeoJson", e);
             return Collections.emptyList();

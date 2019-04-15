@@ -11,13 +11,15 @@ import org.geolatte.mapserver.render.Renderer;
 import org.geolatte.mapserver.tilemap.TileMetadata;
 import org.geolatte.mapserver.layers.TileMapLayer;
 import org.geolatte.mapserver.tilemap.TileSet;
+import org.geolatte.mapserver.transform.TransformFactory;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -48,7 +50,7 @@ public class TestServiceConfiguration {
 
     private ServiceLocator dummyLocator = mkServiceLocator();
 
-    private final FeatureSourceFactoryRegistry fsfregistry = new StdFeatureSourceFactory(Arrays.asList(new FeatureSourceFactoryDouble()));
+    private final FeatureSourceFactoryRegistry fsfregistry = new StdFeatureSourceFactory( Collections.singletonList( new FeatureSourceFactoryDouble() ), dummyLocator);
 
     @Before
     public void setup() {
@@ -180,6 +182,11 @@ public class TestServiceConfiguration {
 
             @Override
             public PainterFactory painterFactory() {
+                return null;
+            }
+
+            @Override
+            public TransformFactory coordinateTransforms() {
                 return null;
             }
 
