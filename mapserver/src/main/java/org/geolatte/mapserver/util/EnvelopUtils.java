@@ -28,7 +28,6 @@ public class EnvelopUtils {
 
         double halfWidth = factor*width(env) / 2;
         double halfHeight = factor*height(env) /2;
-
         C2D lowerLeft = new C2D(
                  ceil(env.lowerLeft().getX() - halfWidth),
                 ceil(env.lowerLeft().getY()  - halfHeight)
@@ -36,7 +35,6 @@ public class EnvelopUtils {
         C2D upperRight = new C2D(
                 ceil(env.upperRight().getX() + halfWidth),
                 ceil(env.upperRight().getY() + halfHeight));
-
         return new Envelope<C2D>(lowerLeft, upperRight, env.getCoordinateReferenceSystem());
     }
 

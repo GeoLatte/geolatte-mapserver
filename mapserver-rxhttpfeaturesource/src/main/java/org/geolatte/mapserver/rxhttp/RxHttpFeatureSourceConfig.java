@@ -64,7 +64,18 @@ public class RxHttpFeatureSourceConfig implements FeatureSourceConfig {
         this.crs = crs;
     }
 
-    @Override
+    @Optional
+    public Boolean convertFeaturesToRequestedCrs = true;
+
+    public Boolean getConvertFeaturesToRequestedCrs() {
+      return convertFeaturesToRequestedCrs;
+    }
+
+    public void setConvertFeaturesToRequestedCrs(Boolean convertFeaturesToRequestedCrs) {
+      this.convertFeaturesToRequestedCrs = convertFeaturesToRequestedCrs;
+    }
+
+  @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

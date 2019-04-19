@@ -48,6 +48,6 @@ class TransformFeature<Q extends Position, ID> implements Feature<Q, ID> {
 
 	@Override
 	public Map<String, Object> getProperties() {
-		return this.getProperties();
+		return (Map<String, Object>)this.properties;
 	}
 }
