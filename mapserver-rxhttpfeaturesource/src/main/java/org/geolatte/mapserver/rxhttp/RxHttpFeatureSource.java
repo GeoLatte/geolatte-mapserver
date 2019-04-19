@@ -57,7 +57,7 @@ public class RxHttpFeatureSource implements FeatureSource {
 	@Override
 	public Observable<PlanarFeature> query(Envelope<C2D> tileBoundingBox, String query, double bboxScaleFactor) {
 		Transform<Position, C2D> transform = buildTransform( tileBoundingBox );
-		Envelope<?> bbox = toQueryBbox( tileBoundingBox, bboxScaleFactor, transform );
+		Envelope<Position> bbox = toQueryBbox( tileBoundingBox, bboxScaleFactor, transform );
 		String queryUrl = render( bbox, query );
 		ClientRequestBuilder builder = client.requestBuilder().setUrlRelativetoBase( queryUrl );
 		if ( this.gzip ) {
@@ -83,12 +83,12 @@ public class RxHttpFeatureSource implements FeatureSource {
 
 	}
 
-	private Envelope<?> toQueryBbox(
+	private Envelope<Position> toQueryBbox(
 			Envelope<C2D> tileBoundingBox,
 			double bboxScaleFactor,
 			Transform<Position, C2D> transform) {
 		if ( transform == null){
-			return bufferRounded(tileBoundingBox, bboxScaleFactor);
+			return bufferRounded(tileBoundingBox.as(Position.class), bboxScaleFactor);
 		} else {
 			return bufferRounded(transform.reverse(tileBoundingBox), bboxScaleFactor );
 		}
