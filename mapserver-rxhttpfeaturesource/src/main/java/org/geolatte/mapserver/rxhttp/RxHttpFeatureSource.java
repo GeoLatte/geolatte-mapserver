@@ -55,6 +55,7 @@ public class RxHttpFeatureSource implements FeatureSource {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Observable<PlanarFeature> query(Envelope<C2D> tileBoundingBox, String query, double bboxScaleFactor) {
 		Transform<Position, C2D> transform = buildTransform( tileBoundingBox );
 		Envelope<Position> bbox = toQueryBbox( tileBoundingBox, bboxScaleFactor, transform );
@@ -74,7 +75,7 @@ public class RxHttpFeatureSource implements FeatureSource {
 				.flatMapIterable( deserializer::deserialize );
 
 		if ( convertFeaturesToRequestedCrs && (transform != null) ) {
-			Observable<Feature> transformed = featureObservable.map( f -> (Feature) (transform.forwardFeature( f )) );
+			Observable<Feature> transformed = featureObservable.map( transform::forwardFeature );
 			return transformed.map( PlanarFeature::from );
 		}
 		else {
