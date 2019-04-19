@@ -21,7 +21,7 @@ public class FeatureSourceGenerate implements FeatureSource {
 
 
     @Override
-    public Observable<PlanarFeature> query(Envelope<C2D> bbox, String query, BboxFactors dynamicFactors, Dimension size, double resolution) {
+    public Observable<PlanarFeature> query(Envelope<C2D> bbox, String query,double bboxScaleFactor) {
 
         GeometryGenerator<C2D, Point<C2D>> point = Generators.point(bbox,  new Random( 52));
 

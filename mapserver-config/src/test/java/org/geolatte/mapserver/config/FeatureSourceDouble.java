@@ -16,7 +16,7 @@ import java.io.IOException;
 public class FeatureSourceDouble implements FeatureSource {
 
     @Override
-    public Observable<PlanarFeature> query(Envelope<C2D> bbox, String query, BboxFactors dynamicFactors, Dimension size, double graphicsRes) {
+    public Observable<PlanarFeature> query(Envelope<C2D> bbox, String query,double bboxScaleFactor) {
         return null; //won't be invoked by test classes so don't worry
     }
 

@@ -69,7 +69,8 @@ public class StdRenderer implements Renderer {
 
         instrumentCreateMapOp(graphics.getMapUnitsPerPixel(), promise);
 
-        Observable<PlanarFeature> features = featureSource.query(tileBoundingBox, this.dynamicFactors, graphics.getDimension(), graphics.getMapUnitsPerPixel());
+        double bboxScaleFactor = this.dynamicFactors.getFactor(upp(graphics.getMapUnitsPerPixel()));
+        Observable<PlanarFeature> features = featureSource.query(tileBoundingBox, bboxScaleFactor);
         Observable<PlanarFeature> share = features.share();
 
         share.subscribe(createRenderingSubscriber(graphics, painter, promise));

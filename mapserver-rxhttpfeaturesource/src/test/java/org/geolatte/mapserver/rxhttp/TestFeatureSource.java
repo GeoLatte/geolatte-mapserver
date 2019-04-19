@@ -38,9 +38,6 @@ public class TestFeatureSource {
 
     private MockFeatureServer mockServer = new MockFeatureServer();
 
-    private BboxFactors bboxFactors = new BboxFactors(1);
-    private Dimension size = new Dimension(250,250);
-
     @Before
     public void setUp(){
         mockServer.start();
@@ -120,7 +117,7 @@ public class TestFeatureSource {
 
 
     private Observable<PlanarFeature> query(Envelope<C2D> bbox) {
-      return featureSource.query(bbox, bboxFactors, size, 1);
+      return featureSource.query(bbox, 1.0d);
     }
 
 }

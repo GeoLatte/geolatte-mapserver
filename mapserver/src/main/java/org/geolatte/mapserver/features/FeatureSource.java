@@ -16,9 +16,9 @@ import java.io.Closeable;
  */
 public interface FeatureSource extends Closeable {
 
-    Observable<PlanarFeature> query(Envelope<C2D> bbox, String query, BboxFactors dynamicFactors, Dimension size, double resolution);
+    Observable<PlanarFeature> query(Envelope<C2D> bbox, String query, double bboxScaleFactor);
 
-    default Observable<PlanarFeature> query(Envelope<C2D> bbox, BboxFactors dynamicFactors, Dimension size, double resolution) {
-        return query( bbox, null, dynamicFactors, size, resolution);
+    default Observable<PlanarFeature> query(Envelope<C2D> bbox, double bboxScaleFactor) {
+        return query( bbox, null, bboxScaleFactor);
     }
 }
