@@ -19,6 +19,8 @@ import org.geolatte.mapserver.transform.TransformFactory;
 import org.stringtemplate.v4.ST;
 import rx.Observable;
 
+import static org.geolatte.mapserver.util.EnvelopUtils.bufferRounded;
+
 /**
  * Created by Karel Maesen, Geovise BVBA on 19/07/2018.
  */
@@ -31,6 +33,7 @@ public class RxHttpFeatureSource implements FeatureSource {
 	final private RxHttpClient client;
 	final private FeatureDeserializerFactory featureDeserializerFactory;
 	final private CrsId sourceCrsId;
+	final private boolean convertFeaturesToRequestedCrs;
 	final private TransformFactory transformFactory;
 
 	public RxHttpFeatureSource(
@@ -42,6 +45,8 @@ public class RxHttpFeatureSource implements FeatureSource {
 		this.gzip = config.getGzip() == null ? true : config.getGzip();
 		this.featureDeserializerFactory = deserFactory;
 		this.sourceCrsId = CrsId.parse( config.getCrs() );
+		this.convertFeaturesToRequestedCrs = config.convertFeaturesToRequestedCrs;
+
 		this.transformFactory = transformFactory;
 		this.client = new RxHttpClient.Builder()
 				.setAccept( "application/json" )
@@ -50,10 +55,10 @@ public class RxHttpFeatureSource implements FeatureSource {
 	}
 
 	@Override
-	public Observable<PlanarFeature> query(Envelope<C2D> bbox, String query) {
-		CrsId targetCrsId = bbox.getCoordinateReferenceSystem().getCrsId();
-		Transform<Position, C2D> transform = buildTransform( targetCrsId );
-		String queryUrl = render( transform, bbox, query );
+	public Observable<PlanarFeature> query(Envelope<C2D> tileBoundingBox, String query, double bboxScaleFactor) {
+		Transform<Position, C2D> transform = buildTransform( tileBoundingBox );
+		Envelope<?> bbox = toQueryBbox( tileBoundingBox, bboxScaleFactor, transform );
+		String queryUrl = render( bbox, query );
 		ClientRequestBuilder builder = client.requestBuilder().setUrlRelativetoBase( queryUrl );
 		if ( this.gzip ) {
 			builder = builder.addHeader( "Accept-Encoding", "gzip" );
@@ -68,18 +73,30 @@ public class RxHttpFeatureSource implements FeatureSource {
 				.flatMapIterable( chunkSplitter::split )
 				.flatMapIterable( deserializer::deserialize );
 
-		if ( transform != null ) {
+		if ( convertFeaturesToRequestedCrs && (transform != null) ) {
 			Observable<Feature> transformed = featureObservable.map( f -> (Feature) (transform.forwardFeature( f )) );
 			return transformed.map( PlanarFeature::from );
-		} else {
+		}
+		else {
 			return featureObservable.map( PlanarFeature::from );
 		}
 
+	}
 
+	private Envelope<?> toQueryBbox(
+			Envelope<C2D> tileBoundingBox,
+			double bboxScaleFactor,
+			Transform<Position, C2D> transform) {
+		if ( transform == null){
+			return bufferRounded(tileBoundingBox, bboxScaleFactor);
+		} else {
+			return bufferRounded(transform.reverse(tileBoundingBox), bboxScaleFactor );
+		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private Transform<Position, C2D> buildTransform(CrsId targetCrsId) {
+	private Transform<Position, C2D> buildTransform(Envelope<C2D> bbox) {
+		CrsId targetCrsId = bbox.getCoordinateReferenceSystem().getCrsId();
 		Transform<Position, C2D> transform = null;
 		if ( !targetCrsId.equals( sourceCrsId ) ) {
 			transform = (Transform<Position, C2D>) this.transformFactory.getTransform( sourceCrsId, targetCrsId );
@@ -99,13 +116,12 @@ public class RxHttpFeatureSource implements FeatureSource {
 		return this.sourceCrsId;
 	}
 
-	private String render(Transform<Position, C2D> transform, Envelope<C2D> bbox, String query) {
-		Envelope env = transform == null ? bbox : transform.reverse( bbox );
-		ST st = fillInTemplateParams( env, query );
+	private <P extends Position> String render(Envelope<P> bbox, String query) {
+		ST st = fillInTemplateParams( bbox, query );
 		return st.render();
 	}
 
-	private ST fillInTemplateParams(Envelope<C2D> bbox, String query) {
+	private <P extends Position> ST fillInTemplateParams(Envelope<P> bbox, String query) {
 		ST st = new ST( template );
 		st.add( "bbox", asString( bbox ) );
 		if ( query != null ) {
@@ -116,7 +132,7 @@ public class RxHttpFeatureSource implements FeatureSource {
 
 	private <P extends Position> String asString(Envelope<P> bbox) {
 		double[] cos = bbox.toArray();
-		return String.format( Locale.ROOT, "%f,%f,%f,%f",  cos[0], cos[1], cos[2], cos[3] );
+		return String.format( Locale.ROOT, "%f,%f,%f,%f", cos[0], cos[1], cos[2], cos[3] );
 	}
 
 	@Override

@@ -5,12 +5,14 @@ import org.geolatte.geom.generator.Generators;
 import org.geolatte.geom.generator.GeometryGenerator;
 import org.geolatte.maprenderer.map.PlanarFeature;
 import org.geolatte.mapserver.features.FeatureSource;
+import org.geolatte.mapserver.render.BboxFactors;
 import rx.Observable;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
+import java.awt.Dimension;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 03/08/2018.
@@ -19,7 +21,7 @@ public class FeatureSourceGenerate implements FeatureSource {
 
 
     @Override
-    public Observable<PlanarFeature> query(Envelope<C2D> bbox, String query) {
+    public Observable<PlanarFeature> query(Envelope<C2D> bbox, String query,double bboxScaleFactor) {
 
         GeometryGenerator<C2D, Point<C2D>> point = Generators.point(bbox,  new Random( 52));
 
