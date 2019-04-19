@@ -4,8 +4,10 @@ import org.geolatte.geom.C2D;
 import org.geolatte.geom.Envelope;
 import org.geolatte.maprenderer.map.PlanarFeature;
 import org.geolatte.mapserver.features.FeatureSource;
+import org.geolatte.mapserver.render.BboxFactors;
 import rx.Observable;
 
+import java.awt.*;
 import java.io.IOException;
 
 /**
@@ -14,7 +16,7 @@ import java.io.IOException;
 public class FeatureSourceDouble implements FeatureSource {
 
     @Override
-    public Observable<PlanarFeature> query(Envelope<C2D> bbox, String query) {
+    public Observable<PlanarFeature> query(Envelope<C2D> bbox, String query, BboxFactors dynamicFactors, Dimension size, double graphicsRes) {
         return null; //won't be invoked by test classes so don't worry
     }
 

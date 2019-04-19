@@ -57,9 +57,10 @@ public class RxHttpFeatureSource implements FeatureSource {
 				.build();
 	}
 
-  @Override
-  public Envelope<C2D> queryBoundingBox(Envelope<C2D> tileBoundingBox, BboxFactors dynamicFactors, Dimension size, double graphicsRes) {
-    Transform<C2D, C2D> transform = buildTransform( tileBoundingBox );
+	@Override
+	public Observable<PlanarFeature> query(Envelope<C2D> tileBoundingBox, String query, BboxFactors dynamicFactors, Dimension size, double graphicsRes) {
+		Transform<C2D, C2D> transform = buildTransform( tileBoundingBox );
+
     Envelope<C2D> env = transform == null ? tileBoundingBox : transform.reverse( tileBoundingBox );
 
     C2D ll = env.lowerLeft();
@@ -68,14 +69,8 @@ public class RxHttpFeatureSource implements FeatureSource {
     double sy = size.height / (ur.getY() - ll.getY());
     double res = Math.max(1 / sx, 1 / sy);
 
-    return bufferRounded(
-      env,
-      dynamicFactors.getFactor(upp(res)));
-  }
+    Envelope<C2D> bbox = bufferRounded(env, dynamicFactors.getFactor(upp(res)));
 
-	@Override
-	public Observable<PlanarFeature> query(Envelope<C2D> bbox, String query) {
-		Transform<C2D, C2D> transform = buildTransform( bbox );
 		String queryUrl = render( bbox, query );
 		ClientRequestBuilder builder = client.requestBuilder().setUrlRelativetoBase( queryUrl );
 		if ( this.gzip ) {
